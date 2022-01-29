@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • Applied Statistical Methods in Animal Sciences</title>
+<title>Exercise Deployment — deploy_exercise • Applied Statistical Methods in Animal Sciences</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,10 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Exercise Deployment — deploy_exercise" />
+<meta property="og:description" content="Wrapper for deployment of a given exercise in a course. The deployment
+consists of producing the pdf-output of the exercise without solutions and
+the pdf-document with the solutions." />
 
 
 
@@ -58,7 +61,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -106,66 +109,43 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Exercise Deployment</h1>
+    
+    <div class="hidden name"><code>deploy_exercise.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Wrapper for deployment of a given exercise in a course. The deployment
+consists of producing the pdf-output of the exercise without solutions and
+the pdf-document with the solutions.</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>deploy_exercise</span><span class='op'>(</span><span class='va'>ps_ex_name</span><span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="convert_exercise_to_nb.html">convert_exercise_to_nb()</a></code> </p>
-        </td>
-        <td><p>Convert Exercise To Notebook</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="create_exercise.html">create_exercise()</a></code> </p>
-        </td>
-        <td><p>Generic Function For Creating New Exercise</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="create_exercise_gel.html">create_exercise_gel()</a></code> </p>
-        </td>
-        <td><p>Wrapper for Genetic Evaluation Exercises</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="deploy_exercise.html">deploy_exercise()</a></code> </p>
-        </td>
-        <td><p>Exercise Deployment</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="deploy_uni_src.html">deploy_uni_src()</a></code> </p>
-        </td>
-        <td><p>Deployment Based on Unified Source File</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>ps_ex_name</th>
+      <td><p>exercicse name</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This wrapper assumes that the source Rmd file containing the exercise problems
+and the solutions is in a subdirectory called 'ex' under the course project directory.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='fu'>devtools</span><span class='fu'>::</span><span class='fu'><a href='https://devtools.r-lib.org/reference/load_all.html'>load_all</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>deploy_exercise</span><span class='op'>(</span>ps_ex_name <span class='op'>=</span> <span class='st'>'asm_ex02'</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+</pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
