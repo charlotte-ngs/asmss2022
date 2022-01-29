@@ -59,7 +59,6 @@ work is licensed under a
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative
 Commons Attribution 4.0 International License</a>.
 
-    #> 
-    #> ---
-    #> 
-    #>  _Latest Changes: 2022-01-29 15:11:58 (pvr)_
+------------------------------------------------------------------------
+
+*Latest Changes: 2022-01-29 15:13:23 (pvr)*
