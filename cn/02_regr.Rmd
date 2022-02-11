@@ -1,0 +1,36 @@
+# Linear Regression {#asm-regr}
+```{r met-regr-reset, include=FALSE}
+met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(), 
+                                                 rstudioapi::getSourceEditorContext()$path, 
+                                                 rprojroot::thisfile()))
+```
+
+## Introduction
+This chapter is based on the book `r met$add("Searle1971")` and on the course notes `r met$add("Buhlmann2016")`. Regression analysis is used to assess relationships between a given variable and other measurements or observations on the same animal. The relationships between the variable and the other characteristics of the animal are estimated based on observed data. 
+
+
+## Example
+A classical example of a regression analysis in animal science is the relationship between bodyweight and breast circumference in cattle. This example has a practical application because the results of the regression analysis of body weight on breast circumference can be used for a measuring band. With such a measuring band the breast circumference of an animal is measured. On the back side of the band, the estimated body weight can directly be determined. 
+
+At this point the question is how is it possible to determine the relationship between the values of breast circumference in centimeters and body weight in kilograms. The answer to this question can be given by a regression analysis. The most important pre-requisites for doing a regression analysis is to have a dataset. For our example, Table \@ref(tab:tab-reg-bw-bc) shows such a dataset which can be used for a regression analysis. 
+
+```{r tab-reg-bw-bc, echo=FALSE, results='asis'}
+tbl_reg <- tibble::tibble(Animal = c(1:10),
+                          `Breast Circumference` = c(176, 177, 178, 179, 179, 180, 181, 182,183, 184),
+                          `Body Weight` = c(471, 463, 481, 470, 496, 491, 518, 511, 510, 541))
+knitr::kable(tbl_reg,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = paste0("Breast Circumference and Body Weight for ", 
+                              nrow(tbl_reg)," Animals", collapse = ""),
+             escape = FALSE)
+```
+
+The dataset in Table \@ref(tab:tab-reg-bw-bc) contains measurements of body weight and breast circumference for $`r nrow(tbl_reg)`$ animals. Figure \@ref(fig:fig-reg-bw-bc) is a graphical representation of our example dataset. 
+
+```{r fig-reg-bw-bc, echo=FALSE, fig.cap="Breast Circumference and Body Weight", fig.pos="h", out.width="100%"}
+library(ggplot2)
+ggplot(tbl_reg, aes(x = `Breast Circumference`, y = `Body Weight`)) +
+  geom_point(color = "blue") 
+```
+
