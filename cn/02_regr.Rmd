@@ -34,3 +34,16 @@ ggplot(tbl_reg, aes(x = `Breast Circumference`, y = `Body Weight`)) +
   geom_point(color = "blue") 
 ```
 
+The diagram in Figure \@ref(fig:fig-reg-bw-bc) shows on the x-axis the breast circumference in cm and on the y-axis the body weight in kg. Each of the blue dots correspond to an observation of one animal in the dataset. A diagram like the one shown in Figure \@ref(fig:fig-reg-bw-bc) is also called a _dot plot_. From a first visual inspection of the dot plot for our dataset, we can see that there is a tendency that larger values of breast circumference of animals are related to heavier animals. The relationship is not deterministic that  means there are exceptions which do not follow the rule of this relationship. One example of an exception are animals 1 and 2. Animal 2 has a larger breast circumference value compared to animal 1,  but animal 2 has a lower body weight compared to animal 1. But despite such exceptions, we can still conclude that on average there is a replationship between breast circumference and body weight. Furthermore, the apparent relationship between breast circumference and body weight seams to be the same for low and high values of breast circumference. 
+
+
+
+
+
+
+
+
+
+
+
+
