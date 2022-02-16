@@ -28,13 +28,39 @@ knitr::kable(tbl_reg,
 
 The dataset in Table \@ref(tab:tab-reg-bw-bc) contains measurements of body weight and breast circumference for $`r nrow(tbl_reg)`$ animals. Figure \@ref(fig:fig-reg-bw-bc) is a graphical representation of our example dataset. 
 
-```{r fig-reg-bw-bc, echo=FALSE, fig.cap="Breast Circumference and Body Weight", fig.pos="h", out.width="100%"}
+```{r fig-reg-bw-bc, echo=FALSE, fig.cap="Breast Circumference and Body Weight", fig.pos="!h", out.width="100%"}
 library(ggplot2)
 ggplot(tbl_reg, aes(x = `Breast Circumference`, y = `Body Weight`)) +
   geom_point(color = "blue") 
 ```
 
-The diagram in Figure \@ref(fig:fig-reg-bw-bc) shows on the x-axis the breast circumference in cm and on the y-axis the body weight in kg. Each of the blue dots correspond to an observation of one animal in the dataset. A diagram like the one shown in Figure \@ref(fig:fig-reg-bw-bc) is also called a _dot plot_. From a first visual inspection of the dot plot for our dataset, we can see that there is a tendency that larger values of breast circumference of animals are related to heavier animals. The relationship is not deterministic that  means there are exceptions which do not follow the rule of this relationship. One example of an exception are animals 1 and 2. Animal 2 has a larger breast circumference value compared to animal 1,  but animal 2 has a lower body weight compared to animal 1. But despite such exceptions, we can still conclude that on average there is a replationship between breast circumference and body weight. Furthermore, the apparent relationship between breast circumference and body weight seams to be the same for low and high values of breast circumference. 
+The diagram in Figure \@ref(fig:fig-reg-bw-bc) shows on the x-axis the breast circumference in cm and on the y-axis the body weight in kg. Each of the blue dots correspond to an observation of one animal in the dataset. A diagram like the one shown in Figure \@ref(fig:fig-reg-bw-bc) is also called a _dot plot_. From a first visual inspection of the dot plot for our dataset, we can see that there is a tendency that larger values of breast circumference of animals are related to heavier animals. The relationship is not deterministic that  means there are exceptions which do not follow the rule of this relationship. One example of an exception are animals 1 and 2. Animal 2 has a larger breast circumference value compared to animal 1,  but animal 2 has a lower body weight compared to animal 1. But despite such exceptions, we can still observe that on average there is a replationship between breast circumference and body weight. Furthermore, the apparent relationship between breast circumference and body weight seams to be the same for low and high values of breast circumference. Based on this last fact, we can say that the relationship between breast circumference and body weight is _linear_. 
+
+```{r create-fig-non-linear, echo=FALSE, eval=FALSE}
+# see https://rpubs.com/kaz_yos/ggplot2-stat-function and 
+# https://ggplot2.tidyverse.org/reference/geom_function.html#examples
+cn_odg_path <- file.path(here::here(), "cn", "odg")
+library(ggplot2)
+# quadratic function
+p_quad <- ggplot() + xlim(-5,5)
+fun.1 <- function(x) x^2 + x
+p_quad <- p_quad + stat_function(fun = fun.1) 
+ggsave(filename = file.path(cn_odg_path, "quadratic_function_plot.png"))
+p_log <- ggplot() + xlim(0,10)
+p_log <- p_log + stat_function(fun = function(x) log(x))
+ggsave(filename = file.path(cn_odg_path, "log_function_plot.png"))
+```
+
+```{r fig-non-linear-rel, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg", fig.cap="Examples of Non-Linear Functions", fig.pos="!h", out.width="100%"}
+#rmdhelp::use_odg_graphic(ps_path = "odg/fig-non-linear-rel.odg")
+knitr::include_graphics(path = "odg/fig-non-linear-rel.png")
+```
+
+Figure \@ref(fig:fig-non-linear-rel) shows two examples of non-linear functions. Both examples show that the relationship between the shown variables $x$ and $y$ is not the same over the shown range of values.
+
+
+## Regression Model
+With the regression model we want to find a mathematical way to describe the relationship between the two variables from  our example, breast circumference and body weight. As already mentioned, we are assuming a linear relationship between the two variables. 
 
 
 
@@ -45,5 +71,4 @@ The diagram in Figure \@ref(fig:fig-reg-bw-bc) shows on the x-axis the breast ci
 
 
 
-
-
+ 
