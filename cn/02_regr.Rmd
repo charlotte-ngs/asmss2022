@@ -56,11 +56,25 @@ ggsave(filename = file.path(cn_odg_path, "log_function_plot.png"))
 knitr::include_graphics(path = "odg/fig-non-linear-rel.png")
 ```
 
-Figure \@ref(fig:fig-non-linear-rel) shows two examples of non-linear functions. Both examples show that the relationship between the shown variables $x$ and $y$ is not the same over the shown range of values.
+Figure \@ref(fig:fig-non-linear-rel) shows two examples of non-linear functions. Both examples show that the relationship between the shown variables $x$ and $y$ is not the same over the shown range of values. Hence by inspecting the diagram of the two variables breast circumference and body weight of our example in Figure \@ref(fig:fig-reg-bw-bc), we can say that the relationship between the variables of our example dataset show a linear relationship.
 
 
 ## Regression Model
-With the regression model we want to find a mathematical way to describe the relationship between the two variables from  our example, breast circumference and body weight. As already mentioned, we are assuming a linear relationship between the two variables. 
+With the regression model we want to find a mathematical formulation to describe and to quantify the relationship between the two variables from  our example, breast circumference and body weight. One possibility to find this relationship is to take an animal with $x$ cm of breast circumference. Then the question is what would be the expected value for its body weight $y$ in kg. Under the assumption of a linear relationship between the variables from our example, the expected value $E(y)$ for the body weight $y$ can be written as 
+
+\begin{equation}
+E(y) = b_0 + b_1 * x
+(\#eq:exbwregmodelregr)
+\end{equation}
+
+The above reasoning on how the variables are related is often referred to as _model building_. The model shown in \@ref(eq:exbwregmodelregr) is called a linear model, because the expected body weight ($E(y)$) is a linear function of the unknown _parameters_ $b_0$ and $b_1$. The number of possible models between two variables $x$ and $y$ is infinite. And therefore the process of model building is difficult and requires some experience. But in general, we can say that a simpler model with fewer unknown parameters is always preferrable over a more complex model as long as the simpler model is able to capture the most important aspects of a relationship between two variables. 
+
+
+## Terminology
+
+
+## Observations
+
 
 
 
