@@ -18,6 +18,7 @@ At this point the question is how is it possible to determine the relationship b
 tbl_reg <- tibble::tibble(Animal = c(1:10),
                           `Breast Circumference` = c(176, 177, 178, 179, 179, 180, 181, 182,183, 184),
                           `Body Weight` = c(471, 463, 481, 470, 496, 491, 518, 511, 510, 541))
+n_nr_obs <- nrow(tbl_reg)
 knitr::kable(tbl_reg,
              booktabs = TRUE,
              longtable = TRUE,
@@ -81,21 +82,117 @@ E(y_i) = b_0 + b_1 * x_i
 where $E(y_i)$ is not the same as $y_i$. The difference $y_i - E(y_i)$ represents the difference between the observed body weight from its expected value $E(y_i)$ and is written as
 
 \begin{equation}
-e_i = y_i - E(y_i) = y_i - b_0 - b_1 * x
+e_i = y_i - E(y_i) = y_i - b_0 - b_1 * x_i
 (\#eq:exbwregmodelresidualregr)
 \end{equation}
 
 Hence for the body weight $y_i$ of animal $i$, we can write
 
 \begin{equation}
-y_i = b_0 + b_1 * x + e_i
+y_i = b_0 + b_1 * x_i + e_i
 (\#eq:exbwregmodelobservedvalueregr)
 \end{equation}
 
+Equations \@ref(eq:bwregmodelanimaliregr), \@ref(eq:exbwregmodelresidualregr) and \@ref(eq:exbwregmodelobservedvalueregr) apply to all observations $y_1, y_2, \ldots, y_{`r n_nr_obs`}$, of our example dataset shown in Table \@ref(tab:tab-reg-bw-bc). The $e_i$ terms for all observations might take many different values. They include potential measurement errors or deficencies of the model itself. Due to the described properties of $e_i$'s, they are considered to be random variables and are usually called _random errors_ or _random residuals_.
 
-When looking at the data in Table \@ref(tab:tab-reg-bw-bc), 
+To complete the description of our model in terms of equation \@ref(eq:exbwregmodelobservedvalueregr), further characteristics of the random errors ($e_i$) must be specified. These characteristics consist of 
+
+* the _expected value_ $E(e_i)$ of $e_i$ and 
+* the variance $var(e_i)$ of $e_i$. 
+
+Useful specifications are that the expected value $E(e_i)$ is zero and all covariances between any pair of $e_i$ and $e_j$ with $i \ne j$ are also zero. Then the variance $var(e_i)$ is assumed to be a constant for all $i$ and is represented by the symbol $\sigma^2$. Summarizing all the proposed properties in a mathematical notation, we obtain
+
+\begin{equation}
+E(e_i) = 0
+(\#eq:expvalueerrorregr)
+\end{equation}
+
+which is obtained from the definition of $e_i$ given in \@ref(eq:exbwregmodelresidualregr). The variance $var(e_i)$ 
+
+\begin{equation}
+var(e_i) = E\left[ e_i - E(e_i) \right]^2 = E(e_i^2) = \sigma^2
+(\#eq:varerrorregr)
+\end{equation}
+
+and 
+
+\begin{equation}
+cov(e_i,e_j) = E\left[ e_i - E(e_i) \right]\left[ e_j - E(e_j) \right] = E(e_ie_j) = 0
+(\#eq:coverrorregr)
+\end{equation}
+
+Equations \@ref(eq:bwregmodelanimaliregr) - \@ref(eq:coverrorregr) give a constitutional description of the linear model that we have designed so far for our example dataset. These properties form the basis for the procedure used to estimated the unknown parameters $b_0$ and $b_1$. 
 
 
+## Parameter Estimation
+There are several methods to estimate the unknown parameters $b_0$ and $b_1$ of the proposed linear model. The most frequently used method which is also implemented in the R-function `lm()` is called _least squares_. 
+
+Least squares estimation is based on the idea of minimizing the sum of the squared deviations of the observations $y_i$ from their expected values. This sum can be written as 
+
+\begin{equation}
+\mathbf{e}^T\mathbf{e} = \sum_{i=1}^N e_i^2 = \sum_{i=1}^N \left[ y_i - E(e_i) \right]^2 = \sum_{i=1}^N \left[ y_i - b_0 - b_1*x_i \right]^2
+(\#eq:sumsquareresidualregr)
+\end{equation}
+
+where $\mathbf{e}^T = \left[\begin{array}{cccc}e_1 & e_2 & \ldots & e_N \end{array}\right]$ is the transpose of the vector $\mathbf{e}$ of length $N$ containing all the $e_i$ values and $N$ stands for the number of observations. 
+
+Although $b_0$ and $b_1$ are fixed (but unknown) values, we treat them for a moment like mathematical variables. The reason for this changed view is that we want to find the values for $b_0$ and $b_1$ that minimize the expression in \@ref(eq:sumsquareresidualregr). The resulting values from the minimization of \@ref(eq:sumsquareresidualregr) will be represented by the symbols $\hat{b}_0$ and $\hat{b}_1$ and they will be called the least squares estimators of $b_0$ and $b_1$. 
+
+Minimization of \@ref(eq:sumsquareresidualregr) is done by taking partial derivatives with respect to both unknowns $b_0$ and $b_1$ and setting both derivatives to zero^[The verification of higher order derivative to confirm that the obtained extremal value is a minimum is not done here.]. This yields two equations from which solutions called $\hat{b}_0$ and $\hat{b}_1$ can be computed. 
+
+\begin{align}
+\frac{\partial\mathbf{e}^T\mathbf{e}}{\partial b_0} &= -2 \sum_{i=1}^N \left[y_i - b_0 - b_1x_i\right]  \notag \\
+  &= -2\left[\sum_{i=1}^N y_i - Nb_0 - b_1\sum_{i=1}^N x_i\right]
+(\#eq:derivssqresidualb0regr)
+\end{align}
+
+\begin{align}
+\frac{\partial\mathbf{e}^T\mathbf{e}}{\partial b_1} &= -2 \sum_{i=1}^N x_i\left[y_i - b_0 - b_1x_i\right] \notag \\
+  &= -2 \left[\sum_{i=1}^N x_iy_i - b_0 \sum_{i=1}^N x_i - b_1 \sum_{i=1}^N x_i^2 \right]
+(\#eq:derivssqresidualb1regr)
+\end{align}
+
+Setting both expression in \@ref(eq:derivssqresidualb0regr) and \@ref(eq:derivssqresidualb1regr) to zero and writing them in terms of $\hat{b}_0$ and $\hat{b}_1$ gives 
+
+\begin{equation}
+N\hat{b}_0 + \hat{b}_1x. = y.
+(\#eq:solderivssqresidualb0regr)
+\end{equation}
+
+and
+
+\begin{equation}
+\hat{b}_0x. + \hat{b}_1(x^2). = (xy).
+(\#eq:solderivssqresidualb1regr)
+\end{equation}
+
+using the dot notation for the following sums $x. = \sum_{i=1}^N x_i$, $y. = \sum_{i=1}^N y_i$, $(x^2). = \sum_{i=1}^N x_i^2$ and $(xy). = \sum_{i=1}^N x_iy_i$. With the bar notation for the means, we can further write 
+
+\begin{equation}
+\bar{x}. = {x. \over N}
+(\#eq:barxdotregr)
+\end{equation}
+
+and
+
+\begin{equation}
+\bar{y}. = {y. \over N}
+(\#eq:barydotregr)
+\end{equation}
+
+The solutions in \@ref(eq:solderivssqresidualb0regr) and \@ref(eq:solderivssqresidualb1regr) can then be written as
+
+\begin{equation}
+\hat{b}_0 = \bar{y}. - \hat{b}_1\bar{x}.
+(\#eq:solderivssqresidualb0regr)
+\end{equation}
+
+and
+
+\begin{equation}
+\hat{b}_1 = \frac{(xy). - N\bar{x}.\bar{y}.}{(x^2). - N\bar{x}.^2}
+(\#eq:solderivssqresidualb1regr)
+\end{equation}
 
 
 
