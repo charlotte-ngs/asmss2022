@@ -70,11 +70,30 @@ E(y) = b_0 + b_1 * x
 The above reasoning on how the variables are related is often referred to as _model building_. The model shown in \@ref(eq:exbwregmodelregr) is called a linear model, because the expected body weight ($E(y)$) is a linear function of the unknown _parameters_ $b_0$ and $b_1$. The number of possible models between two variables $x$ and $y$ is infinite. And therefore the process of model building is difficult and requires some experience. But in general, we can say that a simpler model with fewer unknown parameters is always preferrable over a more complex model as long as the simpler model is able to capture the most important aspects of a relationship between two variables. 
 
 
-## Terminology
-
-
 ## Observations
+For an animal with a breast circumference of $x$ cm, the body weight ($y$) will not exactly be $b_0 + b_1*x$. It has to be noted here that the values for $b_0$ and $b_1$ will be the same for all animals. The fact of the descrepency between the recorded body weights ($y$) and the output of the model is taken into account by writing $E(y)$ instead of $y$ in the model shown in equation \@ref(eq:exbwregmodelregr). For a given observed body weight $y_i$ of animal $i$ with a breast circumference of $x_i$, we can write 
 
+\begin{equation}
+E(y_i) = b_0 + b_1 * x_i
+(\#eq:bwregmodelanimaliregr)
+\end{equation}
+
+where $E(y_i)$ is not the same as $y_i$. The difference $y_i - E(y_i)$ represents the difference between the observed body weight from its expected value $E(y_i)$ and is written as
+
+\begin{equation}
+e_i = y_i - E(y_i) = y_i - b_0 - b_1 * x
+(\#eq:exbwregmodelresidualregr)
+\end{equation}
+
+Hence for the body weight $y_i$ of animal $i$, we can write
+
+\begin{equation}
+y_i = b_0 + b_1 * x + e_i
+(\#eq:exbwregmodelobservedvalueregr)
+\end{equation}
+
+
+When looking at the data in Table \@ref(tab:tab-reg-bw-bc), 
 
 
 
