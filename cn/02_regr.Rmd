@@ -10,7 +10,7 @@ This chapter is based on the book `r met$add("Searle1971")` and on the course no
 
 
 ## Example {#example-regr}
-A classical example of a regression analysis in animal science is the relationship between bodyweight and breast circumference in cattle. This example has a practical application because the results of the regression analysis of body weight on breast circumference can be used for a measuring band. With such a measuring band the breast circumference of an animal is measured. On the back side of the band, the estimated body weight can directly be determined. 
+A classical example of a regression analysis in animal science is the relationship between body weight and breast circumference in cattle. This example has a practical application because the results of the regression analysis of body weight on breast circumference can be used for a measuring band. With such a measuring band the breast circumference of an animal is measured. On the back side of the band, the estimated body weight can directly be determined. 
 
 At this point the question is how is it possible to determine the relationship between the values of breast circumference in centimeters and body weight in kilograms. The answer to this question can be given by a regression analysis. The most important pre-requisites for doing a regression analysis is to have a dataset. For our example, Table \@ref(tab:tab-reg-bw-bc) shows such a dataset which can be used for a regression analysis. 
 
@@ -35,7 +35,7 @@ ggplot(tbl_reg, aes(x = `Breast Circumference`, y = `Body Weight`)) +
   geom_point(color = "blue") 
 ```
 
-The diagram in Figure \@ref(fig:fig-reg-bw-bc) shows on the x-axis the breast circumference in cm and on the y-axis the body weight in kg. Each of the blue dots correspond to an observation of one animal in the dataset. A diagram like the one shown in Figure \@ref(fig:fig-reg-bw-bc) is also called a _dot plot_. From a first visual inspection of the dot plot for our dataset, we can see that there is a tendency that larger values of breast circumference of animals are related to heavier animals. The relationship is not deterministic that  means there are exceptions which do not follow the rule of this relationship. One example of an exception are animals 1 and 2. Animal 2 has a larger breast circumference value compared to animal 1,  but animal 2 has a lower body weight compared to animal 1. But despite such exceptions, we can still observe that on average there is a replationship between breast circumference and body weight. Furthermore, the apparent relationship between breast circumference and body weight seams to be the same for low and high values of breast circumference. Based on this last fact, we can say that the relationship between breast circumference and body weight is _linear_. 
+The diagram in Figure \@ref(fig:fig-reg-bw-bc) shows on the x-axis the breast circumference in cm and on the y-axis the body weight in kg. Each of the blue dots correspond to an observation of one animal in the dataset. A diagram like the one shown in Figure \@ref(fig:fig-reg-bw-bc) is also called a _dot plot_. From a first visual inspection of the dot plot for our dataset, we can see that there is a tendency that larger values of breast circumference of animals are related to heavier animals. The relationship is not deterministic that  means there are exceptions which do not follow the rule of this relationship. One example of an exception are animals 1 and 2. Animal 2 has a larger breast circumference value compared to animal 1,  but animal 2 has a lower body weight compared to animal 1. But despite such exceptions, we can still observe that on average there is a relationship between breast circumference and body weight. Furthermore, the apparent relationship between breast circumference and body weight seams to be the same for low and high values of breast circumference. Based on this last fact, we can say that the relationship between breast circumference and body weight is _linear_. 
 
 ```{r create-fig-non-linear, echo=FALSE, eval=FALSE}
 # see https://rpubs.com/kaz_yos/ggplot2-stat-function and 
@@ -68,11 +68,11 @@ E(y) = b_0 + b_1 * x
 (\#eq:exbwregmodelregr)
 \end{equation}
 
-The above reasoning on how the variables are related is often referred to as _model building_. The model shown in \@ref(eq:exbwregmodelregr) is called a linear model, because the expected body weight ($E(y)$) is a linear function of the unknown _parameters_ $b_0$ and $b_1$. The number of possible models between two variables $x$ and $y$ is infinite. And therefore the process of model building is difficult and requires some experience. But in general, we can say that a simpler model with fewer unknown parameters is always preferrable over a more complex model as long as the simpler model is able to capture the most important aspects of a relationship between two variables. 
+The above reasoning on how the variables are related is often referred to as _model building_. The model shown in \@ref(eq:exbwregmodelregr) is called a linear model, because the expected body weight ($E(y)$) is a linear function of the unknown _parameters_ $b_0$ and $b_1$. The number of possible models between two variables $x$ and $y$ is infinite. And therefore the process of model building is difficult and requires some experience. But in general, we can say that a simpler model with fewer unknown parameters is always preferable over a more complex model as long as the simpler model is able to capture the most important aspects of a relationship between two variables. 
 
 
 ## Observations {#observations-regr}
-For an animal with a breast circumference of $x$ cm, the body weight ($y$) will not exactly be $b_0 + b_1*x$. It has to be noted here that the values for $b_0$ and $b_1$ will be the same for all animals. The fact of the descrepency between the recorded body weights ($y$) and the output of the model is taken into account by writing $E(y)$ instead of $y$ in the model shown in equation \@ref(eq:exbwregmodelregr). For a given observed body weight $y_i$ of animal $i$ with a breast circumference of $x_i$, we can write 
+For an animal with a breast circumference of $x$ cm, the body weight ($y$) will not exactly be $b_0 + b_1*x$. It has to be noted here that the values for $b_0$ and $b_1$ will be the same for all animals. The fact of the discrepancy between the recorded body weights ($y$) and the output of the model is taken into account by writing $E(y)$ instead of $y$ in the model shown in equation \@ref(eq:exbwregmodelregr). For a given observed body weight $y_i$ of animal $i$ with a breast circumference of $x_i$, we can write 
 
 \begin{equation}
 E(y_i) = b_0 + b_1 * x_i
@@ -93,7 +93,7 @@ y_i = b_0 + b_1 * x_i + e_i
 (\#eq:exbwregmodelobservedvalueregr)
 \end{equation}
 
-Equations \@ref(eq:bwregmodelanimaliregr), \@ref(eq:exbwregmodelresidualregr) and \@ref(eq:exbwregmodelobservedvalueregr) apply to all observations $y_1, y_2, \ldots, y_{`r n_nr_obs`}$, of our example dataset shown in Table \@ref(tab:tab-reg-bw-bc). The $e_i$ terms for all observations might take many different values. They include potential measurement errors or deficencies of the model itself. Due to the described properties of $e_i$'s, they are considered to be random variables and are usually called _random errors_ or _random residuals_.
+Equations \@ref(eq:bwregmodelanimaliregr), \@ref(eq:exbwregmodelresidualregr) and \@ref(eq:exbwregmodelobservedvalueregr) apply to all observations $y_1, y_2, \ldots, y_{`r n_nr_obs`}$, of our example dataset shown in Table \@ref(tab:tab-reg-bw-bc). The $e_i$ terms for all observations might take many different values. They include potential measurement errors or deficiencies of the model itself. Due to the described properties of $e_i$'s, they are considered to be random variables and are usually called _random errors_ or _random residuals_.
 
 To complete the description of our model in terms of equation \@ref(eq:exbwregmodelobservedvalueregr), further characteristics of the random errors ($e_i$) must be specified. These characteristics consist of 
 
@@ -138,7 +138,7 @@ where $\mathbf{e}^T = \left[\begin{array}{cccc}e_1 & e_2 & \ldots & e_N \end{arr
 
 Although $b_0$ and $b_1$ are fixed (but unknown) values, we treat them for a moment like mathematical variables. The reason for this changed view is that we want to find the values for $b_0$ and $b_1$ that minimize the expression in \@ref(eq:sumsquareresidualregr). The resulting values from the minimization of \@ref(eq:sumsquareresidualregr) will be represented by the symbols $\hat{b}_0$ and $\hat{b}_1$ and they will be called the least squares estimators of $b_0$ and $b_1$. 
 
-Minimization of \@ref(eq:sumsquareresidualregr) is done by taking partial derivatives with respect to both unknowns $b_0$ and $b_1$ and setting both derivatives to zero^[The verification of higher order derivative to confirm that the obtained extremal value is a minimum is not done here.]. This yields two equations from which solutions called $\hat{b}_0$ and $\hat{b}_1$ can be computed. 
+Minimization of \@ref(eq:sumsquareresidualregr) is done by taking partial derivatives with respect to both unknowns $b_0$ and $b_1$ and setting both derivatives to zero^[The verification of higher order derivative to confirm that the obtained extreme value is a minimum is not done here.]. This yields two equations from which solutions called $\hat{b}_0$ and $\hat{b}_1$ can be computed. 
 
 \begin{align}
 \frac{\partial\mathbf{e}^T\mathbf{e}}{\partial b_0} &= -2 \sum_{i=1}^N \left[y_i - b_0 - b_1x_i\right]  \notag \\
@@ -216,12 +216,12 @@ N = `r n_nr_obs`,\ \bar{x}. = `r x_bar`,\ \bar{y}. = `r y_bar`,\ (xy). = `r xy_d
 $$
 
 \begin{equation}
-\hat{b}_1 = \frac{`r xy_dot` - `r n_nr_obs` * `r x_bar` * `r y_bar`}{`r x2_dot` - `r n_nr_obs` * `r x_bar`^2} = `r b1_hat`
+\hat{b}_1 = \frac{`r xy_dot` - `r n_nr_obs` * `r x_bar` * `r y_bar`}{`r x2_dot` - `r n_nr_obs` * `r x_bar`^2} = `r round(b1_hat, digits=3)`
 (\#eq:numsolderivssqresidualb1regr)
 \end{equation}
 
 \begin{equation}
-\hat{b}_0 = `r y_bar` - `r b1_hat` * `r x_bar` = `r b0_hat`
+\hat{b}_0 = `r y_bar` - `r b1_hat` * `r x_bar` = `r round(b0_hat, digits=3)`
 (\#eq:numsolderivssqresidualb0regr)
 \end{equation}
 
@@ -294,7 +294,7 @@ cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b, ps_name = "\\mathbf{b}")))
 cat("$$\n")
 ```
 
-Then the complete set of equations for all animals in our extended dataset represented by \@ref(eq:extendedbwdecompregr) is 
+Because all equations contain the term $b_0$, the first column of matrix $\mathbf{X}$ consists of all ones. Hence, $x_{10} = x_{20} = \ldots = x_{N0} = 1$. The complete set of equations for all animals in our extended dataset represented by \@ref(eq:extendedbwdecompregr) is 
 
 \begin{equation}
 \mathbf{y} = \mathbf{X}\mathbf{b} + \mathbf{e} \text{, with } E(\mathbf{y}) = \mathbf{X}\mathbf{b}
@@ -362,4 +362,62 @@ These equations are known as the least squares _normal equations_. Provided $(\m
 \end{equation}
 
 
-## Example Continued
+## Example Dataset Continued {#example-dataset-continued-regr}
+We use the original dataset shown in Table \@ref(tab:tab-reg-bw-bc) to illustrate the estimation of the least squares parameters using the matrix-vector notation. The matrix $\mathbf{X}$ and the vectors $\mathbf{y}$, $\mathbf{b}$ and $\mathbf{e}$ are defined as follows.
+
+```{r mat-X-num-shown, echo=FALSE, results='asis'}
+nr_lines_shown <- 2
+nr_lines_dot <- 3
+mat_X_short <- matrix(c(rep(1, nr_lines_shown), 
+                      rep('.', nr_lines_dot), 1, 
+                      tbl_reg$`Breast Circumference`[1:nr_lines_shown], 
+                      rep('.', nr_lines_dot), tbl_reg$`Breast Circumference`[n_nr_obs]), ncol = 2)
+vec_y_short <- c(tbl_reg$`Body Weight`[1:nr_lines_shown], rep('.', nr_lines_dot), tbl_reg$`Body Weight`[n_nr_obs])
+vec_b_short <- c("b_0", "b_1")
+vec_e_short <- c(rmdhelp::vecGetVecElem(psBaseElement = "e", pnVecLen = nr_lines_shown, psResult = 'latex'),
+               rep('.', nr_lines_dot), paste0("e_{", n_nr_obs, "}", collapse = ""))
+# show matrix X and vectors
+cat("$$\n")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_X_short, ps_name = "\\mathbf{X}"), collapse = ""), "\n")
+cat("\\text{, }\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_y_short, ps_name = "y")))
+cat("\\text{, }\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b_short, ps_name = "b")))
+cat("\\text{, }\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_e_short, ps_name = "e")))
+cat("$$\n")
+```
+
+The solution is obtained from equation \@ref(eq:solleastsquareestregr) for this we also need
+
+```{r mat-lsq-sol, echo=FALSE, results='asis'}
+mat_X_num <- matrix(c(rep(1,n_nr_obs), tbl_reg$`Breast Circumference`), ncol = 2)
+mat_XTX <- crossprod(mat_X_num)
+mat_XTXinv <- solve(mat_XTX)
+vec_y <- tbl_reg$`Body Weight`
+mat_XTy <- crossprod(mat_X_num, vec_y)
+vec_sol <- solve(mat_XTX, mat_XTy)
+
+# show the matrices
+cat("$$\n")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_XTX, ps_name = "X^TX"), collapse = ""), "\n")
+cat("\\text{, }\n")
+cat(paste0(rmdhelp::bmatrix(pmat = round(mat_XTXinv, digits = 3), ps_name = "(X^TX)^{-1}"), collapse = ""), "\n")
+cat("\\text{, }\n")
+cat(paste0(rmdhelp::bmatrix(pmat = round(mat_XTy, digits = 3), ps_name = "X^Ty"), collapse = ""), "\n")
+cat("$$\n")
+```
+
+The solution vector $\hat{\mathbf{b}}$ contains the two components corresponding to the estimates of the two unknown parameters. 
+
+```{r lsq-sol-vec, echo=FALSE, results='asis'}
+vec_sol_sym <- c("\\hat{b}_0", "\\hat{b}_1")
+# show the solutions
+cat("$$\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_sol_sym, ps_name = "\\hat{\\mathbf{b}}"), collapse = ""), "\n")
+cat(" = ")
+cat(paste0(rmdhelp::bmatrix(pmat = round(vec_sol, digits = 3)), collapse = ""), "\n")
+cat("$$\n")
+```
+
+Comparing the above shown solutions to the results received earlier shows that for this example, the solution using the matrix-vector notation are the same.
