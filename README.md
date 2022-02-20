@@ -52,6 +52,24 @@ or via e-mail:
 
 ## Lecture Program
 
+| Week | Date  | Topic                                                         |
+|-----:|:------|:--------------------------------------------------------------|
+|    1 | 21.02 | Introduction to Applied Statistical Methods in Animal Science |
+|    2 | 28.02 | Linear Regression Models                                      |
+|    3 | 07.03 | Linear Fixed Effect Models                                    |
+|    4 | 14.03 | Model Selection                                               |
+|    5 | 21.03 | Pedigree BLUP                                                 |
+|    6 | 28.03 | Variance Components                                           |
+|    7 | 04.04 | GBLUP - Marker-Effects Models                                 |
+|    8 | 11.04 | GBLUP - Breeding Value Models                                 |
+|    9 | 18.04 | **Easter Monday**                                             |
+|   10 | 25.04 | Lasso                                                         |
+|   11 | 02.05 | SVM                                                           |
+|   12 | 09.05 | Bayesian Approaches in Linear Regression Models               |
+|   13 | 16.05 | Bayesian Approaches in Linear Mixed Effects Models            |
+|   14 | 23.05 | Questions, Test Exam                                          |
+|   15 | 30.05 | Exams                                                         |
+
 ## License
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This
@@ -61,4 +79,4 @@ Commons Attribution 4.0 International License</a>.
 
 ------------------------------------------------------------------------
 
-*Latest Changes: 2022-01-29 15:13:23 (pvr)*
+*Latest Changes: 2022-02-20 06:50:12 (pvr)*

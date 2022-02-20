@@ -15,3 +15,16 @@ knitr::opts_chunk$set(
 ```
 
 
+This page contains the list of links pointing to the different chapters in the course notes. 
+
+```{r chapter-table, echo=FALSE, message=FALSE, warning=FALSE}
+s_cn_url <- "https://charlotte-ngs.github.io/asmss2022/cn/"
+tbl_chpt <- tibble::tibble(Nr      = c(1, 2),
+                           Date    = c("2022-02-21",
+                                       "2022-02-28"),
+                           Topics  = c(
+                             paste0("[Introduction](", s_cn_url, "01_intro.pdf)", collapse = ""),
+                             paste0("[Linear Regression](", s_cn_url, "02_regr.pdf)", collapse = "")
+                           ))
+knitr::kable(tbl_chpt)
+```
