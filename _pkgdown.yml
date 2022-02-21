@@ -3,8 +3,8 @@ title: Applied Statistical Methods in Animal Sciences
 url: https://charlotte-ngs.github.io/asmss2022/
 
 template:
-  package: preferably
-  bootstrap: 5
+  params:
+    bootswatch: flatly
 
 navbar:
   title:
