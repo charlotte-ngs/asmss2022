@@ -20,7 +20,17 @@ available soon.
 
 ### Exercise Platform
 
+-   The exercise platform can be found at:
+    `http://2-htz.quagzws.com:<PORT>`
+-   The number that you have to insert for `<PORT>` was sent by e-mail,
+    as well as the password
+-   The username is: rstudio
+
 ### Exam
+
+-   Written exam
+-   Date: 30.05.2022 - 08:15 - 10:00
+-   Room: LFW C 11
 
 ## Description
 
@@ -79,4 +89,4 @@ Commons Attribution 4.0 International License</a>.
 
 ------------------------------------------------------------------------
 
-*Latest Changes: 2022-02-20 06:50:12 (pvr)*
+*Latest Changes: 2022-02-21 07:45:30 (pvr)*

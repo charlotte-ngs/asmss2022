@@ -31,9 +31,15 @@ Topics for Master Theses at Qualitas AG together with ETH will be available soon
 
 
 ### Exercise Platform
+- The exercise platform can be found at: `http://2-htz.quagzws.com:<PORT>`
+- The number that you have to insert for `<PORT>` was sent by e-mail, as well as the password
+- The username is: rstudio
 
 
 ### Exam
+- Written exam
+- Date: 30.05.2022 - 08:15 - 10:00
+- Room: LFW C 11
 
 
 ## Description
