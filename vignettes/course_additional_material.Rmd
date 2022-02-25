@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 This page contains additional material like links to slides, video recordings, ohp pictures, and more ...
 
+
+## Slides
 ```{r tbl-sl, echo=FALSE, message=FALSE, warning=FALSE}
 s_sl_url <- "https://charlotte-ngs.github.io/asmss2022/sl/"
 tbl_sl <- tibble::tibble(Nr = c(1, 2),
@@ -27,5 +29,15 @@ tbl_sl <- tibble::tibble(Nr = c(1, 2),
                            paste0("[Linear Regression](", s_sl_url, "l02_regr.pdf)", collapse = "")
                          ))
 knitr::kable(tbl_sl)
+```
+
+## Videos
+```{r tbl-video, echo=FALSE, message=FALSE, warning=FALSE}
+tbl_video <- tibble::tibble(Nr = c(1),
+                            Date = c("2021-02-21"),
+                            Topic = c(
+                              "[Introduction](https://youtu.be/9XdsxWiXU90)"
+                            ))
+knitr::kable(tbl_video)
 ```
 
