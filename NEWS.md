@@ -1,3 +1,7 @@
+# asmss2022 0.1.2
+
+* Added link to video of lecture 01
+
 # asmss2022 0.1.1
 
 * Slides for intro and regression
