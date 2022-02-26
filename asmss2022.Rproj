@@ -16,5 +16,3 @@ AutoAppendNewline: Yes
 StripTrailingWhitespace: Yes
 LineEndingConversion: Posix
 
-BuildType: Website
-WebsitePath: cn
