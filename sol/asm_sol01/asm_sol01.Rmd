@@ -36,7 +36,7 @@ knitr::kable(tbl_ex01_p01_data,
              escape = FALSE)
 ```
 
-The data can be read from `r s_ex01_p01_path`
+The data can be read from `r s_ex01_p01_path`. The additional columns contain data on body condition score (BCS) and height (HEI).
 
 ### Tasks
 
@@ -47,6 +47,10 @@ The data can be read from `r s_ex01_p01_path`
 
 <!-- your-solution-start
 ### Your Solution
+
+* Start by building the model which includes the decision of what type of components go into the vector $\mathbf{b}$. Then write down the model in matrix-vector notation.
+* Determine all the components of $\mathbf{X}$, $\mathbf{y}$, $\mathbf{b}$ and $\mathbf{e}$.
+* Compute the solution for $\hat{\mathbf{b}}
 
 ---  your-solution-end -->
 
@@ -62,7 +66,7 @@ s_sol01_p01_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mult_
 tbl_sol01_p01 <- readr::read_csv(file = s_sol01_p01_path)
 ```
 
-The regression model can be stated as 
+* The regression model can be stated as 
 
 $$ \mathbf{y} = \mathbf{X}\mathbf{b} + \mathbf{e}$$
 
@@ -76,22 +80,24 @@ mat_X <- matrix(c(rep(1, n_nr_obs),
                   tbl_sol01_p01$`Breast Circumference`, 
                   tbl_sol01_p01$BCS, 
                   tbl_sol01_p01$HEI), ncol = n_nr_pred)
-vec_b <- rmdhelp::vecGetVecElem(psBaseElement = "b", pnVecLen = n_nr_pred, psResult = "latex")
+vec_b <- c("b_0", "b_{BC}", "b_{BCS}", "b_{HEI}")
 vec_e <- rmdhelp::vecGetVecElem(psBaseElement = "e", pnVecLen = n_nr_obs, psResult = "latex")
 cat("$$\n")
-cat(paste0(rmdhelp::bmatrix(pmat = mat_X, ps_name = "X"), collapse = ""), "\n")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_X, ps_name = "\\mathbf{X}"), collapse = ""), "\n")
 cat("\\text{, }\n")
-cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_y, ps_name = "y"), collapse = ""), "\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_y, ps_name = "\\mathbf{y}"), collapse = ""), "\n")
 cat("\\text{, }\n")
-cat(paste0(rmdhelp::bcolumn_vector(pvec=vec_e, ps_name = "e"), collapse = ""), "\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec=vec_e, ps_name = "\\mathbf{e}"), collapse = ""), "\n")
 cat("\\text{, }\n")
-cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b, ps_name = "b"), collapse = ""), "\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b, ps_name = "\\mathbf{b}"), collapse = ""), "\n")
 cat("$$\n")
 ```
 
-The solution for the estimates $\hat{b}$ can be computed as
+The residuals are assumed to have expectation $E(\mathbf{e}) = \mathbf{0}$ and a variance-covariance matrix $var(\mathbf{e}) = I_N * \sigma^2$. 
 
-$$\hat{b} = (X^TX)X^Ty $$
+* The solution for the estimates $\hat{b}$ can be computed as
+
+$$\hat{\mathbf{b}} = (X^TX)^{-1}X^Ty $$
 
 ```{r}
 mat_xtx <- crossprod(mat_X)
@@ -111,8 +117,14 @@ cat(paste0(rmdhelp::bmatrix(pmat = round(mat_sol_bhat, digits = 3), ps_name = "\
 
 ## Problem 2
 
+Use the same dataset as in Problem 1 and verify your results using the function `lm()` in R. 
+
 <!-- your-solution-start
 ### Your Solution
+
+* Read the data into a dataframe
+* Use the `lm()` function which takes a formula to define the model and a dataframe
+* Use the function `summary()` on the result of `lm()` to show the results
 
 ---  your-solution-end -->
 
@@ -120,6 +132,28 @@ cat(paste0(rmdhelp::bmatrix(pmat = round(mat_sol_bhat, digits = 3), ps_name = "\
 <!-- master-solution-start -->
 
 ### Solution
+
+* Read the data
+
+```{r, message=FALSE, warning=FALSE}
+s_sol01_p02_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mult_reg.csv"
+tbl_sol01_p02 <- readr::read_csv(file = s_sol01_p02_path)
+```
+
+* Specify the call to `lm()`
+
+```{r}
+lm_bw_mult <- lm(formula = `Body Weight` ~ `Breast Circumference` + `BCS` + `HEI`, 
+                 data = tbl_sol01_p02)
+summary(lm_bw_mult)
+```
+
+* Solutions are obtained by
+
+```{r}
+coefficients(lm_bw_mult)
+```
+
 
 <!-- master-solution-end -->
  
