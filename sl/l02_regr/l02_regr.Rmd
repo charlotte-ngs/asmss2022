@@ -130,3 +130,6 @@ and
 \begin{equation}
 \hat{b}_1 = \frac{(xy). - N\bar{x}.\bar{y}.}{(x^2). - N\bar{x}.^2} \notag
 \end{equation}
+
+
+## 
