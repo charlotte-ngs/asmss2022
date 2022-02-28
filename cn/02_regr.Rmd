@@ -1,4 +1,4 @@
-# Linear Regression {#linear-regression-regr}
+# Linear Regression {#asm-regr}
 ```{r met-regr-reset, include=FALSE}
 met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(), 
                                                  rstudioapi::getSourceEditorContext()$path, 
@@ -6,7 +6,7 @@ met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(),
 ```
 
 ## Introduction {#introduction-regr}
-This chapter is based on the book `r met$add("Searle1971")` and on the course notes `r met$add("Buhlmann2016")`. Regression analysis is used to assess relationships between a given variable and other measurements or observations on the same animal. The relationships between the variable and the other characteristics of the animal are estimated based on observed data. 
+This chapter is based on the book `r met$add("Searle1971")` and on the course notes `r met$add("Buhlmann2016")`. An interesting online book on `Multiple Linear Regression` is given by `r met$add("Lilja2016")`. Regression analysis is used to assess relationships between a given variable and other measurements or observations on the same animal. The relationships between the variable and the other characteristics of the animal are estimated based on observed data. 
 
 
 ## Example {#example-regr}
