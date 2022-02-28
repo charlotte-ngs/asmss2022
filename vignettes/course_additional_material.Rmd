@@ -48,10 +48,12 @@ knitr::kable(tbl_video)
 ## OHP
 ```{r tbl-ohp, echo=FALSE, message=FALSE, warning=FALSE}
 s_ohp_url <- "https://charlotte-ngs.github.io/asmss2022/ohp/"
-tbl_ohp <- tibble::tibble(Nr = c(1),
-                          Date = c("2022-02-21"),
+tbl_ohp <- tibble::tibble(Nr = c(1, 2),
+                          Date = c("2022-02-21",
+                                   "2022-02-28"),
                           Topic = c(
-                            paste0("[Introduction](", s_ohp_url, "20220228_ohp_pictures.pdf)", collapse = "")
+                            paste0("[Introduction](", s_ohp_url, "20220221_ohp_pictures.pdf)", collapse = ""),
+                            paste0("[Linear Regression Analysis](", s_ohp_url, "20220228_ohp_pictures.pdf)")
                           ))
 knitr::kable(tbl_ohp)
 ```
