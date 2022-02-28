@@ -1,3 +1,7 @@
+# asmss2022 0.2.1
+
+* Deployed exercise 01
+
 # asmss2022 0.2.0
 
 * Prepared material for lecture 02
