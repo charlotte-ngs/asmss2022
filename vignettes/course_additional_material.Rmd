@@ -34,10 +34,12 @@ knitr::kable(tbl_sl)
 
 ## Videos
 ```{r tbl-video, echo=FALSE, message=FALSE, warning=FALSE}
-tbl_video <- tibble::tibble(Nr = c(1),
-                            Date = c("2021-02-21"),
+tbl_video <- tibble::tibble(Nr = c(1, 2),
+                            Date = c("2022-02-21",
+                                     "2022-02-28"),
                             Topic = c(
-                              "[Introduction](https://youtu.be/9XdsxWiXU90)"
+                              "[Introduction](https://youtu.be/9XdsxWiXU90)",
+                              "[Linear Regression Analysis](https://youtu.be/RABkYT673HY)"
                             ))
 knitr::kable(tbl_video)
 ```
