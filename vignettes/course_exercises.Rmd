@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+This page contains a list of exercises.
+
 ```{r, echo=FALSE, results='asis'}
 s_url_ex <- "https://charlotte-ngs.github.io/asmss2022/ex/"
 s_url_nb <- "https://charlotte-ngs.github.io/asmss2022/nb/"
