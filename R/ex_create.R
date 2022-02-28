@@ -30,7 +30,7 @@ create_exercise <- function(ps_ex_name,
                             pd_creation_date = format(Sys.Date(), "%Y-%m-%d"),
                             pb_edit          = FALSE){
   s_proj_dir <- here::here()
-  s_ex_src_path <- file.path(s_proj_dir, "ex", ps_ex_name, paste0(ps_ex_name, ".Rmd"))
+  s_ex_src_path <- file.path(s_proj_dir, "sol", ps_ex_name, paste0(ps_ex_name, ".Rmd"))
 
   rteachtools::create_exercise(ps_ex_path    = s_ex_src_path,
                                pn_nr_problem = pn_nr_problem,
@@ -56,20 +56,23 @@ create_exercise <- function(ps_ex_name,
 #'
 #' @examples
 #' \dontrun{
-#' create_exercise_gel(ps_ex_name        = "gel_ex01",
-#'                     pn_exercise_count = 1,
-#'                     ps_author         = "Peter von Rohr",
-#'                     pn_nr_problem     = 2)
+#' create_exercise_gel(ps_ex_name        = "asm_ex01")
 #' }
-create_exercise_gel <- function(ps_ex_name,
-                                pn_exercise_count,
-                                ps_author,
-                                pn_nr_problem,
+create_exercise_asm <- function(ps_ex_name,
+                                pn_exercise_count = NULL,
+                                ps_author = "Peter von Rohr",
+                                pn_nr_problem = 3,
                                 pd_creation_date = format(Sys.Date(), "%Y-%m-%d"),
                                 pb_edit          = FALSE){
+  # determine default of exercise count based on numeric part of ps_ex_name
+  n_exercise_count <- pn_exercise_count
+  if (is.null(n_exercise_count)){
+    n_exercise_count <- as.numeric(gsub(pattern = "asm_ex", replacement = "", ps_ex_name, fixed = TRUE))
+  }
+
   create_exercise(ps_ex_name        = ps_ex_name,
-                  ps_course_name    = "Genetic Evaluation",
-                  pn_exercise_count = pn_exercise_count,
+                  ps_course_name    = "Applied Statistical Methods",
+                  pn_exercise_count = n_exercise_count,
                   ps_author         = ps_author,
                   pn_nr_problem     = pn_nr_problem,
                   pd_creation_date  = pd_creation_date,
