@@ -1,3 +1,7 @@
+# asmss2022 0.2.0
+
+* Prepared material for lecture 02
+
 # asmss2022 0.1.3
 
 * OHP pictures
