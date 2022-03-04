@@ -19,10 +19,12 @@ This page contains a list of exercises.
 ```{r, echo=FALSE, results='asis'}
 s_url_ex <- "https://charlotte-ngs.github.io/asmss2022/ex/"
 s_url_nb <- "https://charlotte-ngs.github.io/asmss2022/nb/"
-tbl_ex <- tibble::tibble(Nr = c(1),
-                         Date = c("2022-02-28"),
+tbl_ex <- tibble::tibble(Nr = c(1, 2),
+                         Date = c("2022-02-28",
+                                  "2022-03-07"),
                          Topic = c(
-                           paste0("Linear Regression [pdf](", s_url_ex, "asm_ex01.pdf) | [nb](", s_url_nb, "asm_ex01_nb_src.nb.html)",  collapse = "")
+                           paste0("Linear Regression [pdf](", s_url_ex, "asm_ex01.pdf) | [nb](", s_url_nb, "asm_ex01_nb_src.nb.html)",  collapse = ""),
+                           paste0("Linear Regression (Part 2) [pdf](", s_url_ex, "asm_ex02.pdf) | [nb](", s_url_nb, "asm_ex02_nb_src.nb.html)",  collapse = "")
                          ))
 knitr::kable(tbl_ex)
 ```
