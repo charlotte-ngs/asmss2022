@@ -1,3 +1,7 @@
+# asmss2022 0.3.0
+
+* Exercise 02 deployed
+
 # asmss2022 0.2.2
 
 * Video and OHP for lecture 02
