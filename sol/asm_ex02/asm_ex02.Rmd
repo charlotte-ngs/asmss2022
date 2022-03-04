@@ -111,13 +111,45 @@ summary(lm_bw_bc_m)
 
 * Comparison of results: intercept is the same, because it has the same unit as the response variable `Body Weight`. The regression slope is multiplied by 100 compared to the result of the original dataset where `Breast Circumference` is in cm.
 
+* Although according to the International System of Units (https://en.wikipedia.org/wiki/International_System_of_Units) meter is the official unit for length, it does not make sense to use meter as unit for breast circumference. This is because the range of measurement for breast circumference is very narrow when the values are expressed in meters. Furthermore the increment of $1$ meter is very unrealistic, compared to the range of available measurement value for breast circumference.
+
 <!-- master-solution-end -->
 
 
-## Problem 2
+## Problem 2: Significance Level
+Do the same type of comparison of regression modelling results when changing the measurement unit for the variable HEI in the complete dataset given in
+
+`https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mult_reg.csv`. 
+
+### Tasks
+
+* Run the same regression model as in Problem 1 of Exercise 1
+* Convert the measurement unit for the variable HEI from centimeter to meter
+* Compare the results of the two regression models with a special focus on the significance level
+
 
 <!-- your-solution-start
 ### Your Solution
+
+* The same regression model as in Problem 1 of Exercise 1
+
+```{r}
+
+```
+
+* Convert the values in column HEI from centimeter to meter
+
+```{r}
+
+```
+
+* Fit again a multiple regression model
+
+```{r}
+
+```
+
+* Compare the results
 
 ---  your-solution-end -->
 
@@ -126,20 +158,40 @@ summary(lm_bw_bc_m)
 
 ### Solution
 
+* Start by reading the data
+
+```{r, message=FALSE, warning=FALSE}
+s_sol02_p02_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mult_reg.csv"
+tbl_sol02_p02 <- readr::read_csv(file = s_sol02_p02_path)
+```
+
+* Regression model
+
+```{r}
+lm_sol02_p02 <- lm(formula = `Body Weight` ~ `Breast Circumference` + BCS + HEI, 
+                   data = tbl_sol02_p02)
+summary(lm_sol02_p02)
+```
+
+* Convert HEI to meters
+
+```{r}
+tbl_sol02_p02_HEI_in_m <- tbl_sol02_p02
+tbl_sol02_p02_HEI_in_m$HEI <- tbl_sol02_p02_HEI_in_m$HEI / 100
+```
+
+* Run the regression model with the new data
+
+```{r}
+lm_sol02_p02_HEI_in_m <- lm(formula = `Body Weight` ~ `Breast Circumference` + BCS + HEI, 
+                            data = tbl_sol02_p02_HEI_in_m)
+summary(lm_sol02_p02_HEI_in_m)
+```
+
+* Comparison of results: As already seen in Problem 1, the regression coefficients change by a factor of $100$. But because also the standard error are $100$ times bigger in the second regression model, the significance result does not change.
+
+
+
 <!-- master-solution-end -->
 
 
-## Problem 3
-
-<!-- your-solution-start
-### Your Solution
-
----  your-solution-end -->
-
-
-<!-- master-solution-start -->
-
-### Solution
-
-<!-- master-solution-end -->
- 
