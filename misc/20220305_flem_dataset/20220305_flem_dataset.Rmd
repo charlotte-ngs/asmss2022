@@ -1,0 +1,50 @@
+---
+title: "Data Set on Fixed Linear Effect Models"
+output: html_notebook
+---
+
+# Disclaimer
+The dataset used for multiple regression is extended by breed and is later used in fixed linear effect models.
+
+
+# Read Multiple Regression Dataset
+The existing dataset for multiple regression is read
+
+```{r}
+s_data_dir <- file.path(here::here(), "docs", "data")
+list.files(path = s_data_dir)
+s_data_path <- file.path(s_data_dir, "asm_bw_mult_reg.csv")
+tbl_mult_reg <- readr::read_csv(file = s_data_path)
+tbl_mult_reg
+```
+
+
+# Breed of Animals
+The breed of the animals is manually assigned
+
+```{r}
+tbl_mult_reg[order(tbl_mult_reg$`Body Weight`),]$Animal
+```
+
+The breed is assigned according to the ranking of body weights
+
+```{r}
+tbl_mult_reg$Breed[tbl_mult_reg[order(tbl_mult_reg$`Body Weight`),]$Animal] <- c(rep("Angus", 3), rep("Simmental", 3), rep("Limousin", 4))
+```
+
+The extended dataset
+
+```{r}
+tbl_mult_reg
+```
+
+
+# Write Extended Dataset
+The extended dataset is written to a file
+
+```{r}
+s_flem_data_path <- file.path(s_data_dir, "asm_bw_flem.csv")
+readr::write_csv(tbl_mult_reg, file = s_flem_data_path)
+
+```
+
