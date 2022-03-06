@@ -26,6 +26,44 @@ knitr::kable(tbl_flem,
              escape = FALSE)
 ```
 
+The extension in our dataset consists of the breed for each animal. With this extension, the immediate question of how to measure "breed" arises. The breed as it is in the dataset cannot be integreated into our model. It must be converted into a numeric code. One possibility is to assign each breed to a number according to how heavy an average animal of the breed is expected to be. Because this assignment is difficult to do, as the body weight of animals within a given breed show a certain variation. For our example, the following assignment of breeds to numeric codes is assumed.
+
+```{r, echo=FALSE}
+n_nr_breed <- nlevels(as.factor(tbl_flem$Breed))
+tbl_breed_map <- tibble::tibble(Code = c(1:n_nr_breed),
+                                Breed = c(unique(sort(tbl_flem$Breed))))
+knitr::kable(tbl_breed_map,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = "Assignment of Breeds to numeric Codes",
+             escape = FALSE)
+```
+
+For reasons of simplicity, we assume that the variable "breed" is the only predictor in a simple regression model
+
+\begin{equation}
+E(y_i) = b_0 + b_1 x_i
+(\#eq:regrbwbreedflem)
+\end{equation}
+
+where $E(y_i)$ stands for the expected value of body weight ($y_i$) of animal $i$, $b_0$ is the intercept, $x_i$ corresponds to the numeric code of the breed of animal $i$ and $b_1$ is the regression coefficient for the breed code. The influence of the predictor variable breed code on body weight could be tested with the hypothesis $b_1 = 0$ which is done by the function `lm()` in R. 
+
+Although this analysis as described is permissible, it does come with a number of problems which show that the assumptions behind this type of model are unrealistic. This can best be shown by looking at the expected values of body weight for animals of the different breeds.
+
+\begin{align}
+E(\text{body weight Angus}) &= b_0 + b_1 \notag \\
+E(\text{body weight Limousin}) &= b_0 + 2b_1 \notag \\
+E(\text{body weight Simmental}) &= b_0 + 3b_1
+(\#eq:expvalbwbreedflem)
+\end{align}
+
+This means, for example, that
+
+\begin{align}
+E(\text{body weight Limousin}) - E(\text{body weight Angus}) &= E(\text{body weight Simmental}) - E(\text{body weight Limousin}) \notag \\
+E(\text{body weight Simmental}) - E(\text{body weight Angus}) &= 2 \left[ E(\text{body weight Limousin}) - E(\text{body weight Angus})\right]
+(\#eq:expvalbwdiffbreedflem)
+\end{align}
 
 
 ## Motivation {#asm-flem-motivation}
