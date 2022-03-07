@@ -1,0 +1,559 @@
+# Fixed Linear Effects Models {#asm-flem}
+```{r met-flem-reset, include=FALSE}
+met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(), 
+                                                 rstudioapi::getSourceEditorContext()$path, 
+                                                 rprojroot::thisfile()))
+```
+
+## Resources {#asm-flem-other-resources}
+Similarly to chapter \@ref(asm-regr), this chapter on `fixed linear effects models` (FLEM) is based on the work of `r met$add("Buhlmann2016")` and on the book `r met$add("Searle1971")`. 
+
+
+## Introduction {#asm-flem-intro}
+In chapter \@ref(asm-regr), we saw how linear regression analysis was used to describe and to quantify the relationship between a response variable and between one or more predictor variables. The type of analysis shown in chapter \@ref(asm-regr) is called "regression analysis, because the response and the predictors are all continuous variables. This means that the values of the variables in the dataset are all floating-point numbers. For datasets where predictor variables are discrete, the model is referred to as _fixed linear effects model_.
+
+The reason why fixed linear effects models must be treated differently from regression models can best be seen by looking at an extension of our example dataset on body weight of some animals. Let us assume that besides the predictors that we have used so far, we have the breed of the animal as an additional information. Animals of different breeds have different body weights, hence we expect that the breed of the animal has an effect on its body weight. The question is how is it possible to integrate the breed of the animal into a model that describes and quantifies the different influence factors on body weight. First, we have a look at the extended dataset.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+s_data_dir <- file.path(here::here(), "docs", "data")
+s_flem_path <- file.path(s_data_dir, "asm_bw_flem.csv")
+tbl_flem <- readr::read_csv(file = s_flem_path)
+knitr::kable(tbl_flem,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = paste0("Extended Dataset on Body Weight for ", 
+                              nrow(tbl_flem)," Animals", collapse = ""),
+             escape = FALSE)
+```
+
+The extension in our dataset consists of the breed for each animal. With this extension, the immediate question of how to measure "breed" arises. The breed as it is in the dataset cannot be integreated into our model. It must be converted into a numeric code. One possibility is to assign each breed to a number according to how heavy an average animal of the breed is expected to be. Because this assignment is difficult to do, as the body weight of animals within a given breed show a certain variation. For our example, the following assignment of breeds to numeric codes is assumed.
+
+```{r, echo=FALSE}
+n_nr_breed <- nlevels(as.factor(tbl_flem$Breed))
+tbl_breed_map <- tibble::tibble(Code = c(1:n_nr_breed),
+                                Breed = c(unique(sort(tbl_flem$Breed))))
+knitr::kable(tbl_breed_map,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = "Assignment of Breeds to numeric Codes",
+             escape = FALSE)
+```
+
+For reasons of simplicity, we assume that the variable "breed" is the only predictor in a simple regression model
+
+\begin{equation}
+E(y_i) = b_0 + b_1 x_i
+(\#eq:regrbwbreedflem)
+\end{equation}
+
+where $E(y_i)$ stands for the expected value of body weight ($y_i$) of animal $i$, $b_0$ is the intercept, $x_i$ corresponds to the numeric code of the breed of animal $i$ and $b_1$ is the regression coefficient for the breed code. The influence of the predictor variable breed code on body weight could be tested with the hypothesis $b_1 = 0$ which is done by the function `lm()` in R. 
+
+Although this analysis as described is permissible, it does come with a number of problems which show that the assumptions behind this type of model are unrealistic. This can best be shown by looking at the expected values of body weight (BW) for animals of the different breeds.
+
+\begin{align}
+E(\text{BW Angus}) &= b_0 + b_1 \notag \\
+E(\text{BW Limousin}) &= b_0 + 2b_1 \notag \\
+E(\text{BW Simmental}) &= b_0 + 3b_1
+(\#eq:expvalbwbreedflem)
+\end{align}
+
+This means, for example, that
+
+\begin{align}
+E(\text{BW Limousin}) - E(\text{BW Angus}) &= E(\text{BW Simmental}) - E(\text{BW Limousin}) \notag \\
+E(\text{BW Simmental}) - E(\text{BW Angus}) &= 2 \left[ E(\text{BW Limousin}) - E(\text{BW Angus})\right]
+(\#eq:expvalbwdiffbreedflem)
+\end{align}
+
+Depending on the data, the relations shown in \@ref(eq:expvalbwdiffbreedflem) might be quite unrealistic. And even without data, only by the allocation of numerical codes to the different breed, the consequences shown in \@ref(eq:expvalbwdiffbreedflem) are forced on the analysis results. The only real estimates that the analysis yields are the one of $b_0$ and of $b_1$. This will also be the case, if different numerical codes are used for the different levels of the variable. 
+
+The inherent difficulty with the analysis suggested above is the allocation of numerical codes to non-quantitative variables such as breed. Yet such varibles are of great interest in many scientific areas. Allocating numerical codes to such variables involves at least two problems. 
+
+1. Often the assignment cannot be made in a reasonable way and is thereby to a large extent an arbitrary process.
+2. Making such allocations of numeric codes to different levels of a variable imposes value differences on the categories of the variable such as shown in equation \@ref(eq:expvalbwdiffbreedflem).
+
+The above state problems can best be solved by using a type of model that is often referred to as _regession on dummy $(0,1)$ variables_. In the context here, we are calling these models just _fixed linear effect models_. The description of these models is deferred to a later section. We first describe an important exception in which the application of a linear regression model on discrete variables is very reasonable and has a wide range of applications.
+
+
+## Linear Regression Analysis for Genomic Data {#asm-flem-motivation}
+The question why linear regression models can be applied to genomic data is best answered by looking at the data. In general, genomic breeding values can either be estimated using a two-step procedure or by a single step approach. At the moment, we assume that we are in the first step of the two step approach where we estimate the marker effects ($a$-values) in a reference population or alternatively we have a perfect data set with all animals genotyped and with a phenotypic observation in a single step setting. Both situations are equivalent when it comes to the structure of the underlying dataset. Furthermore the same class of models can be used to analyse the type of data.
+
+
+## Data {#asm-flem-data}
+As already mentioned in section \@ref(asm-flem-motivation), we are assuming that we have a perfect dataset for a given population of animals. That means each animal $i$ has a phenotypic observation $y_i$ for a given trait of interest. Furthermore, we assume to have a map of only three SNP markers. The marker loci are called $G$, $H$ and $I$. All markers have two alleles each. Figure \@ref(fig:datastucturegbv) tries to illustrate the structure of a dataset used to estimate genomic breeding values (GBV).
+
+```{r datastucturegbv, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg", fig.cap="Structure of Dataset To Estimate GBV", out.width="100%"}
+#rmddochelper::use_odg_graphic(ps_path = "odg/datastucturegbv.odg")
+knitr::include_graphics(path = "odg/datastucturegbv.png")
+```
+ 
+As can be seen from Figure \@ref(fig:datastucturegbv) each of the $N$ animals have known genotypes for all three SNP markers and they all have a phenotypic observation $y_i \quad (i = 1, \cdot, N)$. Because we are assuming each SNP marker to be bi-allelic, there are only three possible marker genotypes at every marker position. Hence marker genotypes are discrete entities with a fixed number of levels. Due to the nature of the SNP marker genotype data, we can already say that they could be modeled as fixed effects in a fixed linear effects model. More details about the model will follow in section \@ref(asm-flem-model).
+
+
+## Model {#asm-flem-model}
+The goal of our data analysis using the dataset described in section \@ref(asm-flem-data) is to come up with estimates for genomic breeding values for all animals in our dataset. The genomic breeding values will later be used to rank the animals. The ranking of the animals according to the GBV is used to select the parents of the future generation of livestock animals. It probably makes sense to distinguish between two different types of models that we have to set up. On the one side we need a model that describes the underlying genetic architecture which is present in our dataset. We will be using a so-called __genetic__ model to describe this. On the other side, we have to be able to get estimates for the GBVs which requires a __statistical__ model which is able to estimate unknown parameters as a function of observed data. In the end, we will realize that the two models are actually the same model but they are just different ways of looking at the same structure of the underlying phenomena. These phenomena characterize the relationship between genetic architecture of an animal and the expression of a certain phenotypic trait in that same animal.
+
+
+### Genetic Model {#asm-flem-genetic-model}
+The availability of genomic information for all animals in the dataset makes it possible to use a polygenic model. In contrast to an infinitesimal model, a polygenic model uses a finite number of discrete loci to model the genetic part of an expressed phenotypic observation. From quantitative genetics (see e.g. [@Falconer1996] for a reference) we know that every phenotypic observation $y$ can be separated into a genetic part $g$ and an environmental part $e$. This leads to the very simple genetic model 
+
+\begin{equation}
+  y = g + e
+  (\#eq:simplegeneticmodel)
+\end{equation}
+
+The environmental part can be split into some fixed known systematic factors such as `herd`, `season effects`, `age` and more and into a random unknown part. The systematic factors are typically grouped into a vector of fixed effects called $\beta$. The unknown environmental random part is usually called $\epsilon$. This allows to re-write the simple genetic model in \@ref(eq:simplegeneticmodel) as
+
+\begin{equation}
+  y = \beta + g + \epsilon
+  (\#eq:envdecompgeneticmodel)
+\end{equation}
+
+The genetic component $g$ can be decomposed into contributions from the finite number of loci that are influencing the observation $y$. In our example dataset (see Figure \@ref(fig:datastucturegbv)) there are three loci^[Implicitly, we are treating the SNP-markers to be identical with the underlying QTL. But based on the fact that we have very many SNPs spread over the complete genome, there will always be SNP sufficiently close to every QTL that influences a certain trait. But in reality the unknown QTL affect the traits and not the SNPs.] that are assumed to have an effect on $y$. Ignoring any interaction effects between the three loci and thereby assuming a completely additive model, the overall genetic effect $g$ can be decomposed into the sum of the genotypic values of each locus. Hence 
+
+\begin{equation}
+  g = \sum_{j=1}^k g_j
+  (\#eq:decompgeneticeffect)
+\end{equation}
+
+where for our example $k$ is equal to three^[In reality $k$ can be $1.5*10^5$ for some commercial SNP chip platforms. When working with complete genomic sequences, $k$ can also be in the order of $3*10^7$.]. 
+
+Considering all SNP loci to be purely additive which means that we are ignoring any dominance effects, the genotypic values $g_j$ at any locus $j$ can just take one of the three values $-a_j$, $0$ or $+a_j$ where $a_j$ corresponds to the $a$ value from the mono-genic model (see Figure \@ref(fig:monogenicsnpmodel)). For our example dataset the genotypic value for each SNP genotype is given in the following table.
+
+```{r 02-flem-genotypicvalue, echo=FALSE, results='asis'}
+tbl_genoval <- tibble::tibble(`SNP Locus` = c(rep("$SNP_1$", 3),
+                                              rep("$SNP_2$", 3),
+                                              rep("$SNP_3$", 3)),
+                              Genotype = c("$G_1G_1$","$G_1G_2$","$G_2G_2$",
+                                           "$H_1H_1$","$H_1H_2$","$H_2H_2$",
+                                           "$I_1I_1$","$I_1I_2$","$I_2I_2$"),
+                              `Genotypic Value` = c("$a_1$", "$0$", "$-a_1$",
+                                                    "$a_2$", "$0$", "$-a_2$",
+                                                    "$a_3$", "$0$", "$-a_3$"))
+knitr::kable(tbl_genoval,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = "Genotypic Values For All Three SNP-Loci",
+             escape = FALSE)
+```
+
+From the Table \@ref(tab:02-flem-genotypicvalue) we can see that always the allele with subscript $1$ is taken to be that with the positive effect. Combining the information from Table \@ref(tab:02-flem-genotypicvalue) together with the decomposition of the genotypic value $g$ in \@ref(eq:decompgeneticeffect), we get 
+
+\begin{equation}
+  g = m^T \cdot a
+  (\#eq:genotypicvalueintermsofa)
+\end{equation}
+
+where $m$ is an indicator vector taking values of $-1$, $0$ and $1$ depending on the SNP marker genotype and $a$ is the vector of $a$ values for all SNP marker loci. Combining the decomposition in \@ref(eq:genotypicvalueintermsofa) together with the basic genetic model in \@ref(eq:envdecompgeneticmodel), we get
+
+\begin{equation}
+  y = \beta + m^T \cdot a + \epsilon
+  (\#eq:finalgeneticmodel)
+\end{equation}
+
+The result obtained in \@ref(eq:envdecompgeneticmodel) is the fundamental decomposition of the phenotypic observation $y$ into a genetic part represented by the SNP marker information ($m$) and an environmental part ($\beta$ and $\epsilon$). The $a$ values are unknown and must be estimated. The estimates of the $a$ values will then be used to predict the GBVs. How this estimation procedure works is described in the next section \@ref(asm-flem-statistical-model). 
+
+
+### Statistical Model {#asm-flem-statistical-model}
+When looking at the fundamental decomposition given in the genetic model presented in \@ref(eq:finalgeneticmodel) from a statistics point of view, the model in \@ref(eq:finalgeneticmodel) can be interpreted as __fixed linear effects model__ (FLEM). FLEM represent a class of linear models where each model term except for the random residual term is a fixed effect. Furthermore, besides a random error term, the response is explained by a linear function of the predictor variables. 
+
+Using the decomposition given in our genetic model (see equation \@ref(eq:finalgeneticmodel)) for our example dataset illustrated in Figure \@ref(fig:datastucturegbv), every observation $y_i$ of animal $i$ can be written as
+
+\begin{equation}
+  y_i = W_i \cdot \beta + M_i \cdot a + \epsilon_i
+  (\#eq:basisstatisticalmodel)
+\end{equation}
+
+where 
+
+* $y_i$ is the observation of animal $i$
+* $\beta$ is a vector of unknown systematic environmental effects
+* $W_i$ is an indicator row vector linking $\beta$ to $y_i$
+* $a$ is a vector of unknown additive allele substitution effects ($a$ values)
+* $M_i$ is an indicator row vector encoding the SNP genotypes of animal $i$ and
+* $\epsilon_i$ is the random unknown environmental term belonging to animal $i$
+
+In the following section, we write down the definition of a FLEM and compare it to the statistical model given in \@ref(eq:basisstatisticalmodel). 
+
+
+## Definition of FLEM {#asm-flem-definition}
+The multiple fixed linear effects model is defined as follows.
+
+
+<!--- ----------------------------------------------------------------------- --
+TODO: Fix defintion
+TODO: The following specification of a definition does not work
+TODO: Fix it to make it work again
+----- ---------------------------------------------------------------------- -->
+
+<!--```{definition, label="defflem", name="Fixed Linear Effects Model"}-->
+In a fixed linear effects model, every observation $i$ in a dataset is characterized by a __response variable__ and a set of __predictors__. Up to some random errors the response variable can be expressed as a linear function of the predictors. The proposed linear function contains unknown parameters. The goal is to estimate both the unknown parameters and the error variance.
+<!--```-->
+
+
+### Terminology {#asm-flem-terminology}
+For datasets where both the predictors and the response variables are on a continuous scale, which means that they correspond to measured quantities such as body weight, breast circumference or milk yield, the model is referred to as __multiple linear regression model__. Because the statistical model in \@ref(eq:basisstatisticalmodel) contains the SNP genotypes as discrete fixed effects, we are not dealing with a regression model but with a more general fixed linear effects model. 
+
+
+### Model Specification {#asm-flem-model-specification}
+An analysis of the model given in \@ref(eq:basisstatisticalmodel) shows that it exactly corresponds to the definition \@ref(def:defflem). In this equivalence, the observation $y_i$ corresponds to the response variable. Furthermore, the unknown environmental term $\epsilon$ corresponds to the random residual part in the FLEM. Except for the random residuals the response variable $y_i$ is a linear function of the fixed effects which corresponds to all systematic environmental effects and to all SNP genotype effects. 
+
+For the description of how to estimate the unknown parameter $\beta$ and $a$ in the model \@ref(eq:basisstatisticalmodel), it is useful to combine $\beta$ and $a$ into a single vector of unknown parameters and we call it $b$.
+
+\begin{equation}
+  b = \left[ \begin{array}{c} \beta \\ a \end{array} \right]
+  (\#eq:combinefixedeffects)
+\end{equation}
+
+Taking the equations as shown in \@ref(eq:basisstatisticalmodel) for all observations ($i=1, \ldots, N$) and expressing them in matrix-vector notation, we get
+
+\begin{equation}
+ y = Xb + \epsilon
+ (\#eq:flemmatrixvector)
+\end{equation}
+
+where 
+
+* $y$ is the vector of $N$ observations
+* $b$ is the vector of all unknown fixed effects
+* $X$ is the incidence matrix linking the parameters of $b$ to $y$
+* $\epsilon$ is the vector of random residuals
+
+The incidence matrix $X$ in \@ref(eq:flemmatrixvector) can be composed from the matrices $W$ and $M$ by concatenating the latter two matrices, i.e., 
+
+\begin{equation}
+  X = \left[ \begin{array}{cc} W  &  M  \end{array} \right]
+  (\#eq:composematrixx)
+\end{equation}
+
+
+## Regression On Dummy Variables {#asm-flem-reg-dummy}
+In a regression model both the response variable and the predictor variables are continuous variables. Examples of such variables are `body weight` and `breast circumference` which are both measured and the measurements are expressed as real numbers. In contrast to such a regression model, the statistical model shown in \@ref(eq:basisstatisticalmodel) has a continuous response, but the predictor variables are discrete variables. The predictor variables are assumed to be genotypes of a certain set of SNP genotypes and hence these genotypes can only have a fixed number of states. Under the assumption of bi-allelic Loci, a SNP locus can have just three genotypes and hence the predictor variable that is used to represent any given SNP-locus can only take three discrete states.
+
+Figure \@ref(fig:compareregflem) shows the difference between a regression model as the one of `body weight` on `breast circumference` and a fixed linear effects model where one locus has an effect on a quantitative trait. In the left diagram of Figure \@ref(fig:compareregflem) the red line denotes the regression line. This line is meaningful because on the x-axis and on the y-axis every single point of the red line would be valid observations. On the x-axis of the diagram on the righthand side, only three values are possible. In the diagram they are shown as Genotypes $G_1G_1$, $G_1G_2$ and $G_2G_2$. We will see very soon that in our statistical model, they will be encoded by $1$, $0$ and $-1$. The response variable in the diagram on the right of Figure \@ref(fig:compareregflem) is a continuous random variable, similarly to the regression model shown in the left diagram. This combination of continuous response variable on a discrete type of variable lead to the term __regression on dummy variables__ because the predictor variables are not continuous but just discrete levels of a certain factor. In this lecture, we are using __fixed linear effects model__ rather than regression on dummy variables for the same type of model. The term of fixed linear effects model was used, because in the next chapter in Genomic BLUP we are going to introduce mixed linear effects model which are an extension of the fixed linear effects model used in this chapter.
+
+```{r generateflemdata, eval=TRUE, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+### # This chunk generates the second half of the following Figure and must only be 
+### #  run once and afterwards, when the following figure is updated. In a normal build
+### #  it need not be evaluated.
+### # fix the number of animals
+n_nr_animal <- 20
+### # intercept
+n_inter_cept <- 500
+### # residual standard deviation
+n_res_sd <- 12.13
+### # vector of genotype value coefficients
+vec_geno_value_coeff <- c(-1,0,1)
+### # sample genotypes of unlinked SNP randomly
+set.seed(436)
+### # fix allele frequency of positive allele
+n_prob_snps <- .45
+### # genotypic values 
+vec_geno_val <- 43.52
+### # put together the genotypes into a matrix
+vec_geno_snp <- sample(vec_geno_value_coeff, n_nr_animal, prob = c((1-n_prob_snps)^2, 
+                                                                   2*(1-n_prob_snps)*n_prob_snps, 
+                                                                   n_prob_snps^2), 
+                       replace = TRUE)
+vec_obs_y <- n_inter_cept + vec_geno_snp * vec_geno_val + rnorm(n = n_nr_animal, mean = 0, sd = n_res_sd)
+### # mapping the -1,0,1 codes to genotypes
+geno_code_map <- tibble::tibble(code = c(-1, 0, 1),
+                            `SNP G` = c("G2G2", "G1G2", "G1G1"))
+geno_code <- tibble::tibble(`Code G` = vec_geno_snp)
+require(dplyr)
+geno_code %>% 
+  inner_join(geno_code_map, by = c("Code G" = "code")) %>%
+  select(`SNP G`) -> geno_snp_g
+
+tbl_obs <- tibble::tibble(Observation = round(vec_obs_y, digits = 0))
+geno_snp_g %>% bind_cols(tbl_obs) -> tbl_all_data
+# tbl_all_data
+### # generate the plot
+require(ggplot2)
+p <- ggplot(data = tbl_all_data, aes(x = `SNP G`, y = Observation)) +
+  geom_point(color = 'blue')
+s_plot_filename <- "odg/flem_geno.pdf"
+if (!file.exists(s_plot_filename))
+  ggsave(s_plot_filename, p)
+```
+
+```{r compareregflem, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg", fig.cap="Comparison Between Regression Model And Fixed Linear Effects Model With An SNP-Locus As A Discrete Predictor Variables", out.width='11cm'}
+#rmddochelper::use_odg_graphic(ps_path = "odg/compareregflem.odg")
+knitr::include_graphics(path = "odg/compareregflem.png")
+```
+
+
+### Fixed Linear Effects Model For SNP Data {#asm-flem-flem-for-snp}
+We are using genetic data and assume that the SNP genotypes have an effect on a quantitative trait. Our goal is to predict genomic breeding values based on the information from the SNP genotypes for the quantitative traits. We have seen that under some simplifying assumptions of additivity of the genetic effects, the genomic breeding values depend on the absolute value of the genotypic values ($a$ values) of the homozygous SNP genotypes. Hence all we need to know from our analysis of the data under a fixed linear effects model are the $a$ values for each SNP locus. The decomposition of the phenotypic observation shown in \@ref(asm-flem-genetic-model) under the assumed genetic model tells us that the phenotypic observation can be explained as a linear function of the genotypic values of the SNP genotypes plus a random error term. The fact that our genetic model is a fixed linear effects model that uses phenotypic observations as response and SNP loci as predictors allows us to set up the following model for an example data set shown in the following subsection.
+
+
+### Example Data Set With SNP Loci And A Phenotypic Observation {#asm-flem-snp-obs}
+We are using the dataset shown in Table \@ref(tab:dataflemsnpobs) as an example on how to use a fixed linear effects model to estimate the genotypic value of the SNP genotypes.
+
+```{r dataflemsnpobs, echo=FALSE}
+### # fix the number of animals
+n_nr_animal <- 20
+### # intercept
+n_inter_cept <- 500
+### # residual standard deviation
+n_res_sd <- 12.13
+### # vector of genotype value coefficients
+vec_geno_value_coeff <- c(-1,0,1)
+### # sample genotypes of unlinked SNP randomly
+set.seed(436)
+### # fix allele frequency of positive allele
+n_prob_snps <- .45
+### # genotypic values 
+vec_geno_val <- c(27.2, 7.3)
+n_nr_snp <- length(vec_geno_val)
+### # put together the genotypes into a matrix
+mat_geno_snp <- matrix(c(sample(vec_geno_value_coeff, n_nr_animal, prob = c((1-n_prob_snps)^2, 
+                                                                   2*(1-n_prob_snps)*n_prob_snps, 
+                                                                   n_prob_snps^2), 
+                       replace = TRUE),
+                       sample(vec_geno_value_coeff, n_nr_animal, prob = c(n_prob_snps^2, 
+                                                                   2*(1-n_prob_snps)*n_prob_snps, 
+                                                                   (1-n_prob_snps)^2), 
+                       replace = TRUE)),
+                       nrow = n_nr_snp)
+mat_obs_y <- n_inter_cept + crossprod(mat_geno_snp, vec_geno_val) + rnorm(n = n_nr_animal, mean = 0, sd = n_res_sd)
+### # mapping the -1,0,1 codes to genotypes
+geno_code_map <- tibble::tibble(code = c(-1, 0, 1),
+                            `SNP G` = c("$G_2G_2$", "$G_1G_2$", "$G_1G_1$"),
+                            `SNP H` = c("$H_2H_2$", "$H_1H_2$", "$H_1H_1$"),
+                            `Genotypic Value G` = c("$-a_G$", "$0$", "$a_G$"),
+                            `Genotypic Value H` = c("$-a_H$", "$0$", "$a_H$"))
+geno_code <- tibble::tibble(`Code G` = mat_geno_snp[1,],
+                            `Code H` = mat_geno_snp[2,])
+
+require(dplyr)
+geno_code %>% 
+  inner_join(geno_code_map, by = c("Code G" = "code")) %>%
+  select(`SNP G`, `Genotypic Value G`) -> geno_snp_g
+geno_code %>% 
+  inner_join(geno_code_map, by = c("Code H" = "code")) %>%
+  select(`SNP H`, `Genotypic Value H`) -> geno_snp_h
+geno_snp_all <- bind_cols(geno_snp_g, geno_snp_h)
+### # add the data
+mat_obs_y_rounded <- round(mat_obs_y, digits = 0)
+tbl_obs <- tibble::tibble(Observation = mat_obs_y_rounded[,1])
+geno_snp_all %>% bind_cols(tbl_obs) -> tbl_all_data
+### # add animal ids
+tbl_all_data <- bind_cols(Animal = c(1:n_nr_animal),tbl_all_data)
+
+# tbl_flemsnppbs <- tibble::tibble()
+knitr::kable(tbl_all_data,
+             booktabs = TRUE,
+             longtable = FALSE,
+             caption = "Animals With Two SNP Loci Affecting A Quantitative Trait",
+             escape = FALSE)
+```
+
+Instead of fitting individual effects for the different SNP genotypes to explain the response variable, we are directly including the genotypic values $a_G$ and $a_H$ into the fixed effects linear model. How the genotypic values are related to the SNP genotypes is also shown in Table \@ref(tab:dataflemsnpobs). For all animals in Table \@ref(tab:dataflemsnpobs), we can write the model equations in matrix-vector notation as
+
+\begin{equation}
+  y = Xb + \epsilon
+  (\#eq:flemsnp)
+\end{equation}
+
+where $y$ is the vector of observations, $b$ is a vector of genotypic values plus an intercept, $X$ is a design matrix linking the elements in $b$ to $y$ and $\epsilon$ is a vector of random errors. Writing out the matrices and vectors leads to 
+
+```{r, echo=FALSE, results='asis'}
+matX <- matrix(c(1, 1, 0,
+                 1, 0, 1,
+                 1, 0, 1,
+                 1, 1, -1,
+                 1, 1, 1,
+                 1, 0, 0,
+                 1, 0, -1,
+                 1, -1, 1,
+                 1, 0, -1,
+                 1, -1, 0,
+                 1, 1, 0,
+                 1, 1, 1,
+                 1, -1, 0,
+                 1, -1, 0,
+                 1, 0, 1,
+                 1, 0, 0,
+                 1, 1, 0,
+                 1, 1, 0,
+                 1, 1, -1,
+                 1, 0, 0), nrow = n_nr_animal, byrow = TRUE)
+vec_b = matrix(c("b_0", "a_G", "a_H"), ncol = 1)
+cat("\\begin{equation}\n")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_obs_y_rounded), collapse = "\n"), "\n")
+cat(" = \n")
+cat(paste0(rmdhelp::bmatrix(pmat = matX), collapse = "\n"), "\n")
+cat(paste0(rmdhelp::bmatrix(pmat = vec_b), collapse = "\n"), "\n")
+cat(" + \\epsilon")
+cat("\\end{equation}")
+```
+
+
+### Parameter Estimation In A Fixed Linear Effects Model {#asm-flem-parameter-estimation-in-flem}
+The goal for model \@ref(eq:flemsnp) is to get an estimate for the unknown parameters $b_0$, $a_G$ and $a_H$. In section \@ref(asm-flem-parameter-estimation-least-squares) we saw how unknown parameters can be estimated for a regression model using least squares. When applying the least squares method, we did not make any assumptions about the predictor variables. The minimization of the sum of the squared residuals can also be applied for the fixed linear effects model. This minimization leads to the same normal equations
+
+\begin{equation}
+  X^TXb^{(0)} = X^Ty
+  (\#eq:normalequationflem)
+\end{equation}
+
+So far everything was identical to the case of the regression model. But when trying to find a solution for \@ref(eq:normalequationflem) we have to account for the different nature of the design matrix $X$. In the regression model this matrix $X$ contains real numbers. In our example of a fixed linear effects model, the matrix $X$ just contains just the three number $-1$, $0$ and $1$^[In most other fixed linear effects models, the design matrix contains just $0$ and $1$.]. The fact that the matrix $X$ contains only a few discrete values makes it very likely that $X$ does not have full column rank. That means it is very likely that some columns of $X$ can be expressed as linear combinations of other columns. This linear dependence of the columns of $X$ causes the matrix $X^TX$ to be singular and hence the inverse of $X^TX$ cannot be computed. Whenever the matrix $X^TX$ is singular, the solution given in \@ref(eq:solutionhatb) cannot be computed.
+
+The normal equations in \@ref(eq:normalequationflem) are written with the symbol $b^{(0)}$ to denote that the equations do not have a single solution $b^{(0)}$ in the sense that we were able to compute them in the case of the regression model. In the case where $X^TX$ is singular, there are infinitely many solutions $b^{(0)}$. These solutions can be expressed as
+
+\begin{equation}
+  b^{(0)} = (X^TX)^-X^Ty
+  (\#eq:gensolnormalequationflem)
+\end{equation}
+
+where $(X^TX)^-$ stands for a __generalized inverse__ of the matrix $X^TX$. 
+
+
+### Generalized Inverse Matrices {#asm-flem-generalized-inverse-matrices}
+A generalized inverse matrix $G$ of a given matrix $A$ is defined as the matrix that satisfies the equation $AGA = A$. The matrix $G$ is not unique. Applying the concept of a generalized inverse to a system of equations $Ax = y$, it can be shown that $x = Gy$ is a solution, if $G$ is a generalized inverse of $A$. Because $G$ is not unique, there are infinitely many solutions corresponding to $\tilde{x} = Gy + (GA - I)z$ where $z$ can be an arbitrary vector of consistent length. Applying these statements concerning generalized inverses and solutions to systems of equations to \@ref(eq:gensolnormalequationflem), it means that $b^{(0)}$ is not a unique solution to \@ref(eq:normalequationflem) because the generalized inverse $(X^TX)^-$ is not unique. As a consequence of that non-uniqueness, the solution $b^{(0)}$ cannot be used as an estimate of the unknown parameter vector $b$. 
+
+
+### Estimable Functions {#asm-flem-estimable-functions}
+The numeric solution of the analysis of the example dataset given in Table \@ref(tab:dataflemsnpobs) is the topic of an exercise. When developing that solution, we will see that some linear functions of $b^{(0)}$ can be found which do not depend on the choice of the generalized inverse $(X^TX)^-$. Such functions are called __estimable functions__ and can be used as estimates for the respective functions of the unknown parameter vector $b$. The idea of estimable functions can be demonstrated with the following example. 
+
+```{r ex-estimable-function-data, echo=FALSE}
+n_nr_rec_est_fun <- 6
+tbl_est_fun <- tibble::tibble(Animal = n_nr_rec_est_fun,
+                              `SNP G` = c("$G_1G_1$", "$G_1G_1$", "$G_1G_1$", "$G_1G_2$", "$G_1G_2$", "$G_1G_2$"),
+                              `SNP H` = c("$H_1H_2$", "$H_1H_2$", "$H_1H_2$", "$H_1H_1$", "$H_1H_1$", "$H_1H_2$"),
+                              `SNP I` = c("$I_1I_2$", "$I_1I_2$", "$I_1I_2$", "$I_1I_2$", "$I_1I_2$", "$I_1I_1$"),
+                              Observation = c(16, 10, 19, 11, 13, 27))
+```
+
+Let us assume that we have a small data set of `r n_nr_rec_est_fun` animals with observations in a particular traits and given genotypes at three loci. The dataset for that example is given in Table \@ref(tab:ex-estimable-function-table). 
+
+```{r ex-estimable-function-table, echo=FALSE}
+knitr::kable(tbl_est_fun,
+             booktabs = TRUE,
+             longtable = FALSE,
+             caption = "Example Showing Estimable Functions",
+             escape = FALSE)
+```
+
+As shown before, we want to estimate the marker effects at the three loci $G$, $H$ and $I$. This can be done with the following fixed effects model. 
+
+$$y = Xb + e$$
+with 
+
+```{r, echo=FALSE, results='asis'}
+# design matrix X
+mat_x_est_fun <- matrix(c(1, 1, 0, 0,
+                          1, 1, 0, 0,
+                          1, 1, 0, 0,
+                          1, 0, 1, 0,
+                          1, 0, 1, 0,
+                          1, 0, 0, 1), ncol = 4, byrow = TRUE)
+# parameter vector b
+vec_b <- c("\\mu", "\\alpha_1", "\\alpha_2", "\\alpha_3")
+cat("$$\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = tbl_est_fun$Observation, ps_name = "y"), collapse = '\n'))
+cat("\\text{, }")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_x_est_fun, ps_name = "X"), collapse = "\n"))
+cat("\\text{ and }")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b, ps_name =  "b"), collapse = "\n"), "\n")
+cat("$$\n")
+```
+
+The vector $b$ of unknown parameters consist of the general mean $\mu$ and the three marker effects $\alpha_1$, $\alpha_2$ and $\alpha_3$. Based on the above information, the normal equations can be written as
+
+```{r, echo=FALSE, results='asis'}
+mat_xtx_est_fun <- crossprod(mat_x_est_fun)
+mat_xty_est_fun <- crossprod(mat_x_est_fun, tbl_est_fun$Observation)
+vec_b0 <- c("\\mu^0", "\\alpha_1^0", "\\alpha_2^0", "\\alpha_3^0")
+cat("$$\n")
+cat(paste0(rmdhelp::bmatrix(mat_xtx_est_fun), collapse = '\n'))
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b0), collapse = '\n'))
+cat(" = ")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_xty_est_fun), collapse = '\n'))
+cat("$$\n")
+```
+
+The above equations have infinitely many solutions. Four of them are shown below in Table \@ref(tab:est-fun-sol). 
+
+```{r est-fun-sol, echo=FALSE}
+tbl_est_fun_sol <- tibble::tibble(`Elements of Solution` = c("$\\mu^0$", "$\\alpha_1^0$", "$\\alpha_2^0$", "$\\alpha_3^0$"),
+                                  `$b_1^0$` = c(16, -1, -4, 11),
+                                  `$b_2^0$` = c(14, 1, -2, 13),
+                                  `$b_3^0$` = c(27, -12, -15, 0),
+                                  `$b_4^0$` = c(-2982, 2997, 2994, 3009))
+knitr::kable(tbl_est_fun_sol,
+             booktabs = TRUE,
+             longtable = FALSE,
+             caption = "Solution of Normal Equations",
+             escape = FALSE)
+```
+
+The differences between the same elements in the four numerical solutions make it clear why no solution $b^0$ can be used as estimates for the unknown parameters in $b$. 
+
+This problem can be addressed, if we are not considering the single elements of a solution vector $b^0$, but linear functions of these elements. Examples of such linear functions are shown in Table \@ref(tab:lin-fun-sol).
+
+
+```{r lin-fun-sol, echo=FALSE}
+tbl_lin_fun_sol <- tibble::tibble(`Linear Function` = c("$\\alpha_1^0 - \\alpha_2^0$", "$\\mu^0 + \\alpha_1^0$", "$\\mu^0 + 1/2(\\alpha_2^0 + \\alpha_3^0)$"),
+                                  `$b_1^0$` = c(3, 15, 19.5),
+                                  `$b_2^0$` = c(3, 15, 19.5),
+                                  `$b_3^0$` = c(3, 15, 19.5),
+                                  `$b_4^0$` = c(3, 15, 19.5))
+knitr::kable(tbl_lin_fun_sol,
+             booktabs = TRUE,
+             longtable = FALSE,
+             caption = "Estimates of Estimable Functions",
+             escape = FALSE)
+```
+
+The values of the expressions shown in Table \@ref(tab:lin-fun-sol) are invariant to whatever solution $b^0$ is selected. Because this invariance statement is true for all solutions $b^0$, these functions are of special interest which corresponds to
+
+* $\alpha_1^0 - \alpha_2^0$: estimate of the difference between marker effect of locus $G$ and locus $H$
+* $\mu^0 + \alpha_1^0$: estimate of the general mean plus the marker effect of locus $G$
+* $\mu^0 + 1/2(\alpha_2^0 + \alpha_3^0)$: estimate of the general mean plus mean effect of loci $H$ and $I$
+
+
+#### Definition of Estimable Functions 
+In summary the underlying idea of estimable functions are that they are linear functions of the parameters $b$ that do not depend on the numerical solutions $b^0$ of the normal equations. Because estimable functions are functions of the parameters $b$, they can be expressed as $q^Tb$ where $q^T$ is a row vector. In a more formal way estimable functions can be described by the following definition.
+
+<!--```{definition, label="defestfun", name="Estimable Function"}-->
+A (linear) function of the parameters $b$ is defined as __estimable__, if it is identically equal to some linear function of the expected value of the vector of observations $y$. 
+<!--```-->
+
+This means the linear function $q^Tb$ is estimable, if 
+
+$$q^Tb = t^TE(y)$$
+
+for some vector $t$. That means, if there exists a vector $t$, such that $t^TE(y) = q^Tb$, then $q^Tb$ is said to be estimable. For our example shown in Table \@ref(tab:ex-estimable-function-table), the expected value of the observations of all animals with a genotype $G_1G_1$ is obtained by 
+
+$$E(y_{G_1G_1}) = \mu + \alpha_1$$
+with $t^T = \left[\begin{array}{cccccc} 1 & 1 & 1 & 0 & 0 & 0 \end{array}\right]$ and $q^T = \left[\begin{array}{cccc} 1 & 1 & 0 & 0 \end{array} \right]$
+
+
+### Properties of Estimable Functions
+Among the many properties we are here just listing the ones that are considered important. The complete list of properties can be found in `r met$add("Searle1971")`. 
+
+* _Form of estimable function_. If $q^Tb$ is estimable, then $q^Tb = t^TE(y)$ for some $t$. By definition $E(y) = Xb$ and therefore, $q^Tb = t^TXb$. Because estimability is not a concept that depends on $b$, this result is true for all values of $b$. Therefore 
+
+$$q^t = t^TX$$
+for some vector $t$. 
+
+* _Invariance to solutions_ $b^0$. If $q^Tb$ is estimable, the linear function $q^Tb^0$ is invariance to whatever solution of the normal equation
+
+$$X^TXb^0 = X^Ty$$
+is used for $b^0$. This is because 
+
+$$q^Tb^0 = t^TXb^0 = t^TXGX^Ty$$
+where $G$ is a generalized inverse of $X^TX$ and $XGX^T$ is invariant to $G$ which means that it is the same for any choice of $G$. 
+
+
+#### Testing for Estimability
+A given function $q^Tb$ is estimable, if some vector $t$ can be found, such that $t^TX = q^T$. For a known value of $q$, it might not be easy to find a vector $t$ satisfying $t^TX=q^T$. Alternatively to finding a vector $t$, estimability of $q^Tb$ can also be investigated by seeing whether $q$ has the property that 
+
+$$q^TH = q^T$$
+
+with $H = GX^TX$. A proof of that can be found in `r met$add("Searle1971")`. 
+
+
+ 
