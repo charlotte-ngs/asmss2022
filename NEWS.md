@@ -1,3 +1,7 @@
+# asmss2022 0.3.3
+
+* Slides with notes for l03 and link to video
+
 # asmss2022 0.3.2
 
 * Slides for l03 on fixed linear effects model
