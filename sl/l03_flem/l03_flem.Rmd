@@ -1,0 +1,89 @@
+---
+title: Fixed Linear Effects Models
+author: Peter von Rohr
+date: "`r Sys.Date()`"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Extension of Dataset on Body Weight
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+s_data_dir <- file.path(here::here(), "docs", "data")
+s_flem_path <- file.path(s_data_dir, "asm_bw_flem.csv")
+tbl_flem <- readr::read_csv(file = s_flem_path)
+tbl_flem <- dplyr::rename(tbl_flem, BC = `Breast Circumference`)
+knitr::kable(tbl_flem,
+             booktabs = TRUE,
+             longtable = TRUE,
+             escape = FALSE)
+```
+
+
+## Include Breed into Model
+
+* Breed has an influence on body weight
+* Predictor variables must be numeric
+* Breed must be converted to numeric code
+* Assignment of codes to breeds is rather arbitrary
+
+
+## Breed Codes
+
+```{r, echo=FALSE}
+n_nr_breed <- nlevels(as.factor(tbl_flem$Breed))
+tbl_breed_map <- tibble::tibble(Code = c(1:n_nr_breed),
+                                Breed = c(unique(sort(tbl_flem$Breed))))
+knitr::kable(tbl_breed_map,
+             booktabs = TRUE,
+             longtable = TRUE,
+             escape = FALSE)
+```
+
+
+## Modelling Effect of Breed
+
+* Simplification: "breed" is the only predictor
+* Expected body weight ($y_i$) for animal $i$
+
+$$E(y_i) = b_0 + b_1 x_i$$
+
+
+## Problems
+
+* Nothing wrong with previous model
+* But the following relations might give a hint to some problems
+
+\begin{align}
+E(\text{BW Angus}) &= b_0 + b_1 \notag \\
+E(\text{BW Limousin}) &= b_0 + 2b_1 \notag \\
+E(\text{BW Simmental}) &= b_0 + 3b_1  \notag
+\end{align}
+
+This means, for example, that
+
+
+\begin{align}
+E(\text{BW Limousin}) - E(\text{BW Angus}) &= \notag \\E(\text{BW Simmental}) - E(\text{BW Limousin}) \notag \\
+E(\text{BW Simmental}) - E(\text{BW Angus}) &=  \notag \\ 2 \left[ E(\text{BW Limousin}) - E(\text{BW Angus})\right]  \notag
+\end{align}
+
+
+## Consequences
+
+* Allocation of numerical codes imposes relations between expected values
+* Relations might be unreasonable
+* Regression analysis only yields estimates for $b_0$ and $b_1$, effects of other breeds are determined
+* Conclusion: regression on numerical codes of discrete variables are in most cases unreasonable
+* Exception: Estimation of marker effects
+
+
+## Linear Regression Analysis for Genomic Data
+
+```{r datastucturegbv, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg", out.width="100%"}
+#rmddochelper::use_odg_graphic(ps_path = "odg/datastucturegbv.odg")
+knitr::include_graphics(path = "odg/datastucturegbv.png")
+```
