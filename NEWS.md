@@ -1,3 +1,7 @@
+# asmss2022 0.3.2
+
+* Slides for l03 on fixed linear effects model
+
 # asmss2022 0.3.1
 
 * Chapter 3 on fixed linear effects model
