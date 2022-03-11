@@ -14,7 +14,7 @@ In chapter \@ref(asm-regr), we saw how linear regression analysis was used to de
 
 The reason why fixed linear effects models must be treated differently from regression models can best be seen by looking at an extension of our example dataset on body weight of some animals. Let us assume that besides the predictors that we have used so far, we have the breed of the animal as an additional information. Animals of different breeds have different body weights, hence we expect that the breed of the animal has an effect on its body weight. The question is how is it possible to integrate the breed of the animal into a model that describes and quantifies the different influence factors on body weight. First, we have a look at the extended dataset.
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r tab-bw-breed-flem, echo=FALSE, message=FALSE, warning=FALSE}
 s_data_dir <- file.path(here::here(), "docs", "data")
 s_flem_path <- file.path(s_data_dir, "asm_bw_flem.csv")
 tbl_flem <- readr::read_csv(file = s_flem_path)
@@ -72,25 +72,26 @@ The inherent difficulty with the analysis suggested above is the allocation of n
 1. Often the assignment cannot be made in a reasonable way and is thereby to a large extent an arbitrary process.
 2. Making such allocations of numeric codes to different levels of a variable imposes value differences on the categories of the variable such as shown in equation \@ref(eq:expvalbwdiffbreedflem).
 
-The above state problems can best be solved by using a type of model that is often referred to as _regession on dummy $(0,1)$ variables_. In the context here, we are calling these models just _fixed linear effect models_. The description of these models is deferred to a later section. We first describe an important exception in which the application of a linear regression model on discrete variables is very reasonable and has a wide range of applications.
+The above state problems can best be solved by using a type of model that is often referred to as _regession on dummy $(0,1)$ variables_. In the context here, we are calling these models just _fixed linear effect models_. The description of these models is deferred to section \@ref(asm-flem-reg-dummy). We first describe an important exception in which the application of a linear regression model on discrete variables is very reasonable and has a wide range of applications.
 
 
 ## Linear Regression Analysis for Genomic Data {#asm-flem-motivation}
-The question why linear regression models can be applied to genomic data is best answered by looking at the data. In general, genomic breeding values can either be estimated using a two-step procedure or by a single step approach. At the moment, we assume that we are in the first step of the two step approach where we estimate the marker effects ($a$-values) in a reference population or alternatively we have a perfect data set with all animals genotyped and with a phenotypic observation in a single step setting. Both situations are equivalent when it comes to the structure of the underlying dataset. Furthermore the same class of models can be used to analyse the type of data.
+The question why linear regression models can be applied to genomic data is best answered by looking at the data. In general, genomic breeding values can either be estimated using a two-step procedure or by a single step approach. At the moment, we assume that we are in the first step of the two step approach where we estimate the marker effects ($a$-values) in a reference population or alternatively we have a perfect data set with all animals genotyped and with a phenotypic observation in a single step setting using a marker-effect model. Both situations are equivalent when it comes to the structure of the underlying dataset. Furthermore the same class of models can be used to analyse this type of data.
 
 
-## Data {#asm-flem-data}
-As already mentioned in section \@ref(asm-flem-motivation), we are assuming that we have a perfect dataset for a given population of animals. That means each animal $i$ has a phenotypic observation $y_i$ for a given trait of interest. Furthermore, we assume to have a map of only three SNP markers. The marker loci are called $G$, $H$ and $I$. All markers have two alleles each. Figure \@ref(fig:datastucturegbv) tries to illustrate the structure of a dataset used to estimate genomic breeding values (GBV).
+### Data {#asm-flem-data}
+As already mentioned in section \@ref(asm-flem-motivation), we are assuming that each animal $i$ has a phenotypic observation $y_i$ for a given trait of interest. Furthermore, every animal has a genotype consisting of only three SNP markers. The marker loci are called $G$, $H$ and $I$. All markers have two alleles each. Figure \@ref(fig:datastucturegbv) tries to illustrate the structure of such a dataset used to estimate marker effects for the three SNP.
 
 ```{r datastucturegbv, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg", fig.cap="Structure of Dataset To Estimate GBV", out.width="100%"}
 #rmddochelper::use_odg_graphic(ps_path = "odg/datastucturegbv.odg")
 knitr::include_graphics(path = "odg/datastucturegbv.png")
 ```
  
-As can be seen from Figure \@ref(fig:datastucturegbv) each of the $N$ animals have known genotypes for all three SNP markers and they all have a phenotypic observation $y_i \quad (i = 1, \cdot, N)$. Because we are assuming each SNP marker to be bi-allelic, there are only three possible marker genotypes at every marker position. Hence marker genotypes are discrete entities with a fixed number of levels. Due to the nature of the SNP marker genotype data, we can already say that they could be modeled as fixed effects in a fixed linear effects model. More details about the model will follow in section \@ref(asm-flem-model).
+As can be seen from Figure \@ref(fig:datastucturegbv) each of the $N$ animals have known genotypes for all three SNP markers and they all have a phenotypic observation $y_i \quad (i = 1, \cdot, N)$. Because we are assuming each SNP marker to be bi-allelic, there are only three possible marker genotypes at every marker position. Hence marker genotypes are discrete entities with a fixed number of levels. Hence, in principle the marker genotypes occur in discrete levels such as the breed of an animal from dataset shown in Table \@ref(tab:tab-bw-breed-flem). Because we are interested in the maker-effect at each locus which is the difference between the expected genotypic value between the genotypes which differ in one favorable allele under a strictly additive model. The relationsships shown in equation \@ref(eq:expvalbwdiffbreedflem) which are imposed by the use of a linear regression model on the discrete genotype variables, contain the marker effects that we are interested in. More details about the model will follow in section \@ref(asm-flem-model).
 
+<!-- TODO: continue here -->
 
-## Model {#asm-flem-model}
+### Model {#asm-flem-model}
 The goal of our data analysis using the dataset described in section \@ref(asm-flem-data) is to come up with estimates for genomic breeding values for all animals in our dataset. The genomic breeding values will later be used to rank the animals. The ranking of the animals according to the GBV is used to select the parents of the future generation of livestock animals. It probably makes sense to distinguish between two different types of models that we have to set up. On the one side we need a model that describes the underlying genetic architecture which is present in our dataset. We will be using a so-called __genetic__ model to describe this. On the other side, we have to be able to get estimates for the GBVs which requires a __statistical__ model which is able to estimate unknown parameters as a function of observed data. In the end, we will realize that the two models are actually the same model but they are just different ways of looking at the same structure of the underlying phenomena. These phenomena characterize the relationship between genetic architecture of an animal and the expression of a certain phenotypic trait in that same animal.
 
 
@@ -226,3 +227,6 @@ The incidence matrix $X$ in \@ref(eq:flemmatrixvector) can be composed from the 
   (\#eq:composematrixx)
 \end{equation}
 
+
+## Regression On Dummy Variables {#asm-flem-reg-dummy}
+In a regression model both the response variable and the predictor variables are continuous variables. Examples of such variables are `body weight` and `breast circumference` which are both measured and the measurements are expressed as real numbers. In contrast to such a regression model, 
