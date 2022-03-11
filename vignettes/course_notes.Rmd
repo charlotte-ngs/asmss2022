@@ -19,14 +19,16 @@ This page contains the list of links pointing to the different chapters in the c
 
 ```{r chapter-table, echo=FALSE, message=FALSE, warning=FALSE}
 s_cn_url <- "https://charlotte-ngs.github.io/asmss2022/cn/"
-tbl_chpt <- tibble::tibble(Nr      = c(1, 2, 3),
+tbl_chpt <- tibble::tibble(Nr      = c(1, 2, 3, 4),
                            Date    = c("2022-02-21",
                                        "2022-02-28",
-                                       "2022-03-07"),
+                                       "2022-03-07",
+                                       "2022-04-14"),
                            Topics  = c(
                              paste0("[Introduction](", s_cn_url, "01_intro.pdf)", collapse = ""),
                              paste0("[Linear Regression](", s_cn_url, "02_regr.pdf)", collapse = ""),
-                             paste0("[Fixed Linear Effects Model](", s_cn_url, "03_flem.pdf)", collapse = "")
+                             paste0("[Fixed Linear Effects Model](", s_cn_url, "03_flem.pdf)", collapse = ""),
+                             paste0("[Regression on Dummy Variables](", s_cn_url, "03_regdvar.pdf", collapse = "")
                            ))
 knitr::kable(tbl_chpt)
 ```

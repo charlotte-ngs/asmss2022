@@ -279,6 +279,174 @@ The system of equations shown in \@ref(eq:asm-flem-bw-breed-dummy-scalar) can be
   (\#eq:asm-flem-bw-breed-dummy-mat-vec)
 \end{equation}
 
+where $\mathbf{y}$ and $\mathbf{e}$ are both vectors of the same length as there are observations in the dataset and are defined the same way as in the regression in chapter \@ref(asm-regr). The vector $\mathbf{b}$ contains the intercept as the first component and regression coefficients for each level of the factor "breed" in the model. The matrix $\mathbf{X}$ is called "design matrix" and contains zeros and ones that link the regression coefficients of the appropriate level to the observations. 
+
+Analogously to the regression model in chapter \@ref(asm-regr) the properties of the components in vector $\mathbf{e}$ of random residuals are such that $E(\mathbf{e}) = \mathbf{0}$ and $var(\mathbf{e}) = I\sigma^2$. Applying the least squares procedure to \@ref(eq:asm-flem-bw-breed-dummy-mat-vec) yields the same normal equations 
+
+\begin{equation}
+\mathbf{X}^T\mathbf{X}\mathbf{b}^{(0)} = \mathbf{X}^T\mathbf{y}
+  (\#eq:asm-flem-bw-breed-dummy-lsq-norm-eq)
+\end{equation}
+
+Due to the definition of the matrix $\mathbf{X}$, it does not have full column rank. Thus the models as shown in \@ref(eq:asm-flem-bw-breed-dummy-mat-vec) that contains factors is also referred to as "models not of full rank". An important consequence of the rank deficiency of the matrix $\mathbf{X}$ is that the inverse $(\mathbf{X}^T\mathbf{X})^{-1}$ of $(\mathbf{X}^T\mathbf{X})$ does not exist. However the use of a generalized inverse of $(\mathbf{X}^T\mathbf{X})$ solutions to the normal equation \@ref(eq:asm-flem-bw-breed-dummy-lsq-norm-eq) can be found.
+
+
+### Parameter Estimation In Models Not Of Full Rank {#asm-flem-parameter-estimation-in-flem}
+The goal of model \@ref(eq:asm-flem-bw-breed-dummy-mat-vec) is to get an estimate for the unknown parameters in vector $\mathbf{b}$. 
+
+The normal equations in \@ref(eq:asm-flem-bw-breed-dummy-lsq-norm-eq) are written with the symbol $\mathbf{b}^{(0)}$ to denote that the equations do not have a single solution $\mathbf{b}^{(0)}$ in the sense that we were able to compute them in the case of the regression model. In the case where $X^TX$ is singular, there are infinitely many solutions $\mathbf{b}^{(0)}$. These solutions can be expressed as
+
+\begin{equation}
+  \mathbf{b}^{(0)} = (\mathbf{X}^T\mathbf{X})^-\mathbf{X}^T\mathbf{y}
+  (\#eq:gensolnormalequationflem)
+\end{equation}
+
+where $(\mathbf{X}^T\mathbf{X})^-$ stands for a __generalized inverse__ of the matrix $(\mathbf{X}^T\mathbf{X})$. 
+
+
+### Generalized Inverse Matrices {#asm-flem-generalized-inverse-matrices}
+A generalized inverse matrix $\mathbf{G}$ of a given matrix $\mathbf{A}$ is defined as the matrix that satisfies the equation $\mathbf{AGA} = \mathbf{A}$. The matrix $\mathbf{G}$ is not unique. Applying the concept of a generalized inverse to a system of equations $\mathbf{Ax} = \mathbf{y}$, it can be shown that $\mathbf{x} = \mathbf{Gy}$ is a solution, if $\mathbf{G}$ is a generalized inverse of $\mathbf{A}$. Because $\mathbf{G}$ is not unique, there are infinitely many solutions corresponding to $\tilde{\mathbf{x}} = \mathbf{Gy} + (\mathbf{GA} - \mathbf{I})\mathbf{z}$ where $\mathbf{z}$ can be an arbitrary vector of consistent length. Applying these statements concerning generalized inverses and solutions to systems of equations to \@ref(eq:gensolnormalequationflem), it means that $\mathbf{b}^{(0)}$ is not a unique solution to \@ref(eq:asm-flem-bw-breed-dummy-lsq-norm-eq) because the generalized inverse $(\mathbf{X}^T\mathbf{X})^-$ is not unique. As a consequence of that non-uniqueness, the solution $\mathbf{b}^{(0)}$ is not suitable as an estimate of the unknown parameter vector $\mathbf{b}$. 
+
+
+### Estimable Functions {#asm-flem-estimable-functions}
+The numeric solution of the analysis of the example dataset given in Table \@ref(tab:tab-bw-breed-flem) is the topic of an exercise. When developing that solution, we will see that some linear functions of $\mathbf{b}^{(0)}$ can be found which do not depend on the choice of the generalized inverse $(\mathbf{X}^T\mathbf{X})^-$. Such functions are called __estimable functions__ and can be used as estimates for the respective functions of the unknown parameter vector $\mathbf{b}$. The idea of estimable functions can be demonstrated with the following example. 
+
+```{r ex-estimable-function-data, echo=FALSE}
+n_nr_rec_est_fun <- 6
+tbl_est_fun <- tibble::tibble(Animal = c(1:n_nr_rec_est_fun),
+                              Breed  = c(rep("Angus", 3), rep("Simmental", 2), "Limousin"),
+                              Observation = c(16, 10, 19, 11, 13, 27))
+
+```
+
+Let us assume that we have a small data set of `r n_nr_rec_est_fun` animals with observations in a particular traits and the breed of the animal as an independent factor. The dataset for that example is given in Table \@ref(tab:ex-estimable-function-table). 
+
+```{r ex-estimable-function-table, echo=FALSE}
+knitr::kable(tbl_est_fun,
+             booktabs = TRUE,
+             longtable = FALSE,
+             caption = "Example Showing Estimable Functions",
+             escape = FALSE)
+```
+
+As shown before, we want to estimate the effect of the breed on the observation. This can be done with the following fixed effects model. 
+
+$$\mathbf{y} = \mathbf{Xb} + \mathbf{e}$$
+with 
+
+```{r, echo=FALSE, results='asis'}
+# design matrix X
+mat_x_est_fun <- matrix(c(1, 1, 0, 0,
+                          1, 1, 0, 0,
+                          1, 1, 0, 0,
+                          1, 0, 1, 0,
+                          1, 0, 1, 0,
+                          1, 0, 0, 1), ncol = 4, byrow = TRUE)
+# parameter vector b
+vec_b <- c("\\mu", "\\alpha_1", "\\alpha_2", "\\alpha_3")
+cat("$$\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = tbl_est_fun$Observation, ps_name = "\\mathbf{y}"), collapse = '\n'))
+cat("\\text{, }")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_x_est_fun, ps_name = "\\mathbf{X}"), collapse = "\n"))
+cat("\\text{ and }")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b, ps_name =  "\\mathbf{b}"), collapse = "\n"), "\n")
+cat("$$\n")
+```
+
+The vector $\mathbf{b}$ of unknown parameters consist of the intercept $\mu$ which was previously called $b_0$ and the three breed effects $\alpha_1$, $\alpha_2$ and $\alpha_3$. Based on the above information, the normal equations can be written as
+
+```{r, echo=FALSE, results='asis'}
+mat_xtx_est_fun <- crossprod(mat_x_est_fun)
+mat_xty_est_fun <- crossprod(mat_x_est_fun, tbl_est_fun$Observation)
+vec_b0 <- c("\\mu^0", "\\alpha_1^0", "\\alpha_2^0", "\\alpha_3^0")
+cat("$$\n")
+cat(paste0(rmdhelp::bmatrix(mat_xtx_est_fun), collapse = '\n'))
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b0), collapse = '\n'))
+cat(" = ")
+cat(paste0(rmdhelp::bmatrix(pmat = mat_xty_est_fun), collapse = '\n'))
+cat("$$\n")
+```
+
+The above equations have infinitely many solutions. Four of them are shown below in Table \@ref(tab:est-fun-sol). 
+
+```{r est-fun-sol, echo=FALSE}
+tbl_est_fun_sol <- tibble::tibble(`Elements of Solution` = c("$\\mu^0$", "$\\alpha_1^0$", "$\\alpha_2^0$", "$\\alpha_3^0$"),
+                                  `$b_1^0$` = c(16, -1, -4, 11),
+                                  `$b_2^0$` = c(14, 1, -2, 13),
+                                  `$b_3^0$` = c(27, -12, -15, 0),
+                                  `$b_4^0$` = c(-2982, 2997, 2994, 3009))
+knitr::kable(tbl_est_fun_sol,
+             booktabs = TRUE,
+             longtable = FALSE,
+             caption = "Solution of Normal Equations",
+             escape = FALSE)
+```
+
+The differences between the same elements in the four numerical solutions make it clear why no solution $\mathbf{b}^0$ can be used as estimates for the unknown parameters in $\mathbf{b}$. 
+
+This problem can be addressed, if we are not considering the single elements of a solution vector $\mathbf{b}^0$, but linear functions of these elements. Examples of such linear functions are shown in Table \@ref(tab:lin-fun-sol).
+
+
+```{r lin-fun-sol, echo=FALSE}
+tbl_lin_fun_sol <- tibble::tibble(`Linear Function` = c("$\\alpha_1^0 - \\alpha_2^0$", "$\\mu^0 + \\alpha_1^0$", "$\\mu^0 + 1/2(\\alpha_2^0 + \\alpha_3^0)$"),
+                                  `$b_1^0$` = c(3, 15, 19.5),
+                                  `$b_2^0$` = c(3, 15, 19.5),
+                                  `$b_3^0$` = c(3, 15, 19.5),
+                                  `$b_4^0$` = c(3, 15, 19.5))
+knitr::kable(tbl_lin_fun_sol,
+             booktabs = TRUE,
+             longtable = FALSE,
+             caption = "Estimates of Estimable Functions",
+             escape = FALSE)
+```
+
+The values of the expressions shown in Table \@ref(tab:lin-fun-sol) are invariant to whatever solution $b^0$ is selected. Because this invariance statement is true for all solutions $\mathbf{b}^0$, these functions are of special interest which corresponds to
+
+* $\alpha_1^0 - \alpha_2^0$: estimate of the difference between breed effects for Angus and Simmental
+* $\mu^0 + \alpha_1^0$: estimate of the general mean plus the breed effect of Angus
+* $\mu^0 + 1/2(\alpha_2^0 + \alpha_3^0)$: estimate of the general mean plus mean effect of breeds Simmental and Limousin
+
+
+#### Definition of Estimable Functions 
+In summary the underlying idea of estimable functions are that they are linear functions of the parameters $\mathbf{b}$ that do not depend on the numerical solutions $\mathbf{b}^0$ of the normal equations. Because estimable functions are functions of the parameters $\mathbf{b}$, they can be expressed as $\mathbf{q}^T\mathbf{b}$ where $\mathbf{q}^T$ is a row vector. In a more formal way estimable functions can be described by the following definition.
+
+... {.definition #defestfun name="Estimable Function"}
+A (linear) function of the parameters $b$ is defined as __estimable__, if it is identically equal to some linear function of the expected value of the vector of observations $y$. 
+...
+
+This means the linear function $\mathbf{q}^T\mathbf{b}$ is estimable, if 
+
+$$\mathbf{q}^T\mathbf{b} = \mathbf{t}^TE(\mathbf{y})$$
+
+for some vector $\mathbf{t}$. That means, if there exists a vector $\mathbf{t}$, such that $\mathbf{t}^TE(\mathbf{y}) = \mathbf{q}^T\mathbf{b}$, then $\mathbf{q}^T\mathbf{b}$ is said to be estimable. For our example shown in Table \@ref(tab:ex-estimable-function-table), the expected value of the observations of all animals with breed Angus is obtained by 
+
+$$E(y_{1j}) = \mu + \alpha_1$$
+with $\mathbf{t}^T = \left[\begin{array}{cccccc} 1 & 1 & 1 & 0 & 0 & 0 \end{array}\right]$ and $\mathbf{q}^T = \left[\begin{array}{cccc} 1 & 1 & 0 & 0 \end{array} \right]$
+
+
+### Properties of Estimable Functions
+Among the many properties we are here just listing the ones that are considered important. The complete list of properties can be found in `r met$add("Searle1971")`. 
+
+* _Form of estimable function_. If $\mathbf{q}^T\mathbf{b}$ is estimable, then $\mathbf{q}^T\mathbf{b} = \mathbf{t}^TE(\mathbf{y})$ for some $\mathbf{t}$. By definition $E(\mathbf{y}) = \mathbf{Xb}$ and therefore, $\mathbf{q}^T\mathbf{b} = \mathbf{t}^T\mathbf{Xb}$. Because estimability is not a concept that depends on $\mathbf{b}$, this result is true for all values of $\mathbf{b}$. Therefore 
+
+$$\mathbf{q}^t = \mathbf{t}^T\mathbf{X}$$
+for some vector $\mathbf{t}$. 
+
+* _Invariance to solutions_ $\mathbf{b}^0$. If $\mathbf{q}^T\mathbf{b}$ is estimable, the linear function $\mathbf{q}^T\mathbf{b}^0$ is invariance to whatever solution of the normal equation
+
+$$\mathbf{X}^T\mathbf{Xb}^0 = \mathbf{X}^T\mathbf{y}$$
+is used for $\mathbf{b}^0$. This is because 
+
+$$\mathbf{q}^T\mathbf{b}^0 = \mathbf{t}^T\mathbf{Xb}^0 = \mathbf{t}^T\mathbf{XGX}^T\mathbf{y}$$
+where $\mathbf{G}$ is a generalized inverse of $\mathbf{X}^T\mathbf{X}$ and $\mathbf{XGX}^T$ is invariant to $\mathbf{G}$ which means that it is the same for any choice of $\mathbf{G}$. 
+
+
+#### Testing for Estimability
+A given function $\mathbf{q}^T\mathbf{b}$ is estimable, if some vector $\mathbf{t}$ can be found, such that $\mathbf{t}^T\mathbf{X} = \mathbf{q}^T$. For a known value of $\mathbf{q}$, it might not be easy to find a vector $\mathbf{t}$ satisfying $\mathbf{t}^T\mathbf{X}=\mathbf{q}^T$. Alternatively to finding a vector $\mathbf{t}$, estimability of $\mathbf{q}^T\mathbf{b}$ can also be investigated by seeing whether $\mathbf{q}$ has the property that 
+
+$$\mathbf{q}^T\mathbf{H} = \mathbf{q}^T$$
+
+with $\mathbf{H} = \mathbf{GX}^T\mathbf{X}$. A proof of that can be found in `r met$add("Searle1971")`. 
 
 
 
