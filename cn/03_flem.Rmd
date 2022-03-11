@@ -87,12 +87,13 @@ As already mentioned in section \@ref(asm-flem-motivation), we are assuming that
 knitr::include_graphics(path = "odg/datastucturegbv.png")
 ```
  
-As can be seen from Figure \@ref(fig:datastucturegbv) each of the $N$ animals have known genotypes for all three SNP markers and they all have a phenotypic observation $y_i \quad (i = 1, \cdot, N)$. Because we are assuming each SNP marker to be bi-allelic, there are only three possible marker genotypes at every marker position. Hence marker genotypes are discrete entities with a fixed number of levels. Hence, in principle the marker genotypes occur in discrete levels such as the breed of an animal from dataset shown in Table \@ref(tab:tab-bw-breed-flem). Because we are interested in the maker-effect at each locus which is the difference between the expected genotypic value between the genotypes which differ in one favorable allele under a strictly additive model. The relationsships shown in equation \@ref(eq:expvalbwdiffbreedflem) which are imposed by the use of a linear regression model on the discrete genotype variables, contain the marker effects that we are interested in. More details about the model will follow in section \@ref(asm-flem-model).
+As can be seen from Figure \@ref(fig:datastucturegbv) each of the $N$ animals have known genotypes for all three SNP markers and they all have a phenotypic observation $y_i \quad (i = 1, \cdot, N)$. Because we are assuming each SNP marker to be bi-allelic, there are only three possible marker genotypes at every marker position. Hence marker genotypes are discrete entities with a fixed number of levels. Hence, in principle the marker genotypes occur in discrete levels such as the breed of an animal from dataset shown in Table \@ref(tab:tab-bw-breed-flem). Because we are interested in the maker-effect at each locus and the relationsships shown in equation \@ref(eq:expvalbwdiffbreedflem) which are imposed by the use of a linear regression model on the discrete genotype variables, contain the marker effects, the regression model can be used for the analysis of genomic data. More details about the model will follow in section \@ref(asm-flem-model).
 
-<!-- TODO: continue here -->
 
 ### Model {#asm-flem-model}
-The goal of our data analysis using the dataset described in section \@ref(asm-flem-data) is to come up with estimates for genomic breeding values for all animals in our dataset. The genomic breeding values will later be used to rank the animals. The ranking of the animals according to the GBV is used to select the parents of the future generation of livestock animals. It probably makes sense to distinguish between two different types of models that we have to set up. On the one side we need a model that describes the underlying genetic architecture which is present in our dataset. We will be using a so-called __genetic__ model to describe this. On the other side, we have to be able to get estimates for the GBVs which requires a __statistical__ model which is able to estimate unknown parameters as a function of observed data. In the end, we will realize that the two models are actually the same model but they are just different ways of looking at the same structure of the underlying phenomena. These phenomena characterize the relationship between genetic architecture of an animal and the expression of a certain phenotypic trait in that same animal.
+The goal of our data analysis using the dataset described in section \@ref(asm-flem-data) is to come up with estimates for maker effects at each SNP locus. The marker effects can be used to predict genomic breeding values for all animals in our dataset. The genomic breeding values will later be used to rank the animals. The ranking of the animals according to the GBV is used to select the parents of the future generation of livestock animals. 
+
+It seams reasonable to distinguish between two different types of models. On the one hand we need a model that describes the underlying genetic architecture of the observed phenotypic values in our dataset. We are using a so-called __genetic__ model to describe the relationship between genetic background and expressed phenotype of interest. On the other hand, we have to be able to get estimates for the GBVs which requires a __statistical__ model. Only with the latter we are going to be able to estimate unknown parameters as a function of observed data. In the end, we will realize that the two models are actually the same model but they are just different ways of looking at the same structure of the underlying phenomena. These phenomena characterize the relationship between genetic architecture of an animal and the expression of a certain phenotypic trait in that same animal.
 
 
 ### Genetic Model {#asm-flem-genetic-model}
@@ -180,16 +181,9 @@ In the following section, we write down the definition of a FLEM and compare it 
 ## Definition of FLEM {#asm-flem-definition}
 The multiple fixed linear effects model is defined as follows.
 
-
-<!--- ----------------------------------------------------------------------- --
-TODO: Fix defintion
-TODO: The following specification of a definition does not work
-TODO: Fix it to make it work again
------ ---------------------------------------------------------------------- -->
-
-<!--```{definition, label="defflem", name="Fixed Linear Effects Model"}-->
+::: {.definition #defflem name="Fixed Linear Effects Model"}
 In a fixed linear effects model, every observation $i$ in a dataset is characterized by a __response variable__ and a set of __predictors__. Up to some random errors the response variable can be expressed as a linear function of the predictors. The proposed linear function contains unknown parameters. The goal is to estimate both the unknown parameters and the error variance.
-<!--```-->
+:::
 
 
 ### Terminology {#asm-flem-terminology}
@@ -229,4 +223,67 @@ The incidence matrix $X$ in \@ref(eq:flemmatrixvector) can be composed from the 
 
 
 ## Regression On Dummy Variables {#asm-flem-reg-dummy}
-In a regression model both the response variable and the predictor variables are continuous variables. Examples of such variables are `body weight` and `breast circumference` which are both measured and the measurements are expressed as real numbers. In contrast to such a regression model, 
+In a regression model both the response variable and the predictor variables are continuous variables. Examples of such variables are `body weight` and `breast circumference` which are both measured and the measurements are expressed as real numbers. In contrast to such a regression model, the predictor variable `Breed` in the extended dataset given in Table \@ref(tab:tab-bw-breed-flem) is a discrete variable. That means, observations of such a variable can only take a certain number of values. These values are determined by the nature of the variable. For our example with the breeds of animals, the observed values can only come from the existing breeds of that species from which the observations were generated.
+
+The discussion of regression on dummy variables is fascilitated by the notioon of __factors__ and __levels__. This terminology is adapted from the literature of experimental design. In the study of the influence of an animals breed on its body weight, we are interested in the extent to which each breed is associated to the body weight. Thus we want to see whether a group of animals from a particular breed show specific values for their body weights and whether these values are different from the body weights of animals from a different breed.
+
+The problem of discrete variables not being measureable is acknowledged by the introduction of the terms "factor" and "levels". Hence a discrete variable is referred to as a "factor". The possible values that a factor can take are called "levels". The concept of levels enables us to quantify differences between the effects that different levels of a factor have on a certain response variable. Translating the concept of levels and factors to our extended dataset (Table \@ref(tab:tab-bw-breed-flem)) means that the breed of an animal is a "factor" and the different breeds are correspond to the different levels of the factor "breed". 
+
+
+### Model {#asm-flem-reg-dummy-model}
+The goal of the model that we are going to develop is to quantify the effect of each level of the factor "breed" on the response variable "body weight". In a first step, all other variables with a potential influence on body weight are ignored. Hence, we are just looking at the possible effect of the breed on body weight. This is done by setting up a regression on three independent variables $x_1$, $x_2$ and $x_3$
+
+\begin{equation} 
+  y_i = b_0 + b_1x_{i1} + b_2x_{i2} + b_3x_{i3} + e_i
+  (\#eq:asm-flem-reg-dummy-bw-breed)
+\end{equation} 
+
+In this context $y_i$ is the body weight of animal $i$ and $b_0$ and $e_i$ are the intercept and the random error term which were already found in the regression analysis of chapter \@ref(asm-regr). Corresponding to the independent variables $x_1$, $x_2$ and $x_3$ are the regression coefficents $b_1$, $b_2$ and $b_3$, respectively. Depending on the defintion of the independent variables $x$, the regression coefficients $b$ will turn out to be terms that lead to estimates of the differences of the effects of the different levels on the response variable. 
+
+For the definition of the independent variables $x$, it is important to note that each animal can only have one breed^[At this point, we assume that all animals are pure-bred. Alternatively, we would interpret crosses as further distinct levels of the factor "breed".] associated to it. Each level of the factor "breed" is assigned to one of the indendent variables $x_1$, $x_2$ or $x_3$. This assignment is completely arbitrary. The assignment given in Table \@ref(tab:asm-flem-breed-var-assign) is proposed. 
+
+```{r asm-flem-breed-var-assign, echo=FALSE, results='asis'}
+tbl_breed_assign <- tibble::tibble(Breed = c(unique(sort(tbl_flem$Breed))),
+                                   `Independent Variable`= c("$x_1$", "$x_2$", "$x_3$"))
+
+knitr::kable(tbl_breed_assign,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = "Assignment of Breeds to Independen Variables",
+             escape = FALSE)
+```
+
+```{r, echo=FALSE}
+n_idx <- 1
+n_ani_id <- tbl_flem$Animal[n_idx]
+s_breed <- tbl_flem$Breed[n_idx]
+s_var <- tbl_breed_assign[tbl_breed_assign$Breed == s_breed,]$`Independent Variable`
+```
+
+For a given animal $i$ that is in breed $j$, the independent variable assigned to breed $j$ is $1$ and all other independent variables are set to $0$. This means for animal $`r n_ani_id`$ from breed `r s_breed`, the variable `r s_var` is set to $1$ and all other variables are set to $0$. 
+
+For our example shown in Table \@ref(tab:tab-bw-breed-flem) when only looking at body weight as response and breed as a factor, $y_{ij}$ stands for the $j^{th}$ animal with breed-level $i$. Then with $e_{ij} = y_{ij} - E(y_{ij})$, the model is the same as in chapter \@ref(asm-regr), except for the two subscripts and for the ordering the observations according to the levels of the breed factor.
+
+\begin{align} 
+y_{11} &= b_0 + b_1 * 1 + b_2 * 0 + b_3 * 0 + e_{11} \notag \\
+y_{12} &= b_0 + b_1 * 1 + b_2 * 0 + b_3 * 0 + e_{12} \notag \\
+\cdots &= \cdots \notag \\
+y_{33} &= b_0 + b_1 * 0 + b_2 * 0 + b_3 * 1 + e_{33}
+  (\#eq:asm-flem-bw-breed-dummy-scalar)
+\end{align} 
+
+The system of equations shown in \@ref(eq:asm-flem-bw-breed-dummy-scalar) can be converted into matrix-vector notation which turns the model in the familiar form
+
+\begin{equation}
+\mathbf{y} = \mathbf{X}\mathbf{b} + \mathbf{e}
+  (\#eq:asm-flem-bw-breed-dummy-mat-vec)
+\end{equation}
+
+
+
+
+
+
+
+
+
