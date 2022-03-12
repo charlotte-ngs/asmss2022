@@ -56,7 +56,8 @@ create_exercise <- function(ps_ex_name,
 #'
 #' @examples
 #' \dontrun{
-#' create_exercise_gel(ps_ex_name        = "asm_ex01")
+#' devtools::load_all()
+#' create_exercise_asm(ps_ex_name        = "asm_ex01")
 #' }
 create_exercise_asm <- function(ps_ex_name,
                                 pn_exercise_count = NULL,
