@@ -1,0 +1,81 @@
+---
+title: "Create Genomics Dataset"
+output: html_notebook
+---
+
+# Disclaimer
+This nb shows the simulation of a simple genomics dataset. Animals are not related to each other
+
+
+```{r dataflemsnpobs, echo=TRUE}
+### # fix the number of animals
+n_nr_animal <- 20
+### # intercept
+n_inter_cept <- 500
+### # residual standard deviation
+n_res_sd <- 12.13
+### # vector of genotype value coefficients
+vec_geno_value_coeff <- c(-1,0,1)
+### # sample genotypes of unlinked SNP randomly
+set.seed(436)
+### # fix allele frequency of positive allele
+n_prob_snps <- .45
+### # genotypic values 
+vec_geno_val <- c(27.2, 7.3)
+n_nr_snp <- length(vec_geno_val)
+### # put together the genotypes into a matrix
+mat_geno_snp <- matrix(c(sample(vec_geno_value_coeff, n_nr_animal, prob = c((1-n_prob_snps)^2, 
+                                                                   2*(1-n_prob_snps)*n_prob_snps, 
+                                                                   n_prob_snps^2), 
+                       replace = TRUE),
+                       sample(vec_geno_value_coeff, n_nr_animal, prob = c(n_prob_snps^2, 
+                                                                   2*(1-n_prob_snps)*n_prob_snps, 
+                                                                   (1-n_prob_snps)^2), 
+                       replace = TRUE)),
+                       nrow = n_nr_snp)
+mat_obs_y <- n_inter_cept + crossprod(mat_geno_snp, vec_geno_val) + rnorm(n = n_nr_animal, mean = 0, sd = n_res_sd)
+### # mapping the -1,0,1 codes to genotypes
+geno_code_map <- tibble::tibble(code = c(-1, 0, 1),
+                            `SNP G` = c("$G_2G_2$", "$G_1G_2$", "$G_1G_1$"),
+                            `SNP H` = c("$H_2H_2$", "$H_1H_2$", "$H_1H_1$"),
+                            `Genotypic Value G` = c("$-a_G$", "$0$", "$a_G$"),
+                            `Genotypic Value H` = c("$-a_H$", "$0$", "$a_H$"))
+geno_code <- tibble::tibble(`Code G` = mat_geno_snp[1,],
+                            `Code H` = mat_geno_snp[2,])
+
+require(dplyr)
+geno_code %>% 
+  inner_join(geno_code_map, by = c("Code G" = "code")) %>%
+  select(`SNP G`, `Genotypic Value G`) -> geno_snp_g
+geno_code %>% 
+  inner_join(geno_code_map, by = c("Code H" = "code")) %>%
+  select(`SNP H`, `Genotypic Value H`) -> geno_snp_h
+geno_snp_all <- bind_cols(geno_snp_g, geno_snp_h)
+### # add the data
+mat_obs_y_rounded <- round(mat_obs_y, digits = 0)
+tbl_obs <- tibble::tibble(Observation = mat_obs_y_rounded[,1])
+geno_snp_all %>% bind_cols(tbl_obs) -> tbl_all_data
+### # add animal ids
+tbl_all_data <- bind_cols(Animal = c(1:n_nr_animal),tbl_all_data)
+tbl_all_data
+# tbl_flemsnppbs <- tibble::tibble()
+#knitr::kable(tbl_all_data,
+#             booktabs = TRUE,
+#             longtable = FALSE,
+#             caption = "Animals With Two SNP Loci Affecting A Quantitative Trait",
+#             escape = FALSE)
+```
+
+
+Relevant parts of esulting dataset is written to a file
+
+```{r}
+tbl_ex_data <- dplyr::select(tbl_all_data, Animal, `SNP G`, `SNP H`, Observation)
+tbl_ex_data
+```
+
+```{r}
+s_ex_data_path <- file.path(here::here(), "docs", "data", "asm_flem_genomic_data.csv")
+readr::write_csv(tbl_ex_data, file = s_ex_data_path)
+```
+
