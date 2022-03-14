@@ -238,7 +238,7 @@ The goal of the model that we are going to develop is to quantify the effect of 
   (\#eq:asm-flem-reg-dummy-bw-breed)
 \end{equation} 
 
-In this context $y_i$ is the body weight of animal $i$ and $b_0$ and $e_i$ are the intercept and the random error term which were already found in the regression analysis of chapter \@ref(asm-regr). Corresponding to the independent variables $x_1$, $x_2$ and $x_3$ are the regression coefficents $b_1$, $b_2$ and $b_3$, respectively. Depending on the defintion of the independent variables $x$, the regression coefficients $b$ will turn out to be terms that lead to estimates of the differences of the effects of the different levels on the response variable. 
+In this context $y_i$ is the body weight of animal $i$ and $b_0$ and $e_i$ are the intercept and the random error term which were already found in the regression analysis of chapter \@ref(asm-regr). Corresponding to the independent variables $x_1$, $x_2$ and $x_3$ are the regression coefficents $b_1$, $b_2$ and $b_3$, respectively. Depending on the definition of the independent variables $x$, the regression coefficients $b$ will turn out to be terms that lead to estimates of the differences of the effects of the different levels on the response variable. 
 
 For the definition of the independent variables $x$, it is important to note that each animal can only have one breed^[At this point, we assume that all animals are pure-bred. Alternatively, we would interpret crosses as further distinct levels of the factor "breed".] associated to it. Each level of the factor "breed" is assigned to one of the indendent variables $x_1$, $x_2$ or $x_3$. This assignment is completely arbitrary. The assignment given in Table \@ref(tab:asm-flem-breed-var-assign) is proposed. 
 
@@ -410,9 +410,9 @@ The values of the expressions shown in Table \@ref(tab:lin-fun-sol) are invarian
 #### Definition of Estimable Functions 
 In summary the underlying idea of estimable functions are that they are linear functions of the parameters $\mathbf{b}$ that do not depend on the numerical solutions $\mathbf{b}^0$ of the normal equations. Because estimable functions are functions of the parameters $\mathbf{b}$, they can be expressed as $\mathbf{q}^T\mathbf{b}$ where $\mathbf{q}^T$ is a row vector. In a more formal way estimable functions can be described by the following definition.
 
-... {.definition #defestfun name="Estimable Function"}
+::: {.definition #defestfun name="Estimable Function"}
 A (linear) function of the parameters $b$ is defined as __estimable__, if it is identically equal to some linear function of the expected value of the vector of observations $y$. 
-...
+:::
 
 This means the linear function $\mathbf{q}^T\mathbf{b}$ is estimable, if 
 
