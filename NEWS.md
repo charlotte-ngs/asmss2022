@@ -1,3 +1,7 @@
+# asmss2022 0.4.1
+
+* Deployed asm_ex03
+
 # asmss2022 0.4.0
 
 * Material for lecture 04
