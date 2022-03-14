@@ -28,7 +28,7 @@ tbl_chpt <- tibble::tibble(Nr      = c(1, 2, 3, 4),
                              paste0("[Introduction](", s_cn_url, "01_intro.pdf)", collapse = ""),
                              paste0("[Linear Regression](", s_cn_url, "02_regr.pdf)", collapse = ""),
                              paste0("[Fixed Linear Effects Model](", s_cn_url, "03_flem.pdf)", collapse = ""),
-                             paste0("[Regression on Dummy Variables](", s_cn_url, "03_regdvar.pdf", collapse = "")
+                             paste0("[Regression on Dummy Variables](", s_cn_url, "03_regdvar.pdf)", collapse = "")
                            ))
 knitr::kable(tbl_chpt)
 ```
