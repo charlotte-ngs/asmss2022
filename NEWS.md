@@ -1,3 +1,7 @@
+# asmss2022 0.4.0
+
+* Material for lecture 04
+
 # asmss2022 0.3.3
 
 * Slides with notes for l03 and link to video
