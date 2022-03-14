@@ -172,5 +172,46 @@ Setup the least squares normal equations. Find a solution for $\mathbf{b}^0$ and
 
 ### Solution
 
+* Define elements of least squares normal equations
+
+The required elements are the vector $\mathbf{y}$ and the matrix $\mathbf{X}$. The are defined as follows
+
+```{r}
+s_ex03p03_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+tbl_ex03p03_data <- readr::read_csv(file = s_ex03p03_data_path)
+```
+
+In a first step, the records in our dataframe are sorted according to their breed.
+
+```{r}
+tbl_ex03p03_data <- tbl_ex03p03_data[order(tbl_ex03p03_data$Breed),]
+tbl_ex03p03_data
+```
+
+After the sorting process, the elements of the least squares normal equation can be extracted.
+
+```{r}
+vec_y <- tbl_ex03p03_data$`Body Weight`
+mat_X <- model.matrix(lm(`Body Weight` ~ 0 + Breed, data = tbl_ex03p03_data))
+attr(mat_X, "assign") <- NULL
+attr(mat_X, "contrasts") <- NULL
+colnames(mat_X) <- NULL
+rownames(mat_X) <- NULL
+mat_X <- cbind(matrix(1,nrow = nrow(mat_X), ncol = 1), mat_X)
+mat_X
+```
+
+
+Which corresponds to
+
+```{r, echo=FALSE, results='asis'}
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_y, ps_name = "\\mathbf{y}", ps_env = "$$")))
+cat(paste0(rmdhelp::bmatrix(pmat = mat_X, ps_name = "\\mathbf{X}", ps_env = "$$")))
+```
+
+
+* Find a solution for $\mathbf{b}^0$
+
+* Construct the estimable function. As a hint, assume the missing factor level in the output of `lm()` to be zero.
 <!-- master-solution-end -->
  
