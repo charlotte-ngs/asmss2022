@@ -20,16 +20,18 @@ This page contains additional material like links to slides, video recordings, o
 ## Slides
 ```{r tbl-sl, echo=FALSE, message=FALSE, warning=FALSE}
 s_sl_url <- "https://charlotte-ngs.github.io/asmss2022/sl/"
-tbl_sl <- tibble::tibble(Nr = c(1, 2, 3, 4),
+tbl_sl <- tibble::tibble(Nr = c(1, 2, 3, 4, 5),
                          Date = c("2022-02-21",
                                   "2022-02-28",
                                   "2022-02-28",
-                                  "2022-03-07"),
+                                  "2022-03-07",
+                                  "2022-03-14"),
                          Topic = c(
                            paste0("[Introduction](", s_sl_url, "asm-w01-v01-intro.pdf)", collapse = ""),
                            paste0("[Linear Regression](", s_sl_url, "l02_regr.pdf)", collapse = ""),
                            paste0("[Linear Regression (Part 2)](", s_sl_url, "l02_regr_part2.pdf)", collapse = ""),
-                           paste0("Fixed Linear Effects Model [org](", s_sl_url, "l03_flem.pdf) | [with notes](", s_sl_url, "l03_flem_with_notes.pdf)", collapse = "")
+                           paste0("Fixed Linear Effects Model [org](", s_sl_url, "l03_flem.pdf) | [with notes](", s_sl_url, "l03_flem_with_notes.pdf)", collapse = ""),
+                           paste0("[Regression on Dummy Variables](", s_sl_url, "l04_regdvar.pdf)", collapse = "")
                          ))
 knitr::kable(tbl_sl)
 ```

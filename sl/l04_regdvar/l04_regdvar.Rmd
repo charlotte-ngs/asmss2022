@@ -85,3 +85,46 @@ $$E(G_1G_1) - E(G_2G_2) = 2b_1$$
 * Levels for our example factor `Breed` are: `Angus`, `Limousin` and `Simmental`
 
 
+## Levels To Independent Variables
+
+Use "separate" $x$-variable for each level, hence each of the breeds
+
+```{r asm-flem-breed-var-assign, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+s_data_dir <- file.path(here::here(), "docs", "data")
+s_flem_path <- file.path(s_data_dir, "asm_bw_flem.csv")
+tbl_flem <- readr::read_csv(file = s_flem_path)
+tbl_breed_assign <- tibble::tibble(Breed = c(unique(sort(tbl_flem$Breed))),
+                                   `Independent Variable`= c("$x_1$", "$x_2$", "$x_3$"))
+
+knitr::kable(tbl_breed_assign,
+             booktabs = TRUE,
+             longtable = TRUE,
+             escape = FALSE)
+```
+
+
+
+## Model
+
+* Observation $y_{ij}$ stands for birth weight for animal $j$ in breed $i$
+
+\begin{align} 
+y_{11} &= b_0 + b_1 * 1 + b_2 * 0 + b_3 * 0 + e_{11} \notag \\
+y_{12} &= b_0 + b_1 * 1 + b_2 * 0 + b_3 * 0 + e_{12} \notag \\
+\cdots &= \cdots \notag \\
+y_{33} &= b_0 + b_1 * 0 + b_2 * 0 + b_3 * 1 + e_{33} \notag
+\end{align} 
+
+* Sort animals according to breeds
+
+
+## Matrix - Vector Notation
+
+\begin{equation}
+\mathbf{y} = \mathbf{X}\mathbf{b} + \mathbf{e} \notag
+\end{equation}
+
+
+
+
+
