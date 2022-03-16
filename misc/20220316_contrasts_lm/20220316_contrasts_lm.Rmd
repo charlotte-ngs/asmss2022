@@ -22,3 +22,26 @@ contrasts(as.factor(tbl_ex03p03_data$Breed))
 ```{r}
 model.matrix(lm(`Body Weight`~Breed, data = tbl_ex03p03_data))
 ```
+
+
+## Example from Video https://youtu.be/eVSIDf5w1_I
+
+```{r}
+data("OrchardSprays")
+str(OrchardSprays)
+```
+
+Plot
+
+```{r}
+plot(decrease ~ treatment, data = OrchardSprays)
+```
+
+
+## Resources
+
+https://www.r-bloggers.com/2015/01/using-and-interpreting-different-contrasts-in-linear-models-in-r/
+https://rcompanion.org/rcompanion/h_01.html
+https://bookdown.org/pingapang9/linear_models_bookdown/chap-contrasts.html
+
+https://youtu.be/eVSIDf5w1_I
