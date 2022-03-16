@@ -1,0 +1,99 @@
+---
+title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 4
+author: Peter von Rohr
+date: 2022-03-16
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+    keep_md: false
+    keep_tex: false
+header-includes:
+ \usepackage{longtable}
+ \usepackage{float}
+params:
+  doctype:
+    label: 'Document Type'
+    value: 'solution'
+    choices: ['exercise', 'solution', 'notebook']
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE}
+s_ex04p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+
+## Problem 1: Overfitting
+Use the extended dataset on `Body Weight` of animals and fit all the variables and the factor breed. Compare the result with a regression that uses only `Breast Circumference` or with the linear model that only uses the factor `Breed`. The data set is available from: `r s_ex04p01_data_path` 
+
+
+
+<!-- your-solution-start
+### Your Solution
+
+* Read the data
+
+* Fit the full model
+
+* Fit the model with only `Breast Circumference`
+
+* Fit the model with only `Breed`
+
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+* Read the data
+
+```{r}
+s_ex04p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+tbl_ex04p01_data <- readr::read_csv(file = s_ex04p01_data_path)
+```
+
+* Fit the full model
+
+```{r}
+lm_ex04p01_full <- lm(formula = `Body Weight` ~ `Breast Circumference` + BCS + HEI + Breed, data = tbl_ex04p01_data)
+summary(lm_ex04p01_full)
+```
+
+* Fit the model with only `Breast Circumference`
+
+```{r}
+lm_ex04p01_bwbc <- lm(formula = `Body Weight` ~ `Breast Circumference`, data = tbl_ex04p01_data)
+summary(lm_ex04p01_bwbc)
+```
+
+* Fit only the model with the factor `Breed`
+
+```{r}
+lm_ex04p01_bwbreed <- lm(formula = `Body Weight` ~ Breed, data = tbl_ex04p01_data)
+summary(lm_ex04p01_bwbreed)
+```
+
+<!-- master-solution-end -->
+
+
+## Problem 2
+
+<!-- your-solution-start
+### Your Solution
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+ 
