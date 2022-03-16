@@ -30,7 +30,7 @@ create_exercise <- function(ps_ex_name,
                             pd_creation_date = format(Sys.Date(), "%Y-%m-%d"),
                             pb_edit          = FALSE){
   s_proj_dir <- here::here()
-  s_ex_src_path <- file.path(s_proj_dir, "sol", ps_ex_name, paste0(ps_ex_name, ".Rmd"))
+  s_ex_src_path <- file.path(s_proj_dir, "ex", ps_ex_name, paste0(ps_ex_name, ".Rmd"))
 
   rteachtools::create_exercise(ps_ex_path    = s_ex_src_path,
                                pn_nr_problem = pn_nr_problem,
