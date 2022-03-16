@@ -1,0 +1,24 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Data
+
+```{r}
+s_ex03p03_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+s_ex03p03_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+tbl_ex03p03_data <- readr::read_csv(file = s_ex03p03_data_path)
+```
+
+## Contrasts
+
+These results are consistent with the results obtained by `lm()`. If we wanted to see what type of estimable functions are used by the `lm()` function, it can be shown using the function `contrasts()`. For our example with the Breed, we obtain the contrast matrix by 
+
+```{r}
+contrasts(as.factor(tbl_ex03p03_data$Breed))
+```
+
+```{r}
+model.matrix(lm(`Body Weight`~Breed, data = tbl_ex03p03_data))
+```
