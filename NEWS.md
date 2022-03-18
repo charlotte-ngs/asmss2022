@@ -1,3 +1,7 @@
+# asmss2022 0.5.0
+
+* Course notes for lecture 05
+
 # asmss2022 0.4.1
 
 * Deployed asm_ex03
