@@ -37,11 +37,120 @@ Plot
 plot(decrease ~ treatment, data = OrchardSprays)
 ```
 
+```{r}
+model1 <- lm(decrease ~treatment, data = OrchardSprays)
+summary(model1)
+```
+
+Use heterogeneous variance for different treatement classes using gls in model3
+```{r}
+library(nlme)
+model2 <- gls(decrease~treatment, data = OrchardSprays)
+model3 <- update(model2, weights=varIdent(form=~1|treatment))
+AIC(model2, model3)
+```
+
+```{r}
+summary(model3)
+```
+
+Succesive difference contrasts
+
+Save old options
+```{r}
+opts <- options()
+getOption("contrasts")
+```
+
+Change contrasts and run model
+
+```{r}
+library(MASS)
+options(contrasts = c("contr.sdif", "contr.sdif"))
+model4 <- gls(decrease ~ treatment, data = OrchardSprays)
+model5 <- update(model4,  weights=varIdent(form=~1|treatment))
+summary(model5)
+```
+
+Re-set options
+
+```{r}
+options(opts)
+```
+
+## Example from https://bookdown.org/pingapang9/linear_models_bookdown/chap-contrasts.html
+
+```{r}
+library(dplyr)
+library(broom)
+data("PlantGrowth")
+PlantGrowth %>% 
+  filter(group != "ctrl") %>% 
+  lm(weight ~ group, .) %>%
+  tidy()
+```
+
+
+## Example from https://marissabarlaz.github.io/portfolio/contrastcoding/
+Examples from the mentioned website are applied to our extended dataset assigned to `tbl_ex03p03_data`. 
+
+### Dummy Coding
+The coding scheme that is most familiar is the dummy coding or the treatment coding. In that coding all levels are compares to a reference level. The reference is the level that is first in an alphabetical order. The contrast matrix for a factor with four levels looks as follows
+
+```{r}
+contr.treatment(4)
+```
+
+Checking the contrasts for the dummy variables `Breed` and `BCS` after conversion to factors, gives
+
+```{r}
+tbl_ex03p03_data$Breed <- as.factor(tbl_ex03p03_data$Breed)
+tbl_ex03p03_data$BCS <- as.integer(tbl_ex03p03_data$BCS)
+tbl_ex03p03_data$BCS <- as.factor(tbl_ex03p03_data$BCS)
+```
+
+Contrasts for `Breed`
+
+```{r}
+contrasts(tbl_ex03p03_data$Breed)
+```
+
+Contrasts for `BCS` 
+
+```{r}
+contrasts(tbl_ex03p03_data$BCS)
+```
+
+The contrasts can be changed by an assignment
+
+```{r}
+nr_breed <- nlevels(tbl_ex03p03_data$Breed)
+contrasts(tbl_ex03p03_data$Breed) <- contr.treatment(nr_breed)
+lm_bwbrbcs <- lm(`Body Weight` ~ Breed + BCS, data = tbl_ex03p03_data)
+summary(lm_bwbrbcs)
+```
+
+Changing to a different reference level
+
+```{r}
+contrasts(tbl_ex03p03_data$Breed) <- contr.treatment(nr_breed, base = nr_breed)
+contrasts(tbl_ex03p03_data$Breed)
+```
+
+```{r}
+lm_bwbrbcs2 <- lm(`Body Weight` ~ Breed + BCS, data = tbl_ex03p03_data)
+summary(lm_bwbrbcs2)
+```
+
 
 ## Resources
 
 https://www.r-bloggers.com/2015/01/using-and-interpreting-different-contrasts-in-linear-models-in-r/
 https://rcompanion.org/rcompanion/h_01.html
 https://bookdown.org/pingapang9/linear_models_bookdown/chap-contrasts.html
+https://marissabarlaz.github.io/portfolio/contrastcoding/
+https://www.uvm.edu/~statdhtx/StatPages/R/ContrastsInR.html
+https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf
 
 https://youtu.be/eVSIDf5w1_I
+https://youtu.be/qQHNRaBbR90
