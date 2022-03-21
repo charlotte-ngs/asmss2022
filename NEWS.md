@@ -1,3 +1,7 @@
+# asmss2022 0.5.1
+
+* Exercise asm_ex04
+
 # asmss2022 0.5.0
 
 * Course notes for lecture 05
