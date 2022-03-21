@@ -132,8 +132,11 @@ con_mat
 This is a symmetric matrix. What is the inverse of this matrix
 
 ```{r}
-solve(con_mat)
+est_mat <- solve(con_mat)
+est_mat
 ```
+
+
 
 Contrasts for `BCS` 
 
@@ -172,8 +175,34 @@ contr.treatment(3)
 contr.sdif(3)
 ```
 
+Extending the sdif contrast
+
+```{r}
+mat_sdif <- contr.sdif(3)
+mat_sdif <- cbind(matrix(1, nrow = nrow(mat_sdif), ncol = 1), mat_sdif)
+mat_sdif
+```
+
+Estimable function
+
+```{r}
+mat_est_sdif <- solve(mat_sdif)
+mat_est_sdif
+```
+
 ```{r}
 contr.sum(3)
+```
+
+```{r}
+mat_sum <- contr.sum(3)
+mat_sum <- cbind(matrix(1, nrow = nrow(mat_sum), ncol = 1), mat_sum)
+mat_sum
+```
+
+```{r}
+mat_est_sum <- solve(mat_sum)
+mat_est_sum
 ```
 
 
