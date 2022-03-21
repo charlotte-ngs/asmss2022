@@ -5,24 +5,127 @@ output: html_notebook
 
 ## Data
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 s_ex03p03_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
 s_ex03p03_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
 tbl_ex03p03_data <- readr::read_csv(file = s_ex03p03_data_path)
 ```
 
+
+## Least Squares Normal Equations
+In this section, we are computing one solution for the Least Squares Normal Equation. First sort the data according to the breed
+
+```{r}
+tbl_ex03p03_data <- tbl_ex03p03_data[order(tbl_ex03p03_data$Breed),]
+```
+
+
+```{r}
+mat_X <- model.matrix(lm(`Body Weight` ~ 0 + Breed, data = tbl_ex03p03_data))
+mat_X <- cbind(matrix(1, nrow = nrow(tbl_ex03p03_data), ncol = 1), mat_X)
+dimnames(mat_X) <- NULL
+mat_xtx <- crossprod(mat_X)
+mat_xtx
+```
+
+The MP generalized inverse is obtained by 
+
+```{r}
+mat_xtx_ginv <- MASS::ginv(mat_xtx)
+mat_xtx_ginv
+```
+
+The right hand side
+
+```{r}
+vec_y <- tbl_ex03p03_data$`Body Weight`
+mat_xty <- crossprod(mat_X, vec_y)
+mat_xty
+```
+
+One solution is obtained by
+
+```{r}
+mat_b0 <- crossprod(mat_xtx_ginv, mat_xty)
+mat_b0
+```
+
+Setting the components of this solution vector $b^0$ equal to 
+
+```{r, echo=FALSE, results='asis'}
+vec_b0 <- c("\\mu", "\\alpha_1", "\\alpha_2", "\\alpha_3")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b0, ps_name = "b^0", ps_env = "$$"), collapse = ""))
+```
+
+
 ## Contrasts
 
-These results are consistent with the results obtained by `lm()`. If we wanted to see what type of estimable functions are used by the `lm()` function, it can be shown using the function `contrasts()`. For our example with the Breed, we obtain the contrast matrix by 
+These results are consistent with the results obtained by `lm()`. If we wanted to see what type of estimable functions are used by the `lm()` function, it can be derived from the ouput of the function `contrasts()`. For our example with the Breed, we obtain the contrast matrix by 
 
 ```{r}
 contrasts(as.factor(tbl_ex03p03_data$Breed))
 ```
 
+This means that the effect reported as `Limousin` by `lm()` corresponds to the first estimable function and the effect reported as `Simmental` corresponds to the second estimable function. What the estimable functions are, we obtain from the computations that follow below. The effect for `Angus` is contained in the intercept which is just set to the mean body weight of all Angus animals. 
+
+Adding to the above contrast matrix a row of all ones to the left side and inverting the extended matrix gives
+
 ```{r}
-model.matrix(lm(`Body Weight`~Breed, data = tbl_ex03p03_data))
+mat_contr <- contrasts(as.factor(tbl_ex03p03_data$Breed))
+mat_contr <- cbind(matrix(1, nrow = nrow(mat_contr), ncol = 1), mat_contr)
+mat_contr
 ```
 
+Inverting the above shown contrast matrix yields the matrix with estimable functions
+
+```{r}
+mat_estf <- solve(mat_contr)
+row.names(mat_estf)[1] <- "(Intercept)"
+mat_estf
+```
+
+The frist row of the above matrix shows that the intercept corresponds to the mean of all Angus animals. This can be verified by
+
+```{r}
+n_inter_dummy <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Angus", ]$`Body Weight`)
+n_inter_dummy
+```
+
+The linear model yields
+
+```{r}
+lm_ex03p03 <- lm(`Body Weight` ~ Breed, data = tbl_ex03p03_data)
+coefficients(lm_ex03p03)["(Intercept)"]
+```
+
+The second and the third row of the above shown matrix of estimable functions contain the vector $q^T$ for the effect that are given as rownames. For example for the effect `Limousin` the row-vector $q^T$ is
+
+```{r, echo=FALSE, results='asis'}
+vec_q_LI <- mat_estf[2,]
+cat(paste(rmdhelp::brow_vector(pvec = vec_q, ps_name = "q^T_{LI}", ps_env = "$$")))
+```
+
+This means that the effect for Limousin corresponds to the difference between $\alpha_2 - \alpha_1$ which corresponds to 
+
+```{r}
+eff_LI <- mat_b0[3] - mat_b0[2]
+eff_LI
+```
+
+The solution from `lm()` is
+
+```{r}
+coefficients(lm_ex03p03)["BreedLimousin"]
+```
+
+Similarly for the effect of Simmental. The estimable function is determined by the third row of the matrix of estimable functions. 
+
+```{r, echo=FALSE, results='asis'}
+vec_q_SI <- mat_estf[3,]
+cat(paste(rmdhelp::brow_vector(pvec = vec_q, ps_name = "q^T_{SI}", ps_env = "$$")))
+```
+
+That means, the effect for Simmental corresponds to the difference between $\alpha_3$ and $\alpha_1$. 
 
 ## Example from Video https://youtu.be/eVSIDf5w1_I
 
