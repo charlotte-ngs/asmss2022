@@ -102,7 +102,7 @@ The second and the third row of the above shown matrix of estimable functions co
 
 ```{r, echo=FALSE, results='asis'}
 vec_q_LI <- mat_estf[2,]
-cat(paste(rmdhelp::brow_vector(pvec = vec_q, ps_name = "q^T_{LI}", ps_env = "$$")))
+cat(paste(rmdhelp::brow_vector(pvec = vec_q_LI, ps_name = "q_{LI}", ps_env = "$$")))
 ```
 
 This means that the effect for Limousin corresponds to the difference between $\alpha_2 - \alpha_1$ which corresponds to 
@@ -122,10 +122,22 @@ Similarly for the effect of Simmental. The estimable function is determined by t
 
 ```{r, echo=FALSE, results='asis'}
 vec_q_SI <- mat_estf[3,]
-cat(paste(rmdhelp::brow_vector(pvec = vec_q, ps_name = "q^T_{SI}", ps_env = "$$")))
+cat(paste(rmdhelp::brow_vector(pvec = vec_q_SI, ps_name = "q_{SI}", ps_env = "$$")))
 ```
 
 That means, the effect for Simmental corresponds to the difference between $\alpha_3$ and $\alpha_1$. 
+
+```{r}
+eff_SI <- mat_b0[4] - mat_b0[2]
+eff_SI
+```
+
+The solution from `lm()`
+
+```{r}
+coefficients(lm_ex03p03)["BreedSimmental"]
+```
+
 
 ## Example from Video https://youtu.be/eVSIDf5w1_I
 
