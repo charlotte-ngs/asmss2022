@@ -98,14 +98,18 @@ lm_ex03p03 <- lm(`Body Weight` ~ Breed, data = tbl_ex03p03_data)
 coefficients(lm_ex03p03)["(Intercept)"]
 ```
 
-The second and the third row of the above shown matrix of estimable functions contain the vector $q^T$ for the effect that are given as rownames. For example for the effect `Limousin` the row-vector $q^T$ is
+The second and the third row of the above shown matrix of estimable functions contain the vector $q^T$ for the effect that are given as rownames. For example for the effect `Limousin` the row-vector $q^T_{LI}$ is
 
 ```{r, echo=FALSE, results='asis'}
-vec_q_LI <- mat_estf[2,]
+vec_q_LI <- c(0, mat_estf[2,])
 cat(paste(rmdhelp::brow_vector(pvec = vec_q_LI, ps_name = "q_{LI}", ps_env = "$$")))
 ```
 
-This means that the effect for Limousin corresponds to the difference between $\alpha_2 - \alpha_1$ which corresponds to 
+This means that the effect for Limousin shown in the output of `lm()`  corresponds to the difference between $\alpha_2 - \alpha_1$. This is obtained by multiplying $q^T_{LI}$ with $b^0$, hence
+
+$$q^T_{LI} \cdot b^0 = \alpha_2 - \alpha_1$$
+
+The numerical solution for the effect of `BreedLimousin` is computed as 
 
 ```{r}
 eff_LI <- mat_b0[3] - mat_b0[2]
@@ -121,11 +125,11 @@ coefficients(lm_ex03p03)["BreedLimousin"]
 Similarly for the effect of Simmental. The estimable function is determined by the third row of the matrix of estimable functions. 
 
 ```{r, echo=FALSE, results='asis'}
-vec_q_SI <- mat_estf[3,]
+vec_q_SI <- c(0, mat_estf[3,])
 cat(paste(rmdhelp::brow_vector(pvec = vec_q_SI, ps_name = "q_{SI}", ps_env = "$$")))
 ```
 
-That means, the effect for Simmental corresponds to the difference between $\alpha_3$ and $\alpha_1$. 
+That means, the effect for Simmental is computed as $q^T_{SI} \cdot b^0$ corresponds to the difference between $\alpha_3$ and $\alpha_1$. 
 
 ```{r}
 eff_SI <- mat_b0[4] - mat_b0[2]
@@ -137,6 +141,15 @@ The solution from `lm()`
 ```{r}
 coefficients(lm_ex03p03)["BreedSimmental"]
 ```
+
+Combining, the two estimable functions into a vector $c$
+
+```{r, echo=FALSE, results='asis'}
+vec_c <- c("\\alpha_2 - \\alpha_1", "\\alpha_3 - \\alpha_1")
+cat(paste(rmdhelp::bcolumn_vector(pvec = vec_c, ps_name = "c", ps_env = "$$")))
+```
+
+Multiplying the contrast matrix obtained by the function `contrasts()` with the vector $c$ shows for `BreedLimousin` and for `BreedSimmental` with which estimable function they were computed.
 
 
 ## Example from Video https://youtu.be/eVSIDf5w1_I
