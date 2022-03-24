@@ -58,9 +58,10 @@ cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b0, ps_name = "b^0", ps_env = "$$"
 ```
 
 
-## Contrasts
+## Default Contrasts
+By default the `lm()` function uses the so-called __treatment__ contrasts. This means that all levels of a factor are compared to the first level when sorting the levels alphabetically. The first level is interpreted as a control case where all other levels are interpreted as different treatments which are compared to the control.
 
-These results are consistent with the results obtained by `lm()`. If we wanted to see what type of estimable functions are used by the `lm()` function, it can be derived from the ouput of the function `contrasts()`. For our example with the Breed, we obtain the contrast matrix by 
+In what follows, we try to show how the solutions of the normal equations are related to the results obtained by `lm()`. If we wanted to see what type of estimable functions are used by the `lm()` function, it can be derived from the ouput of the function `contrasts()`. For our example with the Breed, we obtain the contrast matrix by 
 
 ```{r}
 contrasts(as.factor(tbl_ex03p03_data$Breed))
@@ -150,6 +151,46 @@ cat(paste(rmdhelp::bcolumn_vector(pvec = vec_c, ps_name = "c", ps_env = "$$")))
 ```
 
 Multiplying the contrast matrix obtained by the function `contrasts()` with the vector $c$ shows for `BreedLimousin` and for `BreedSimmental` with which estimable function they were computed.
+
+
+## Alternative Contrasts
+One possible alternative for the default treatment contrasts are the sequential difference contrasts. These can be activated by changing the options of the current R-session with the following command
+
+```{r}
+opts <- options()
+options(contrasts = c("contr.sdif", "contr.sdif"))
+getOption("contrasts")
+```
+
+With the sequential difference contrasts, we are looking at the pair-wise differences of the levels. In order to construct the contrast matrix for the sequential different contrasts, the R-package MASS is required and the contrast matrix looks as follows
+
+```{r}
+library(MASS)
+(cmat_sdiff <- contrasts(as.factor(tbl_ex03p03_data$Breed)))
+```
+
+From the contrast matrix, we can try to infer the estimable functions by adding a column of ones to the left of the matrix and the compute the inverse of that extended contrast matrix. 
+
+```{r}
+ecmat_sdiff <- cbind(matrix(1, nrow = nrow(cmat_sdiff), ncol = 1), cmat_sdiff)
+ecmat_sdiff
+```
+
+The inverse of ecmat_sdiff
+
+```{r}
+est_mat_sdiff <- solve(ecmat_sdiff)
+est_mat_sdiff
+```
+
+
+Finally, we have to re-set the options
+
+```{r}
+options(opts)
+getOption("contrasts")
+```
+
 
 
 ## Example from Video https://youtu.be/eVSIDf5w1_I
