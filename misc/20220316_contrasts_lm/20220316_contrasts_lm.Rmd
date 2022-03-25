@@ -180,7 +180,48 @@ The inverse of ecmat_sdiff
 
 ```{r}
 est_mat_sdiff <- solve(ecmat_sdiff)
+row.names(est_mat_sdiff)[1] <- "(Intercept)"
 est_mat_sdiff
+```
+
+The first row of the above matrix shows how the intercept is computed from the class means. With the first row all having a value of $1/k$ for $k$ being the number of levels, it follows that the intercept here is computed as the mean over all class means
+
+```{r}
+n_mean_angus <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Angus", ]$`Body Weight`)
+n_mean_limousin <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Limousin", ]$`Body Weight`)
+n_mean_simmental <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Simmental", ]$`Body Weight`)
+mean(c(n_mean_angus, n_mean_limousin,n_mean_simmental))
+```
+
+The intercept is 
+
+```{r}
+lm_sdiff <- lm(formula = `Body Weight` ~ Breed, data = tbl_ex03p03_data)
+coefficients(lm_sdiff)["(Intercept)"]
+```
+
+The second and the third row of `est_mat_sdiff` show the estimable functions that are used to compute the reported effects from the solutions of the normal equations. So the effect `Limousin-Angus` is computed from the difference between $\alpha_2-\alpha_1$ 
+
+```{r}
+mat_b0[3] - mat_b0[2]
+```
+
+The effect from `lm()`
+
+```{r}
+coefficients(lm_sdiff)["BreedLimousin-Angus"]
+```
+
+Similarly for `Simmental-Limousin`
+
+```{r}
+mat_b0[4] - mat_b0[3]
+```
+
+The effect from `lm()`
+
+```{r}
+coefficients(lm_sdiff)["BreedSimmental-Limousin"]
 ```
 
 
