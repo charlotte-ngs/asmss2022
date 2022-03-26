@@ -1,0 +1,102 @@
+---
+title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 5
+author: Peter von Rohr
+date: 2022-03-26
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+    keep_md: false
+    keep_tex: false
+header-includes:
+ \usepackage{longtable}
+ \usepackage{float}
+params:
+  doctype:
+    label: 'Document Type'
+    value: 'solution'
+    choices: ['exercise', 'solution', 'notebook']
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, echo=FALSE}
+s_ex05p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+## Problem 1: Helmert Contrasts
+Use the dataset of `Body Weight` and `Breed` to fit a linear model. The aim of this exercise is to use the `Helmert`-contrasts instead of the defautl `Treatment` contrasts. What are the estimable functions used in the `Helmert`-Contrasts and what are the effects that are reported for the different levels of the factor `Breed`? Verify your answer by comparing estimable functions of solutions of the least squares normal equations to the effects of `lm()`.
+
+The dataset is available under
+
+```{r, echo=FALSE}
+cat(s_ex05p01_data_path, "\n")
+```
+
+### Hint
+
+* Use `options(contrasts = c("contr.helmert", "contr.helmert"))` to change the default contrasts to the desired `Helmert`-Contrasts
+
+
+<!-- your-solution-start
+### Your Solution
+
+* Compute solutions to least squares normal equation
+
+* Change contrasts from default to Helmert
+
+* Find estimable functions associated to Helmert contrasts
+
+* Check back with effects of `lm()`
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+* Compute solutions to least squares normal equation
+
+* Change contrasts from default to Helmert
+
+* Find estimable functions associated to Helmert contrasts
+
+* Check back with effects of `lm()`
+
+<!-- master-solution-end -->
+
+
+## Problem 2
+
+<!-- your-solution-start
+### Your Solution
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+
+
+## Problem 3
+
+<!-- your-solution-start
+### Your Solution
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+ 
