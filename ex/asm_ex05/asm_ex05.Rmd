@@ -29,7 +29,7 @@ s_ex05p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_fl
 ```
 
 ## Problem 1: Helmert Contrasts
-Use the dataset of `Body Weight` and `Breed` to fit a linear model. The aim of this exercise is to use the `Helmert`-contrasts instead of the defautl `Treatment` contrasts. What are the estimable functions used in the `Helmert`-Contrasts and what are the effects that are reported for the different levels of the factor `Breed`? Verify your answer by comparing estimable functions of solutions of the least squares normal equations to the effects of `lm()`.
+Use the dataset of `Body Weight` and `Breed` to fit a linear model of `Body Weight` on `Breed`. The aim of this exercise is to use the `Helmert`-contrasts instead of the defautl `Treatment` contrasts. What are the estimable functions used in the `Helmert`-Contrasts and what are the effects that are reported for the different levels of the factor `Breed`? Verify your answer by comparing estimable functions of solutions of the least squares normal equations to the effects of `lm()`.
 
 The dataset is available under
 
@@ -60,13 +60,81 @@ cat(s_ex05p01_data_path, "\n")
 
 ### Solution
 
-* Compute solutions to least squares normal equation
+* Compute solutions to least squares normal equation. First the data is read from the given file
 
-* Change contrasts from default to Helmert
+```{r}
+tbl_e05p01 <- readr::read_csv(file = s_ex05p01_data_path)
+```
 
-* Find estimable functions associated to Helmert contrasts
+The data is sorted according to the breed
+
+```{r}
+tbl_e05p01 <- tbl_e05p01[order(tbl_e05p01$Breed),]
+tbl_e05p01
+```
+
+A solution vector depends on the matrix $X$ and on the vector $y$. The vector $y$ is directly obtained from the column `Body Weight` of the dataframe. 
+
+```{r}
+vec_y <- tbl_e05p01$`Body Weight`
+```
+
+The matrix $X$ can be obtained from the function `model.matrix()`. 
+
+```{r}
+mat_X <- model.matrix(lm(`Body Weight` ~ 0 + Breed, data = tbl_e05p01))
+mat_X <- cbind(matrix(1, nrow = nrow(mat_X), ncol = 1), mat_X)
+mat_X
+```
+
+A solution for the least squares normal equations is obtained by 
+
+```{r}
+mat_xtx_ginv <- MASS::ginv(crossprod(mat_X))
+mat_xty <- crossprod(mat_X, vec_y)
+mat_b0 <- crossprod(mat_xtx_ginv, mat_xty)
+mat_b0
+```
+
+The solutions correspond to the vector $b^0$ with the components
+
+```{r, echo=FALSE, results='asis'}
+vec_b0 <- c("\\mu", "\\alpha_1", "\\alpha_2", "\\alpha_3")
+cat("$$\n")
+cat("b^0 = ")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_b0), collapse = "\n"), "\n")
+cat(" = \n")
+cat(paste0(rmdhelp::bmatrix(pmat = round(mat_b0, digits = 3)), collapse = "\n"), "\n")
+cat("$$\n")
+```
+
+
+* Change contrasts from default to Helmert. Start by saving away the existing options
+
+```{r}
+opts <- options()
+```
+
+Change contrasts
+
+```{r}
+options(contrasts = c("contr.helmert", "contr.helmert"))
+getOption("contrasts")
+```
+
+
+* Find estimable functions associated to Helmert contrasts. Estimable functions are derived from the contrasts matrix.
+
+
 
 * Check back with effects of `lm()`
+
+* Restore original options
+
+
+```{r}
+options(opts)
+```
 
 <!-- master-solution-end -->
 
