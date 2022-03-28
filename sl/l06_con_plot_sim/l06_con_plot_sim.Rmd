@@ -9,6 +9,23 @@ output: beamer_presentation
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+s_bwbr_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+s_bwbr_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+tbl_bwbr <- readr::read_csv(file = s_bwbr_path)
+
+mat_X <- model.matrix(lm(`Body Weight` ~ 0 + Breed, data = tbl_bwbr))
+mat_X <- cbind(matrix(1, nrow = nrow(tbl_bwbr), ncol = 1), mat_X)
+dimnames(mat_X) <- NULL
+mat_xtx <- crossprod(mat_X)
+mat_xtx_ginv <- MASS::ginv(mat_xtx)
+vec_y <- tbl_bwbr$`Body Weight`
+mat_xty <- crossprod(mat_X, vec_y)
+mat_b0 <- crossprod(mat_xtx_ginv, mat_xty)
+
+```
+
+
 
 ## Three Topics
 
@@ -63,16 +80,46 @@ tbl_bwbr <- readr::read_csv(file = s_bwbr_path)
 ## Intercept
 
 ```{r, echo=FALSE}
-n_mean_angus <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Angus", ]$`Body Weight`)
-n_mean_limousin <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Limousin", ]$`Body Weight`)
-n_mean_simmental <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Simmental", ]$`Body Weight`)
-
-m <- 
+n_mean_angus <- mean(tbl_bwbr[tbl_bwbr$Breed == "Angus", ]$`Body Weight`)
+n_mean_limousin <- mean(tbl_bwbr[tbl_bwbr$Breed == "Limousin", ]$`Body Weight`)
+n_mean_simmental <- mean(tbl_bwbr[tbl_bwbr$Breed == "Simmental", ]$`Body Weight`)
+m <- c(n_mean_angus, n_mean_limousin, n_mean_simmental)
 ```
 
 * First row of `em_treat` shows computation of estimate for intercept
 * Define vector $m$ as the vector of the mean values for `Body Weight` for all breeds
 
+```{r, echo=FALSE, results='asis'}
+vec_m <- c("E(y_{1.})", "E(y_{2.})", "E(y_{3.})")
+cat("$$\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_m, ps_name = "m"), collapse = "\n"), "\n")
+cat(" = \n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = round(m, digits = 3)), collapse = "\n"), "\n")
+cat("$$\n")
+```
+
+```{r}
+em_treat[1,] %*% m
+```
 
 
+## Effects
 
+* Vector $\alpha$ from solution $b^0$ of least-squares normal equations
+
+```{r, echo=FALSE, results='asis'}
+vec_alpha <- c("\\alpha_1", "\\alpha_2", "\\alpha_3")
+cat("$$\n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = vec_alpha, ps_name = "\\alpha"), collapse = "\n"), "\n")
+cat(" = \n")
+cat(paste0(rmdhelp::bcolumn_vector(pvec = round(mat_b0[2:(nrow(mat_b0)),], digits = 3)), collapse = "\n"), "\n")
+cat("$$\n")
+```
+
+```{r}
+em_treat[2,] %*% mat_b0[2:(nrow(mat_b0)),]
+```
+
+```{r}
+em_treat[3,] %*% mat_b0[2:(nrow(mat_b0)),]
+```
