@@ -1,0 +1,79 @@
+---
+title: Applied Statistical Methods - Notebook 5
+author: Peter von Rohr
+date: 2022-03-26
+output: html_notebook
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, echo=FALSE}
+s_ex05p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+## Problem 1: Helmert Contrasts
+Use the dataset of `Body Weight` and `Breed` to fit a linear model of `Body Weight` on `Breed`. The aim of this exercise is to use the `Helmert`-contrasts instead of the defautl `Treatment` contrasts. What are the estimable functions used in the `Helmert`-Contrasts and what are the effects that are reported for the different levels of the factor `Breed`? Verify your answer by comparing estimable functions of solutions of the least squares normal equations to the effects of `lm()`.
+
+The dataset is available under
+
+```{r, echo=FALSE}
+cat(s_ex05p01_data_path, "\n")
+```
+
+### Hint
+
+* Use `options(contrasts = c("contr.helmert", "contr.helmert"))` to change the default contrasts to the desired `Helmert`-Contrasts
+
+
+### Your Solution
+
+* Compute solutions to least squares normal equation
+
+* Change contrasts from default to Helmert
+
+* Find estimable functions associated to Helmert contrasts
+
+* Check back with effects of `lm()`
+
+
+
+
+
+```{r, echo=FALSE}
+vec_nobs <- c(10,30,100)
+s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+## Problem 2: Simulation
+Use the results of the regression of `Body Weight` on `Breast Circumference` and simulate three datasets with `r vec_nobs[1]`, `r vec_nobs[2]` and `r vec_nobs[3]` observations respectively. What is the number of observations required to obtain the same regression results from the simulated dataset that you used in the simulation? 
+
+The original dataset is available under:
+
+```{r, echo=FALSE}
+cat(s_ex05p02_data_path, "\n")
+```
+
+### Your Solution
+
+* Run the regression analysis of `Body Weight` on `Breast Circumference`
+
+* Create the three datasets
+
+* Analyse each of the datasets using `lm()`
+
+* Check the obtained results, whether they match the input from the simulation
+
+
+
+
+
+
+
+```{r, echo=FALSE, results='asis'}
+cat('\n---\n\n _Latest Changes: ', format(Sys.time(), '%Y-%m-%d %H:%M:%S'), ' (', Sys.info()['user'], ')_\n', sep = '')
+```
+ 
