@@ -123,11 +123,74 @@ getOption("contrasts")
 ```
 
 
-* Find estimable functions associated to Helmert contrasts. Estimable functions are derived from the contrasts matrix.
+* Find estimable functions associated to Helmert contrasts. Estimable functions are derived from the contrasts matrix. First the Breed column must be converted to a factor.
+
+```{r}
+tbl_e05p01$Breed <- as.factor(tbl_e05p01$Breed)
+c_mat_helmert <- contrasts(tbl_e05p01$Breed)
+c_mat_helmert
+```
+
+Add a columns of all ones to `c_mat_helmert`. 
+
+```{r}
+c_mat_helmert <- cbind(matrix(1, nrow = nrow(c_mat_helmert), ncol = 1), c_mat_helmert)
+c_mat_helmert
+```
+
+Compute the inverse of `c_mat_helmert`
+
+```{r}
+est_mat_helmert <- solve(c_mat_helmert)
+est_mat_helmert
+```
+
+The first row tells us how the intercept is computed. The intercept ($\hat{b}_0$) here corresponds to 
+
+$$\hat{b}_0 = {1\over 3}\left( E(y_{1.}) + E(y_{2.}) + E(y_{3.})\right)$$
+where $E(y_{1.})$,  $E(y_{2.})$ and $E(y_{3.})$ are the mean values of `Body Weight` for Angus, Limousin and Simmental animals, respectively. 
+
+```{r}
+n_mean_angus <- mean(tbl_e05p01[tbl_e05p01$Breed == "Angus", ]$`Body Weight`)
+n_mean_limousin <- mean(tbl_e05p01[tbl_e05p01$Breed == "Limousin", ]$`Body Weight`)
+n_mean_simmental <- mean(tbl_e05p01[tbl_e05p01$Breed == "Simmental", ]$`Body Weight`)
+mean(c(n_mean_angus, n_mean_limousin,n_mean_simmental))
+```
+
+The second row of `est_mat_helmert` shows the first estimable function that is used. It corresponds to 
+
+$$\hat{b}_1 = {1\over 2}(\alpha_2 - \alpha_1)$$
+where $\hat{b}_1$ measures the difference between the breeds `Limousin` and `Angus` corresponding to
+
+```{r}
+1/2*(mat_b0[3] - mat_b0[2])
+```
+
+The third row of `est_mat_helmert` shows how the `Body Weight` of the breed `Simmental` is compared to the two other breeds. It is 
+
+$$\hat{b}_2 = {1\over 6}(2\alpha_3 - \alpha_2 - \alpha_1)$$
+
+which measures the difference between `Simmental` and `Limousin` and `Angus` together.
+
+```{r}
+1/6 * (2*mat_b0[4] - mat_b0[3] - mat_b0[2])
+```
 
 
+* Check back with effects of `lm()`. The estimate for the intercept is
 
-* Check back with effects of `lm()`
+```{r}
+lm_helmert <- lm(`Body Weight` ~ Breed, data = tbl_e05p01)
+coefficients(lm_helmert)["(Intercept)"]
+```
+
+The estimates for the `Breed` effects can be seen from the list of all coefficients.
+
+```{r}
+coefficients(lm_helmert)
+```
+
+
 
 * Restore original options
 
@@ -139,10 +202,30 @@ options(opts)
 <!-- master-solution-end -->
 
 
-## Problem 2
+```{r, echo=FALSE}
+vec_nobs <- c(10,30,100)
+s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+## Problem 2: Simulation
+Use the results of the regression of `Body Weight` on `Breast Circumference` and simulate three datasets with `r vec_nobs[1]`, `r vec_nobs[2]` and `r vec_nobs[3]` observations respectively. What is the number of observations required to obtain the same regression results from the simulated dataset that you used in the simulation? 
+
+The original dataset is available under:
+
+```{r, echo=FALSE}
+cat(s_ex05p02_data_path, "\n")
+```
 
 <!-- your-solution-start
 ### Your Solution
+
+* Run the regression analysis of `Body Weight` on `Breast Circumference`
+
+* Create the three datasets
+
+* Analyse each of the datasets using `lm()`
+
+* Check the obtained results, whether they match the input from the simulation
 
 ---  your-solution-end -->
 
@@ -154,17 +237,3 @@ options(opts)
 <!-- master-solution-end -->
 
 
-## Problem 3
-
-<!-- your-solution-start
-### Your Solution
-
----  your-solution-end -->
-
-
-<!-- master-solution-start -->
-
-### Solution
-
-<!-- master-solution-end -->
- 
