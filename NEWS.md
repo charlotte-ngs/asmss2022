@@ -1,6 +1,10 @@
+# asmss2022 0.6.0
+
+* Exercise asm_ex05
+
 # asmss2022 0.5.2
 
-Slides l05
+* Slides l05
 
 # asmss2022 0.5.1
 
