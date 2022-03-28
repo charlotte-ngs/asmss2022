@@ -26,6 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo=FALSE}
 s_ex05p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+s_ex05p01_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
 ```
 
 ## Problem 1: Helmert Contrasts
@@ -205,6 +206,7 @@ options(opts)
 ```{r, echo=FALSE}
 vec_nobs <- c(10,30,100)
 s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+s_ex05p02_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
 ```
 
 ## Problem 2: Simulation
@@ -233,6 +235,42 @@ cat(s_ex05p02_data_path, "\n")
 <!-- master-solution-start -->
 
 ### Solution
+
+* Run the regression analysis of `Body Weight` on `Breast Circumference`
+
+```{r}
+tbl_bwbc <- readr::read_csv(file = s_ex05p02_data_path)
+lm_bwbc <- lm(`Body Weight` ~ `Breast Circumference`, data = tbl_bwbc)
+b0 <- coefficients(lm_bwbc)["(Intercept)"]
+b1 <- coefficients(lm_bwbc)["`Breast Circumference`"]
+mean_bc <- mean(tbl_bwbc$`Breast Circumference`)
+sd_bc <- sd(tbl_bwbc$`Breast Circumference`)
+sry_bwbc <- summary(lm_bwbc)
+sd_res <- sry_bwbc$sigma
+```
+
+
+* Create the three datasets. In a first step, we create a function that takes as arguments 
+    + number of observations
+    + intercept $b_0$
+    + slope $b_1$
+    + mean `Breast Circumference`
+    + standard deviation `Breast Circumference`
+    + standard deviation of residuals
+
+and returns a dataset according to these input values.
+
+```{r}
+simulate_bwbc <- function(pn_nrobs, pn_b0, pn_b1, pn_mean_x, pn_sd_x, pn_sd_res){
+  
+}
+```
+
+
+```{r}
+vec_nobs <- c(10,30,100)
+
+```
 
 <!-- master-solution-end -->
 
