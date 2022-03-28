@@ -1,0 +1,78 @@
+---
+title: Contrasts, Plots and Simulation
+author: Peter von Rohr
+date: "`r Sys.Date()`"
+output: beamer_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Three Topics
+
+1. Contrasts in R
+2. Plots
+3. Simulation
+
+
+## Contrasts in R
+
+* Estimable functions used in R are encoded by so-called `contrasts`
+* Use `getOption("contrasts")` to find which contrasts are used
+* Use `options(contrasts = c("<contast_unordered>", "<contrast_ordered"))` to change contrasts
+
+
+## Contrasts and Estimable Functions
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+s_bwbr_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+s_bwbr_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+tbl_bwbr <- readr::read_csv(file = s_bwbr_path)
+```
+
+* Relationship between contrasts and estimable functions via __contrasts matrix__
+
+```{r}
+(cm_treat <- contrasts(as.factor(tbl_bwbr$Breed)))
+```
+
+
+## Estimable Functions
+
+* Extend contrast matrix
+
+```{r}
+(cm_treat <- cbind(matrix(1, 
+                     nrow = nrow(cm_treat),
+                     ncol = 1), 
+                   cm_treat))
+```
+
+
+## Estimable Functions II
+
+* Invert extended contrast matrix
+
+```{r}
+(em_treat <- solve(cm_treat))
+```
+
+
+## Intercept
+
+```{r, echo=FALSE}
+n_mean_angus <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Angus", ]$`Body Weight`)
+n_mean_limousin <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Limousin", ]$`Body Weight`)
+n_mean_simmental <- mean(tbl_ex03p03_data[tbl_ex03p03_data$Breed == "Simmental", ]$`Body Weight`)
+
+m <- 
+```
+
+* First row of `em_treat` shows computation of estimate for intercept
+* Define vector $m$ as the vector of the mean values for `Body Weight` for all breeds
+
+
+
+

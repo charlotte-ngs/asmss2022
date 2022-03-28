@@ -30,7 +30,7 @@ tbl_ex <- tibble::tibble(Nr = c(1, 2, 3, 4, 5),
                            paste0("Linear Regression (Part 2) [pdf](", s_url_ex, "asm_ex02.pdf) | [nb](", s_url_nb, "asm_ex02_nb_src.nb.html)",  collapse = ""),
                            paste0("Regression on Dummy Variables [pdf](", s_url_ex, "asm_ex03.pdf) | [nb](", s_url_nb, "asm_ex03_nb_src.nb.html)", collapse = ""),
                            paste0("Overfitting and Plots [pdf](", s_url_ex, "asm_ex04.pdf) | [nb](", s_url_nb, "asm_ex04_nb_src.nb.html)", collapse = ""),
-                           paste0("Contrasts and Simulation [pdf](", s_url_ex, "asm_ex04.pdf) | [nb](", s_url_nb, "asm_ex05_nb_src.nb.html)", collapse = "")
+                           paste0("Contrasts and Simulation [pdf](", s_url_ex, "asm_ex05.pdf) | [nb](", s_url_nb, "asm_ex05_nb_src.nb.html)", collapse = "")
                          ))
 knitr::kable(tbl_ex)
 ```
