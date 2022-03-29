@@ -1,3 +1,7 @@
+# asmss2022 0.6.1
+
+* Link to video of lecture 06
+
 # asmss2022 0.6.0
 
 * Exercise asm_ex05
