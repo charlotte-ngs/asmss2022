@@ -262,14 +262,20 @@ and returns a dataset according to these input values.
 
 ```{r}
 simulate_bwbc <- function(pn_nrobs, pn_b0, pn_b1, pn_mean_x, pn_sd_x, pn_sd_res){
-  
+  vec_bc <- rnorm(pn_nrobs, mean = pn_mean_x, sd = pn_sd_x)
+  vec_bw <- pn_b0 + pn_b1 * vec_x + rnorm(pn_nrobs, mean = 0, sd = pn_sd_res)
+  tbl_result <- tibble::tibble(Animal = c(1:pn_nrobs),
+                               BC = vec_bc,
+                               BW = vec_bw)
+  return(tbl_result)
 }
 ```
 
+With the above defined function, we can create a list with the three datasets
 
 ```{r}
 vec_nobs <- c(10,30,100)
-
+l_data_set <- lapply()
 ```
 
 <!-- master-solution-end -->
