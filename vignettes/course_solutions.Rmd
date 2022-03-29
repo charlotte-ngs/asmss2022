@@ -25,9 +25,9 @@ tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4),
                                   "2022-03-21"),
                          Topic = c(
                            paste0("[Linear Regression](", s_url_sol, "asm_ex01_sol.pdf)",  collapse = ""),
-                           paste0("[Linear Regression (Part 2)(", s_url_sol, "asm_ex02_sol.pdf)",  collapse = ""),
-                           paste0("[Regression on Dummy Variables(", s_url_sol, "asm_ex03_sol.pdf)", collapse = ""),
-                           paste0("Overfitting and Plots [pdf](", s_url_sol, "asm_ex04_sol.pdf)", collapse = "")
+                           paste0("[Linear Regression (Part 2)](", s_url_sol, "asm_ex02_sol.pdf)",  collapse = ""),
+                           paste0("[Regression on Dummy Variables](", s_url_sol, "asm_ex03_sol.pdf)", collapse = ""),
+                           paste0("[Overfitting and Plots](", s_url_sol, "asm_ex04_sol.pdf)", collapse = "")
                          ))
 knitr::kable(tbl_sol)
 ```
