@@ -11,6 +11,7 @@ output:
 header-includes:
  \usepackage{longtable}
  \usepackage{float}
+bibliography: [bibliography.bib]
 params:
   doctype:
     label: 'Document Type'
@@ -25,11 +26,59 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+met <- rmdhelp::MendeleyExportToolR6$new()
+met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(),
+                              rstudioapi::getActiveDocumentContext()$path,
+                              whereami::thisfile()))
+
 ```
 
+```{r p01-init, echo=FALSE}
+n_nr_feed <- 4
+```
 
 ## Problem 1: Experiment Evaluation
-A research farm did a feeding trial with three different feeding regimes in dairy cows. 
+In the paper by `r met$add("Manzocchi2020")` `r n_nr_feed` different feeding treatments for dairy cows were compared. The different feeding treatments consisted of 
+
+```{r, echo=FALSE}
+tbl_feed <- tibble::tibble(Treatment = c(1:n_nr_feed),
+                           Feed = c("hay",
+                                    "grass-silage",
+                                    "maize silage",
+                                    "shredlage"))
+knitr::kable(tbl_feed,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+From the results section of the paper, the values for energy corrected milk (ECM in kg/day)  and coagulation time (CGT in min) of the milk are shown in the table below. 
+
+```{r, echo=FALSE}
+tbl_ecm <- tibble::tibble(Treatment = c(1:n_nr_feed),
+                          ECM = c(24.3, 23.6, 25.0, 23.8),
+                          CGT = c(11.0, 10.6, 10.5, 10.3))
+knitr::kable(tbl_ecm,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+The standard errors of the means (SEM) for the above reported target variables were 
+
+```{r, echo=FALSE}
+tbl_sem <- tibble::tibble(Response = c("ECM", "CGT"),
+                          SEM = c(1.18, 0.60))
+knitr::kable(tbl_sem,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+The real experiment is designed according to an incomplete latin square where in two runs groups of six cows were assigned to each of the four treatments. For the purpose of this exercise, we simplify the experimental design and assume that groups of twelve cows were assigned to the treatments all at the same time. The paper mentions that besides of the treatment numerous fixed effects (experimental run and interactions between treatments and experimental runs) and covariates (lactation stage) were considered. But unfortunately, no estimates for the different effects were given. Hence we are assuming that the treatment is the major effect on our responses. 
+
+### Your Tasks
+
+* Simulate a dataset with twelve cows per treatment and assign to each of the cows a value for the two responses ECM and CGT with mean values shown in the table above and with standard deviation equal to the SEM values. 
+* Analyse the dataset with a fixed linear effect model and verify whether you can reproduce the results of the paper
+* Think about what type of contrasts are ideal for this type of dataset.
 
 <!-- your-solution-start
 ### Your Solution
@@ -70,17 +119,5 @@ A research farm did a feeding trial with three different feeding regimes in dair
 <!-- master-solution-end -->
 
 
-## Problem 3
 
-<!-- your-solution-start
-### Your Solution
-
----  your-solution-end -->
-
-
-<!-- master-solution-start -->
-
-### Solution
-
-<!-- master-solution-end -->
- 
+# References 
