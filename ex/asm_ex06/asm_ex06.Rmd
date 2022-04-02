@@ -35,6 +35,7 @@ met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(),
 
 ```{r p01-init, echo=FALSE}
 n_nr_feed <- 4
+n_nr_cow_per_group <- 12
 ```
 
 ## Problem 1: Experiment Evaluation
@@ -72,24 +73,25 @@ knitr::kable(tbl_sem,
              longtable = TRUE)
 ```
 
-The real experiment is designed according to an incomplete latin square where in two runs groups of six cows were assigned to each of the four treatments. For the purpose of this exercise, we simplify the experimental design and assume that groups of twelve cows were assigned to the treatments all at the same time. The paper mentions that besides of the treatment numerous fixed effects (experimental run and interactions between treatments and experimental runs) and covariates (lactation stage) were considered. But unfortunately, no estimates for the different effects were given. Hence we are assuming that the treatment is the major effect on our responses. 
+The real experiment is designed according to an incomplete latin square where in two runs groups of six cows were assigned to each of the four treatments. For the purpose of this exercise, we simplify the experimental design and assume that groups of `r n_nr_cow_per_group` cows were assigned to the treatments all at the same time. The paper mentions that besides of the treatment numerous fixed effects (experimental run and interactions between treatments and experimental runs) and covariates (lactation stage) were considered. But unfortunately, no estimates for the different effects were given. Hence we are assuming that the treatment is the major effect on our responses. 
 
 ### Your Tasks
 
-* Simulate a dataset with twelve cows per treatment and assign to each of the cows a value for the two responses ECM and CGT with mean values shown in the table above and with standard deviation equal to the SEM values. 
-* Analyse the dataset with a fixed linear effect model and verify whether you can reproduce the results of the paper
+* Simulate a dataset with `r n_nr_cow_per_group` cows per treatment and assign to each of the cows a value for the two responses ECM and CGT with mean values shown in the table above and with standard deviation equal to the SEM values. 
+* Analyse the dataset with a fixed linear effect model
+* Verify whether you can reproduce the results of the paper
 * Think about what type of contrasts are ideal for this type of dataset.
 
 <!-- your-solution-start
 ### Your Solution
 
-* Reading the data
+* Simulate dataset similar to the one in the paper for ECM and CGT for the four treatments
 
-* Generate datasets with more observation
+* Analyse the dataset with `lm()` 
 
-* Analyse generated datasets
+* Compare your results with the results from the paper
 
-* Determine number of records required
+* What are the best contrast for our analysis
 
 ---  your-solution-end -->
 
@@ -98,7 +100,70 @@ The real experiment is designed according to an incomplete latin square where in
 
 ### Solution
 
-* Reading the data
+* Simulate dataset similar to the one in the paper for ECM and CGT for the four treatments. The dataset for ECM and CGT contains four columns, the ID for the cow, the treatment and the two response variables. We use the function `get_treatment_data()` to generate the data for the  `r n_nr_cow_per_group` for a given treatment.
+
+```{r}
+get_treatment_data <- function(pn_treatment, pn_nr_cow, 
+                               pn_mean_ecm, pn_sd_ecm, 
+                               pn_mean_cgt, pn_sd_cgt){
+  tbl_result <- tibble::tibble(Cow = c(((pn_treatment-1)*pn_nr_cow + 1):(pn_treatment*pn_nr_cow)),
+                               Treatment = rep(pn_treatment, pn_nr_cow),
+                               ECM = rnorm(pn_nr_cow, mean = pn_mean_ecm, sd = pn_sd_ecm),
+                               CGT = rnorm(pn_nr_cow, mean = pn_mean_cgt, sd = pn_sd_cgt))
+  return(tbl_result)
+}
+```
+
+The function `get_treatment_data()` can be used to generate a dataset for each treamtent. These datasets can be combined to one dataset
+
+```{r}
+set.seed(76281)
+tbl_ecm_cgt_t1 <- get_treatment_data(pn_treatment = 1, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[1], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[1],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt_t2 <- get_treatment_data(pn_treatment = 2, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[2], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[2],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt_t3 <- get_treatment_data(pn_treatment = 3, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[3], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[3],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt_t4 <- get_treatment_data(pn_treatment = 4, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[4], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[4],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt <- dplyr::bind_rows(tbl_ecm_cgt_t1,
+                               tbl_ecm_cgt_t2,
+                               tbl_ecm_cgt_t3,
+                               tbl_ecm_cgt_t4)
+```
+
+The first three and the last three records of the genrated dataset are shown below
+
+```{r, echo=FALSE}
+knitr::kable(dplyr::bind_rows(head(tbl_ecm_cgt, 3),tail(tbl_ecm_cgt, 3)),
+             booktabs = TRUE,
+             longtable = TRUE)
+
+```
+
+
+
+* Analyse the dataset with `lm()` 
+
+* Compare your results with the results from the paper
+
+* What are the best contrast for our analysis
 
 
 <!-- master-solution-end -->
