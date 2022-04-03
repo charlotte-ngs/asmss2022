@@ -237,6 +237,8 @@ n_nr_rep <- 30
 
 * Investigate the result dataframe and check how many times a significant result was obtained.
 
+* Double the number of observations until significant results can be found
+
 ---  your-solution-end -->
 
 
@@ -338,6 +340,69 @@ tbl_sig_result
 ```
 
 Hence from a total of `r n_nr_rep` repetitions of the analysis of the data, only `r nrow(tbl_sig_result)` effect estimates were significantly different from $0$ at a significance level of `r n_sig_level`. This is not very frequence. Hence the chosen experimental design does not lead to a high chance to find significant results of the shown magnitude.
+
+```{r, echo=FALSE}
+if (params$isonline){
+  s_ecm_cgt_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_sim_ecm_cgt.csv"  
+} else {
+  s_ecm_cgt_path <- file.path(here::here(), "docs", "data", "asm_sim_ecm_cgt.csv")
+}
+```
+
+* Double the number of observations until significant results can be found. We start with an analysis of a given number of observations. The dataset for this initial analysis can be read from the following address
+
+```{r, echo=FALSE}
+cat(s_ecm_cgt_path, "\n")
+```
+
+The initial analysis is done as follows
+
+```{r}
+tbl_ecm_cgt_base <- readr::read_csv(file = s_ecm_cgt_path)
+lm_ecm_cgt_base <- lm(ECM ~ factor(Treatment), data = tbl_ecm_cgt_base)
+smry_ecm_cgt_base <- summary(lm_ecm_cgt_base)
+```
+
+From the results of the lm-analysis, we are extracting the significance levels
+
+```{r}
+mat_coef_ecm_cgt_base <- smry_ecm_cgt_base$coefficients
+vec_prt_treat <- mat_coef_ecm_cgt_base[2:nrow(mat_coef_ecm_cgt_base), "Pr(>|t|)"]
+vec_prt_treat
+```
+
+As long as all of those levels are below a given significance level, we double the size of the data set
+
+```{r}
+set.seed(3098)
+vec_prt_treat <- rep(1, length(vec_prt_treat))
+n_sig_level <- 0.01
+n_nr_iter_max <- 10
+n_iter_count <- 1
+n_nr_cow_per_group <- 6
+while (all(vec_prt_treat > n_sig_level) && n_iter_count < n_nr_iter_max){
+  # generate data
+  tbl_ecm_cgt_data <- get_ecm_cgt_data(pn_nr_treatment = n_nr_feed,
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pvec_mean_ecm = tbl_ecm$ECM,
+                                     pvec_mean_cgt = tbl_ecm$CGT, 
+                                     pvec_sem = tbl_sem$SEM)
+  # analyse data with lm
+  smry_lm_ecm <- summary(lm(ECM ~ factor(Treatment), data = tbl_ecm_cgt_data))
+  mat_coef_ecm_cgt <- smry_lm_ecm$coefficients
+  vec_prt_treat <- mat_coef_ecm_cgt[2:nrow(mat_coef_ecm_cgt), "Pr(>|t|)"]
+  # increment count
+  n_iter_count <- n_iter_count + 1
+  # double the number of couws per treatment
+  n_nr_cow_per_group <- n_nr_cow_per_group * 2
+}
+cat(" * Iteration count: ", n_iter_count, "\n")
+cat(" * Size of dataset: ", n_nr_cow_per_group, "\n")
+cat(" * Summary: ")
+smry_lm_ecm
+```
+
+
 
 <!-- master-solution-end -->
 
