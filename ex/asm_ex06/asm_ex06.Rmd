@@ -298,14 +298,46 @@ tbl_ecm_cgt_data <- get_ecm_cgt_data(pn_nr_treatment = n_nr_feed,
 * Inside of the loop store the results of `lm()` in a new dataframe. In a loop over the number of repetitions, a new dataset is generated and analysed
 
 ```{r}
-tbl_lm_result
+set.seed(2443)
+tbl_lm_result <- NULL
 for (i in 1:n_nr_rep){
+  # generate data
+  tbl_ecm_cgt_data <- get_ecm_cgt_data(pn_nr_treatment = n_nr_feed,
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pvec_mean_ecm = tbl_ecm$ECM,
+                                     pvec_mean_cgt = tbl_ecm$CGT, 
+                                     pvec_sem = tbl_sem$SEM)
+  # analyse data with lm
+  smry_lm_ecm <- summary(lm(ECM ~ factor(Treatment), data = tbl_ecm_cgt_data))
+  coef_mat <- smry_lm_ecm$coefficients
+  # collect results
+  tbl_coef <- dplyr::bind_cols(tibble::tibble(Repetition = c(rep(i, nrow(coef_mat)))),
+                            tibble::tibble(RowNames = row.names(coef_mat)),
+                            tibble::as_tibble(coef_mat))
+  if (is.null(tbl_lm_result)){
+    tbl_lm_result <- tbl_coef
+  } else {
+    tbl_lm_result <- dplyr::bind_rows(tbl_lm_result, tbl_coef)
+  }
   
 }
 ```
 
+```{r, echo=FALSE}
+n_sig_level <- 0.01
+```
 
-* Investigate the result dataframe and check how many times a significant result was obtained.
+* Investigate the result dataframe and check how many times a significant result was obtained. From the result dataframe, we want to filter out all the treatment factor level estimates that have a significance level less than `r n_sig_level`. This is done using the `filter()` function from the `dplyr` package. Two and more `filter()` - steps can be combined using the pipe-operator `%>%`. 
+
+```{r}
+library(dplyr)
+tbl_sig_result <- tbl_lm_result %>% 
+  filter(RowNames != "(Intercept)") %>%
+  filter(`Pr(>|t|)` < n_sig_level)
+tbl_sig_result
+```
+
+Hence from a total of `r n_nr_rep` repetitions of the analysis of the data, only `r nrow(tbl_sig_result)` effect estimates were significantly different from $0$ at a significance level of `r n_sig_level`. This is not very frequence. Hence the chosen experimental design does not lead to a high chance to find significant results of the shown magnitude.
 
 <!-- master-solution-end -->
 
