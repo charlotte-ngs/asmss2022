@@ -1,0 +1,411 @@
+---
+title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 6
+author: Peter von Rohr
+date: 2022-03-30
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+    keep_md: false
+    keep_tex: false
+header-includes:
+ \usepackage{longtable}
+ \usepackage{float}
+bibliography: [bibliography.bib]
+params:
+  doctype:
+    label: 'Document Type'
+    value: 'solution'
+    choices: ['exercise', 'solution', 'notebook']
+  isonline:
+    label: 'Online (y/n)'
+    value: TRUE
+    choices: [TRUE, FALSE]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+met <- rmdhelp::MendeleyExportToolR6$new()
+met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(),
+                              rstudioapi::getActiveDocumentContext()$path,
+                              whereami::thisfile()))
+
+```
+
+```{r p01-init, echo=FALSE}
+n_nr_feed <- 4
+n_nr_cow_per_group <- 6
+```
+
+## Problem 1: Experiment Evaluation
+In the paper by `r met$add("Manzocchi2020")` `r n_nr_feed` different feeding treatments for dairy cows were compared. The different feeding treatments consisted of 
+
+```{r, echo=FALSE}
+tbl_feed <- tibble::tibble(Treatment = c(1:n_nr_feed),
+                           Feed = c("hay",
+                                    "grass-silage",
+                                    "maize silage",
+                                    "shredlage"))
+knitr::kable(tbl_feed,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+From the results section of the paper, the values for energy corrected milk (ECM in kg/day)  and coagulation time (CGT in min) of the milk are shown in the table below. 
+
+```{r, echo=FALSE}
+tbl_ecm <- tibble::tibble(Treatment = c(1:n_nr_feed),
+                          ECM = c(24.3, 23.6, 25.0, 23.8),
+                          CGT = c(11.0, 10.6, 10.5, 10.3))
+knitr::kable(tbl_ecm,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+The standard errors of the means (SEM) for the above reported target variables were 
+
+```{r, echo=FALSE}
+tbl_sem <- tibble::tibble(Response = c("ECM", "CGT"),
+                          SEM = c(1.18, 0.60))
+knitr::kable(tbl_sem,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+The real experiment is designed according to an incomplete latin square where in two runs groups of six cows were assigned to each of the four treatments. For the purpose of this exercise, we simplify the experimental design and assume that groups of `r n_nr_cow_per_group` cows were assigned to the treatments all at the same time. The paper mentions that besides of the treatment numerous fixed effects (experimental run and interactions between treatments and experimental runs) and covariates (lactation stage) were considered. But unfortunately, no estimates for the different effects were given. Hence we are assuming that the treatment is the major effect on our responses. 
+
+### Your Tasks
+
+* Simulate a dataset with `r n_nr_cow_per_group` cows per treatment and assign to each of the cows a value for the two responses ECM and CGT with mean values shown in the table above and with standard deviation equal to the SEM values. 
+* Analyse the dataset with a fixed linear effect model
+* Verify whether you can reproduce the results of the paper
+* Think about what type of contrasts are ideal for this type of dataset.
+
+<!-- your-solution-start
+### Your Solution
+
+* Simulate dataset similar to the one in the paper for ECM and CGT for the four treatments
+
+* Analyse the dataset with `lm()` 
+
+* Compare your results with the results from the paper
+
+* What are the best contrast for our analysis
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+* Simulate dataset similar to the one in the paper for ECM and CGT for the four treatments. The dataset for ECM and CGT contains four columns, the ID for the cow, the treatment and the two response variables. We use the function `get_treatment_data()` to generate the data for the  `r n_nr_cow_per_group` for a given treatment.
+
+```{r}
+get_treatment_data <- function(pn_treatment, pn_nr_cow, 
+                               pn_mean_ecm, pn_sd_ecm, 
+                               pn_mean_cgt, pn_sd_cgt){
+  tbl_result <- tibble::tibble(Cow = c(((pn_treatment-1)*pn_nr_cow + 1):(pn_treatment*pn_nr_cow)),
+                               Treatment = rep(pn_treatment, pn_nr_cow),
+                               ECM = rnorm(pn_nr_cow, mean = pn_mean_ecm, sd = pn_sd_ecm),
+                               CGT = rnorm(pn_nr_cow, mean = pn_mean_cgt, sd = pn_sd_cgt))
+  return(tbl_result)
+}
+```
+
+The function `get_treatment_data()` can be used to generate a dataset for each treamtent. These datasets can be combined to one dataset
+
+```{r}
+set.seed(76281)
+tbl_ecm_cgt_t1 <- get_treatment_data(pn_treatment = 1, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[1], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[1],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt_t2 <- get_treatment_data(pn_treatment = 2, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[2], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[2],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt_t3 <- get_treatment_data(pn_treatment = 3, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[3], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[3],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt_t4 <- get_treatment_data(pn_treatment = 4, 
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pn_mean_ecm = tbl_ecm$ECM[4], 
+                                     pn_sd_ecm = tbl_sem$SEM[1],
+                                     pn_mean_cgt = tbl_ecm$CGT[4],
+                                     pn_sd_cgt = tbl_sem$SEM[2])
+tbl_ecm_cgt <- dplyr::bind_rows(tbl_ecm_cgt_t1,
+                               tbl_ecm_cgt_t2,
+                               tbl_ecm_cgt_t3,
+                               tbl_ecm_cgt_t4)
+```
+
+The first three and the last three records of the genrated dataset are shown below
+
+```{r, echo=FALSE}
+knitr::kable(dplyr::bind_rows(head(tbl_ecm_cgt, 3),tail(tbl_ecm_cgt, 3)),
+             booktabs = TRUE,
+             longtable = TRUE)
+
+# write data to a file, if it does not exist
+s_local_data_path <- file.path(here::here(), "docs", "data", "asm_sim_ecm_cgt.csv")
+if (!params$isonline && !file.exists(s_local_data_path)) readr::write_csv(tbl_ecm_cgt, file = s_local_data_path)
+```
+
+
+* Analyse the dataset with `lm()`. For the analysis with `lm()`, it is important to convert the treatments to the datatype `factor`. This can be done via the conversion function `as.factor()`. Alternatively, it can also be specified in the formula argument to `lm()`.
+
+```{r}
+lm_ecm_treat <- lm(ECM ~ factor(Treatment), data = tbl_ecm_cgt)
+summary(lm_ecm_treat)
+```
+
+Similarly for `CGT`
+
+```{r}
+lm_cgt_treat <- lm(CGT ~ factor(Treatment), data = tbl_ecm_cgt)
+summary(lm_cgt_treat)
+```
+
+
+
+* Compare your results with the results from the paper. The results of our `lm()` - analysis did confirm the results of the paper. For ECM the comparison is shown in the following table
+
+```{r, echo=FALSE}
+tbl_ecm_comp <- dplyr::select(tbl_ecm, Treatment, ECM)
+vec_coef_ecm_treat <- coefficients(lm_ecm_treat)
+tbl_ecm_results <- tibble::tibble(ECM_LM_Results = c(vec_coef_ecm_treat[1],
+                     vec_coef_ecm_treat[1] + vec_coef_ecm_treat[2:length(vec_coef_ecm_treat)]))
+tbl_ecm_comp <- dplyr::bind_cols(tbl_ecm_comp, tbl_ecm_results)
+knitr::kable(tbl_ecm_comp,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+Except for treatment 3, all levels show estimates that go in the correct direction. The same can be done with CGT
+
+```{r, echo=FALSE}
+tbl_cgt_comp <- dplyr::select(tbl_ecm, Treatment, CGT)
+vec_coef_cgt_treat <- coefficients(lm_cgt_treat)
+tbl_cgt_results <- tibble::tibble(CGT_LM_Results = c(vec_coef_cgt_treat[1],
+                    vec_coef_cgt_treat[1] + vec_coef_cgt_treat[2:length(vec_coef_cgt_treat)]))
+tbl_cgt_comp <- dplyr::bind_cols(tbl_cgt_comp, tbl_cgt_results)
+knitr::kable(tbl_cgt_comp,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+For CGT, the effect sizes from the LM-analysis are larger compared to what was reported in the paper.
+
+* What are the best contrast for our analysis. Treatment contrasts which are used by default, can be used here. Then we are assuming that treatment 1 which corresponds to "hay" feeding is assigned to be the control feeding and all other feeding strategies are interpreted as experimental treatments.
+
+
+<!-- master-solution-end -->
+
+
+## Problem 2: Significance and Size of Dataset
+For some of the LM-analyses done in Problem 1, the results might not be significant. The same was also true in the paper. Their reported results were also declared to be non-significant. This might have two reasons.
+
+1. Either the generated dataset is just a "bad" example due to the unfortunate random numbers that were drawn or 
+2. The size of the dataset is too small. 
+
+Check both reasons by implementing the following tasks
+
+### Your Tasks
+```{r, echo=FALSE}
+n_nr_rep <- 30
+```
+
+* Repeat the simulation `r n_nr_rep` times and check how many times a significant effect of one of the treatments can be reported.
+* Increase the size of the dataset until one of the treatment effect is significant.
+
+
+<!-- your-solution-start
+### Your Solution
+
+* Create a loop that runs over all repetitions and does the analysis as shown in the solution of Problem 1
+
+* Inside of the loop store the results of `lm()` in a new dataframe
+
+* Investigate the result dataframe and check how many times a significant result was obtained.
+
+* Double the number of observations until significant results can be found
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+* Create a loop that runs over all repetitions and does the analysis as shown in the solution of Problem 1. For each of the repetitions, a new dataset is generated. This is done as shown in the solution of Problem 1 using the function `get_treatment_data()`. 
+
+```{r}
+get_treatment_data <- function(pn_treatment, pn_nr_cow, 
+                               pn_mean_ecm, pn_sd_ecm, 
+                               pn_mean_cgt, pn_sd_cgt){
+  tbl_result <- tibble::tibble(Cow = c(((pn_treatment-1)*pn_nr_cow + 1):(pn_treatment*pn_nr_cow)),
+                               Treatment = rep(pn_treatment, pn_nr_cow),
+                               ECM = rnorm(pn_nr_cow, mean = pn_mean_ecm, sd = pn_sd_ecm),
+                               CGT = rnorm(pn_nr_cow, mean = pn_mean_cgt, sd = pn_sd_cgt))
+  return(tbl_result)
+}
+```
+
+Instead of combining the dataset with all the treatments with sequential statements, we are doing that in a loop and are encapsulating that in a further function called `get_ecm_cgt_data()`. 
+
+```{r}
+get_ecm_cgt_data <- function(pn_nr_treatment, pn_nr_cow, 
+                             pvec_mean_ecm, pvec_mean_cgt, 
+                             pvec_sem){
+  tbl_result <- NULL
+  # loop over treatments
+  for (i in 1:pn_nr_treatment){
+    tbl_cur <- get_treatment_data(pn_treatment = i,
+                                  pn_nr_cow    = pn_nr_cow,
+                                  pn_mean_ecm  = pvec_mean_ecm[i],
+                                  pn_sd_ecm    = pvec_sem[1],
+                                  pn_mean_cgt  = pvec_mean_cgt[i],
+                                  pn_sd_cgt    = pvec_sem[2])
+    if (is.null(tbl_result)){
+      tbl_result <- tbl_cur
+    } else {
+      tbl_result <- dplyr::bind_rows(tbl_result, tbl_cur)
+    }
+  }
+  # return result
+  return(tbl_result)
+}
+```
+
+A single dataset can be generated with 
+
+```{r, eval=FALSE}
+tbl_ecm_cgt_data <- get_ecm_cgt_data(pn_nr_treatment = n_nr_feed,
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pvec_mean_ecm = tbl_ecm$ECM,
+                                     pvec_mean_cgt = tbl_ecm$CGT, 
+                                     pvec_sem = tbl_sem$SEM)
+```
+
+
+* Inside of the loop store the results of `lm()` in a new dataframe. In a loop over the number of repetitions, a new dataset is generated and analysed
+
+```{r}
+set.seed(2443)
+tbl_lm_result <- NULL
+for (i in 1:n_nr_rep){
+  # generate data
+  tbl_ecm_cgt_data <- get_ecm_cgt_data(pn_nr_treatment = n_nr_feed,
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pvec_mean_ecm = tbl_ecm$ECM,
+                                     pvec_mean_cgt = tbl_ecm$CGT, 
+                                     pvec_sem = tbl_sem$SEM)
+  # analyse data with lm
+  smry_lm_ecm <- summary(lm(ECM ~ factor(Treatment), data = tbl_ecm_cgt_data))
+  coef_mat <- smry_lm_ecm$coefficients
+  # collect results
+  tbl_coef <- dplyr::bind_cols(tibble::tibble(Repetition = c(rep(i, nrow(coef_mat)))),
+                            tibble::tibble(RowNames = row.names(coef_mat)),
+                            tibble::as_tibble(coef_mat))
+  if (is.null(tbl_lm_result)){
+    tbl_lm_result <- tbl_coef
+  } else {
+    tbl_lm_result <- dplyr::bind_rows(tbl_lm_result, tbl_coef)
+  }
+  
+}
+```
+
+```{r, echo=FALSE}
+n_sig_level <- 0.01
+```
+
+* Investigate the result dataframe and check how many times a significant result was obtained. From the result dataframe, we want to filter out all the treatment factor level estimates that have a significance level less than `r n_sig_level`. This is done using the `filter()` function from the `dplyr` package. Two and more `filter()` - steps can be combined using the pipe-operator `%>%`. 
+
+```{r}
+library(dplyr)
+tbl_sig_result <- tbl_lm_result %>% 
+  filter(RowNames != "(Intercept)") %>%
+  filter(`Pr(>|t|)` < n_sig_level)
+tbl_sig_result
+```
+
+Hence from a total of `r n_nr_rep` repetitions of the analysis of the data, only `r nrow(tbl_sig_result)` effect estimates were significantly different from $0$ at a significance level of `r n_sig_level`. This is not very frequence. Hence the chosen experimental design does not lead to a high chance to find significant results of the shown magnitude.
+
+```{r, echo=FALSE}
+if (params$isonline){
+  s_ecm_cgt_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_sim_ecm_cgt.csv"  
+} else {
+  s_ecm_cgt_path <- file.path(here::here(), "docs", "data", "asm_sim_ecm_cgt.csv")
+}
+```
+
+* Double the number of observations until significant results can be found. We start with an analysis of a given number of observations. The dataset for this initial analysis can be read from the following address
+
+```{r, echo=FALSE}
+cat(s_ecm_cgt_path, "\n")
+```
+
+The initial analysis is done as follows
+
+```{r}
+tbl_ecm_cgt_base <- readr::read_csv(file = s_ecm_cgt_path)
+lm_ecm_cgt_base <- lm(ECM ~ factor(Treatment), data = tbl_ecm_cgt_base)
+smry_ecm_cgt_base <- summary(lm_ecm_cgt_base)
+```
+
+From the results of the lm-analysis, we are extracting the significance levels
+
+```{r}
+mat_coef_ecm_cgt_base <- smry_ecm_cgt_base$coefficients
+vec_prt_treat <- mat_coef_ecm_cgt_base[2:nrow(mat_coef_ecm_cgt_base), "Pr(>|t|)"]
+vec_prt_treat
+```
+
+As long as all of those levels are below a given significance level, we double the size of the data set
+
+```{r}
+set.seed(3098)
+vec_prt_treat <- rep(1, length(vec_prt_treat))
+n_sig_level <- 0.01
+n_nr_iter_max <- 10
+n_iter_count <- 1
+n_nr_cow_per_group <- 6
+while (all(vec_prt_treat > n_sig_level) && n_iter_count < n_nr_iter_max){
+  # generate data
+  tbl_ecm_cgt_data <- get_ecm_cgt_data(pn_nr_treatment = n_nr_feed,
+                                     pn_nr_cow = n_nr_cow_per_group, 
+                                     pvec_mean_ecm = tbl_ecm$ECM,
+                                     pvec_mean_cgt = tbl_ecm$CGT, 
+                                     pvec_sem = tbl_sem$SEM)
+  # analyse data with lm
+  smry_lm_ecm <- summary(lm(ECM ~ factor(Treatment), data = tbl_ecm_cgt_data))
+  mat_coef_ecm_cgt <- smry_lm_ecm$coefficients
+  vec_prt_treat <- mat_coef_ecm_cgt[2:nrow(mat_coef_ecm_cgt), "Pr(>|t|)"]
+  # increment count
+  n_iter_count <- n_iter_count + 1
+  # double the number of couws per treatment
+  n_nr_cow_per_group <- n_nr_cow_per_group * 2
+}
+cat(" * Iteration count: ", n_iter_count, "\n")
+cat(" * Size of dataset: ", n_nr_cow_per_group, "\n")
+cat(" * Summary: ")
+smry_lm_ecm
+```
+
+
+
+<!-- master-solution-end -->
+
+
+
+# References 

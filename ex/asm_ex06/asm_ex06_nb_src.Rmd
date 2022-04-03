@@ -1,0 +1,134 @@
+---
+title: Applied Statistical Methods - Notebook 6
+author: Peter von Rohr
+date: '2022-03-30'
+output: html_notebook
+params:
+  doctype:
+    label: Document Type
+    value: solution
+    choices:
+    - exercise
+    - solution
+    - notebook
+  isonline:
+    label: Online (y/n)
+    value: true
+    choices:
+    - true
+    - false
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+met <- rmdhelp::MendeleyExportToolR6$new()
+met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(),
+                              rstudioapi::getActiveDocumentContext()$path,
+                              whereami::thisfile()))
+
+```
+
+```{r p01-init, echo=FALSE}
+n_nr_feed <- 4
+n_nr_cow_per_group <- 6
+```
+
+## Problem 1: Experiment Evaluation
+In the paper by `r met$add("Manzocchi2020")` `r n_nr_feed` different feeding treatments for dairy cows were compared. The different feeding treatments consisted of 
+
+```{r, echo=FALSE}
+tbl_feed <- tibble::tibble(Treatment = c(1:n_nr_feed),
+                           Feed = c("hay",
+                                    "grass-silage",
+                                    "maize silage",
+                                    "shredlage"))
+knitr::kable(tbl_feed,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+From the results section of the paper, the values for energy corrected milk (ECM in kg/day)  and coagulation time (CGT in min) of the milk are shown in the table below. 
+
+```{r, echo=FALSE}
+tbl_ecm <- tibble::tibble(Treatment = c(1:n_nr_feed),
+                          ECM = c(24.3, 23.6, 25.0, 23.8),
+                          CGT = c(11.0, 10.6, 10.5, 10.3))
+knitr::kable(tbl_ecm,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+The standard errors of the means (SEM) for the above reported target variables were 
+
+```{r, echo=FALSE}
+tbl_sem <- tibble::tibble(Response = c("ECM", "CGT"),
+                          SEM = c(1.18, 0.60))
+knitr::kable(tbl_sem,
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+The real experiment is designed according to an incomplete latin square where in two runs groups of six cows were assigned to each of the four treatments. For the purpose of this exercise, we simplify the experimental design and assume that groups of `r n_nr_cow_per_group` cows were assigned to the treatments all at the same time. The paper mentions that besides of the treatment numerous fixed effects (experimental run and interactions between treatments and experimental runs) and covariates (lactation stage) were considered. But unfortunately, no estimates for the different effects were given. Hence we are assuming that the treatment is the major effect on our responses. 
+
+### Your Tasks
+
+* Simulate a dataset with `r n_nr_cow_per_group` cows per treatment and assign to each of the cows a value for the two responses ECM and CGT with mean values shown in the table above and with standard deviation equal to the SEM values. 
+* Analyse the dataset with a fixed linear effect model
+* Verify whether you can reproduce the results of the paper
+* Think about what type of contrasts are ideal for this type of dataset.
+
+### Your Solution
+
+* Simulate dataset similar to the one in the paper for ECM and CGT for the four treatments
+
+* Analyse the dataset with `lm()` 
+
+* Compare your results with the results from the paper
+
+* What are the best contrast for our analysis
+
+
+
+
+
+## Problem 2: Significance and Size of Dataset
+For some of the LM-analyses done in Problem 1, the results might not be significant. The same was also true in the paper. Their reported results were also declared to be non-significant. This might have two reasons.
+
+1. Either the generated dataset is just a "bad" example due to the unfortunate random numbers that were drawn or 
+2. The size of the dataset is too small. 
+
+Check both reasons by implementing the following tasks
+
+### Your Tasks
+```{r, echo=FALSE}
+n_nr_rep <- 30
+```
+
+* Repeat the simulation `r n_nr_rep` times and check how many times a significant effect of one of the treatments can be reported.
+* Increase the size of the dataset until one of the treatment effect is significant.
+
+
+### Your Solution
+
+* Create a loop that runs over all repetitions and does the analysis as shown in the solution of Problem 1
+
+* Inside of the loop store the results of `lm()` in a new dataframe
+
+* Investigate the result dataframe and check how many times a significant result was obtained.
+
+* Double the number of observations until significant results can be found
+
+
+
+
+
+
+# References 
+
+
+```{r, echo=FALSE, results='asis'}
+cat('\n---\n\n _Latest Changes: ', format(Sys.time(), '%Y-%m-%d %H:%M:%S'), ' (', Sys.info()['user'], ')_\n', sep = '')
+```
+ 
