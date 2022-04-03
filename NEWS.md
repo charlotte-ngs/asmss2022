@@ -1,3 +1,7 @@
+# asmss2022 0.7.0
+
+* Deployed asm_ex06
+
 # asmss2022 0.6.1
 
 * Link to video of lecture 06
