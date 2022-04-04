@@ -1,0 +1,52 @@
+---
+title: Model Selection
+author: Peter von Rohr
+date: "`r Sys.Date()`"
+output: beamer_presentation
+params:
+  isonline:
+    label: 'Online (y/n)'
+    value: TRUE
+    choices: [TRUE, FALSE]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# rmdhelp::show_knit_hook_call()
+knitr::knit_hooks$set(hook_convert_odg = rmdhelp::hook_convert_odg)
+```
+
+## Why Model Selection
+
+* Start with results of Problem 1 of Exercise 4
+* Two models with variables that show a significant effect
+
+```{r comp-two-models, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg", out.width="100%"}
+# produce output for two models
+# s_ex04p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+# s_ex04p01_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+# tbl_ex04p01_data <- readr::read_csv(file = s_ex04p01_data_path)
+# lm_ex04p01_bwbc <- lm(formula = `Body Weight` ~ `Breast Circumference`, data = tbl_ex04p01_data)
+# summary(lm_ex04p01_bwbc)
+# lm_ex04p01_bwbreed <- lm(formula = `Body Weight` ~ Breed, data = tbl_ex04p01_data)
+#rmdhelp::use_odg_graphic(ps_path = "odg/comp-two-models.odg")
+knitr::include_graphics(path = "odg/comp-two-models.png")
+```
+ 
+* Why not combining them to get an even better model?
+
+
+## Full Model
+
+* All variables included
+
+```{r, echo=FALSE}
+if (params$isonline){
+  s_ex04p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+} else {
+  s_ex04p01_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+}
+tbl_ex04p01_data <- readr::read_csv(file = s_ex04p01_data_path)
+summary(lm(formula = `Body Weight` ~ `Breast Circumference` + BCS + HEI + Breed, data = tbl_ex04p01_data))
+```
+
