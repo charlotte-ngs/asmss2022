@@ -6,7 +6,7 @@ output: beamer_presentation
 params:
   isonline:
     label: 'Online (y/n)'
-    value: TRUE
+    value: FALSE
     choices: [TRUE, FALSE]
 ---
 
@@ -40,7 +40,7 @@ knitr::include_graphics(path = "odg/comp-two-models.png")
 
 * All variables included
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 if (params$isonline){
   s_ex04p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
 } else {
@@ -49,4 +49,58 @@ if (params$isonline){
 tbl_ex04p01_data <- readr::read_csv(file = s_ex04p01_data_path)
 summary(lm(formula = `Body Weight` ~ `Breast Circumference` + BCS + HEI + Breed, data = tbl_ex04p01_data))
 ```
+```{r show-full-model, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg", out.width="100%"}
+#rmdhelp::use_odg_graphic(ps_path = "odg/show-full-model.odg")
+knitr::include_graphics(path = "odg/show-full-model.png")
+```
 
+ 
+## Best Model
+
+* Including all variables does not always lead to the best model
+* Best model aims at explaining a maximum of variation in responses
+* Measured by 
+
+$$R^2 = \frac{||\hat{y} - \bar{y}||^2}{||y - \bar{y}||^2}$$
+
+$$R_{adj}^2 = 1 - (1 - R^2) \frac{n-1}{n-p-1}$$
+
+## Finding the Best Model
+
+* Full search over all possible combinations of predictors is too expensive
+* Use practical approximations
+    + Forward selection
+    + Backward elimination
+    
+    
+## Alternative Model Selection Criteria
+
+* Mallows $C_p$ Statistic
+
+$$C_p(\mathcal{M}) = \frac{SSE(\mathcal{M})}{\hat{\sigma}^2} - n + 2 |\mathcal{M}|$$
+
+* Akaike Information Criterion (AIC)
+* Bayes Information Criterion (BIC)
+    
+    
+## Forward Selection
+
+1. Start with the smallest model $\mathcal{M}_0$ 
+2. Include the predictor variable which reduces the residual sum of squares the most.
+3. Continue with step 2 until all predictor variables have been chosen
+4. Choose the model with the smallest $C_p$ value.
+
+
+## Backward Elimination
+
+1. Start with the full model 
+2. Exclude the predictor variable increases the residual sum of squares the least.
+3. Continue with step 2 until all predictor values have been deleted
+4. Choose the model which has the smallest $C_p$ value.
+
+
+## Example
+
+* In R uxe: 
+    + package `olsrr` - no spaces in variable names
+    + function `MASS::stepAIC()`
