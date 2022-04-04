@@ -1,3 +1,7 @@
+# asmss2022 0.7.1
+
+* Slides l07_model_selection
+
 # asmss2022 0.7.0
 
 * Deployed asm_ex06
