@@ -1,9 +1,18 @@
 ---
 title: Applied Statistical Methods - Notebook 5
 author: Peter von Rohr
-date: 2022-03-26
+date: '2022-03-26'
 output: html_notebook
+params:
+  doctype:
+    label: Document Type
+    value: solution
+    choices:
+    - exercise
+    - solution
+    - notebook
 ---
+
 
 
 ```{r setup, include=FALSE}
@@ -13,6 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo=FALSE}
 s_ex05p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+# s_ex05p01_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
 ```
 
 ## Problem 1: Helmert Contrasts
@@ -46,6 +56,7 @@ cat(s_ex05p01_data_path, "\n")
 ```{r, echo=FALSE}
 vec_nobs <- c(10,30,100)
 s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+# s_ex05p02_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
 ```
 
 ## Problem 2: Simulation

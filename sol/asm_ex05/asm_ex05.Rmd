@@ -26,6 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo=FALSE}
 s_ex05p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+# s_ex05p01_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
 ```
 
 ## Problem 1: Helmert Contrasts
@@ -205,6 +206,7 @@ options(opts)
 ```{r, echo=FALSE}
 vec_nobs <- c(10,30,100)
 s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+# s_ex05p02_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
 ```
 
 ## Problem 2: Simulation
@@ -233,6 +235,93 @@ cat(s_ex05p02_data_path, "\n")
 <!-- master-solution-start -->
 
 ### Solution
+
+* Run the regression analysis of `Body Weight` on `Breast Circumference`
+
+```{r}
+tbl_bwbc <- readr::read_csv(file = s_ex05p02_data_path)
+lm_bwbc <- lm(`Body Weight` ~ `Breast Circumference`, data = tbl_bwbc)
+b0 <- coefficients(lm_bwbc)["(Intercept)"]
+b1 <- coefficients(lm_bwbc)["`Breast Circumference`"]
+mean_bc <- mean(tbl_bwbc$`Breast Circumference`)
+sd_bc <- sd(tbl_bwbc$`Breast Circumference`)
+sry_bwbc <- summary(lm_bwbc)
+sd_res <- sry_bwbc$sigma
+```
+
+
+* Create the three datasets. In a first step, we create a function that takes as arguments 
+    + number of observations
+    + intercept $b_0$
+    + slope $b_1$
+    + mean `Breast Circumference`
+    + standard deviation `Breast Circumference`
+    + standard deviation of residuals
+
+and returns a dataset according to these input values.
+
+```{r}
+simulate_bwbc <- function(pn_nrobs, pn_b0, pn_b1, pn_mean_x, pn_sd_x, pn_sd_res){
+  vec_bc <- rnorm(pn_nrobs, mean = pn_mean_x, sd = pn_sd_x)
+  vec_bw <- pn_b0 + pn_b1 * vec_bc + rnorm(pn_nrobs, mean = 0, sd = pn_sd_res)
+  tbl_result <- tibble::tibble(Animal = c(1:pn_nrobs),
+                               BC = vec_bc,
+                               BW = vec_bw)
+  return(tbl_result)
+}
+```
+
+With the above defined function, we can create a list with the three datasets
+
+```{r}
+set.seed(1928)
+vec_nobs <- c(10,30,100)
+l_data_set <- lapply(vec_nobs, simulate_bwbc, 
+                     pn_b0 = b0, 
+                     pn_b1 = b1, 
+                     pn_mean_x = mean_bc, 
+                     pn_sd_x = sd_bc, 
+                     pn_sd_res = sd_res) 
+```
+
+Each of the datasets is analysed by `lm()` and the results are again stored in a list
+
+```{r}
+l_lm_result <- lapply(l_data_set, function(x) lm(BW ~ BC, data = x))
+```
+
+Collect the resutls into a table
+
+```{r}
+tbl_result <- NULL
+for (cur_res in l_lm_result){
+  sry_cur_res <- summary(cur_res)
+  tbl_cur <- tibble::tibble(NrObs = length(cur_res$residuals),
+              Intercept_Estimate = coefficients(sry_cur_res)["(Intercept)", "Estimate"],
+              Intercept_StdErr = coefficients(sry_cur_res)["(Intercept)", "Std. Error"],
+              Slope_Estimate = coefficients(sry_cur_res)["BC", "Estimate"],
+              Slope_StdErr = coefficients(sry_cur_res)["BC", "Std. Error"],
+              ResStdErr = sry_cur_res$sigma)
+  if (is.null(tbl_result)){
+    tbl_result <- tbl_cur
+  } else {
+    tbl_result <- dplyr::bind_rows(tbl_result, tbl_cur)
+  }
+}
+knitr::kable(tbl_result)
+```
+
+The true values used in the sumulation are 
+
+```{r, echo=FALSE, results='asis'}
+tbl_true_values <- tibble::tibble(Intercept = b0,
+                                  Slope = b1,
+                                  ResStdErr = sd_res)
+knitr::kable(tbl_true_values,
+             longtable = TRUE,
+             booktabs = TRUE)
+```
+
 
 <!-- master-solution-end -->
 
