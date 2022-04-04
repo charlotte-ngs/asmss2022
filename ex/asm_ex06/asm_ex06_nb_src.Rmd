@@ -1,8 +1,10 @@
 ---
-title: Applied Statistical Methods - Notebook 6
-author: Peter von Rohr
+title: "Applied Statistical Methods - Notebook 6"
+author: "Peter von Rohr"
 date: '2022-03-30'
-output: html_notebook
+output:
+  html_notebook: default
+  pdf_document: default
 params:
   doctype:
     label: Document Type
@@ -13,20 +15,20 @@ params:
     - notebook
   isonline:
     label: Online (y/n)
-    value: true
+    value: yes
     choices:
-    - true
-    - false
+    - yes
+    - no
 ---
 
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-met <- rmdhelp::MendeleyExportToolR6$new()
-met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(),
-                              rstudioapi::getActiveDocumentContext()$path,
-                              whereami::thisfile()))
+# met <- rmdhelp::MendeleyExportToolR6$new()
+# met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(),
+#                               rstudioapi::getActiveDocumentContext()$path,
+#                               whereami::thisfile()))
 
 ```
 
@@ -36,7 +38,7 @@ n_nr_cow_per_group <- 6
 ```
 
 ## Problem 1: Experiment Evaluation
-In the paper by `r met$add("Manzocchi2020")` `r n_nr_feed` different feeding treatments for dairy cows were compared. The different feeding treatments consisted of 
+In the paper by Manzocchi et al 2020 `r n_nr_feed` different feeding treatments for dairy cows were compared. The different feeding treatments consisted of 
 
 ```{r, echo=FALSE}
 tbl_feed <- tibble::tibble(Treatment = c(1:n_nr_feed),
@@ -126,6 +128,7 @@ n_nr_rep <- 30
 
 
 # References 
+Manzocchi, Elisa, Werner Hengartner, Michael Kreuzer, and Katrin Giller. 2020. “Effect of feeding hay vs. silages of various types to dairy cows on feed intake, milk composition and coagulation properties.” Journal of Dairy Research 87 (3): 334–40. https://doi.org/10.1017/S0022029920000801.
 
 
 ```{r, echo=FALSE, results='asis'}
