@@ -44,20 +44,22 @@ knitr::kable(tbl_sl)
 
 ## Videos
 ```{r tbl-video, echo=FALSE, message=FALSE, warning=FALSE}
-tbl_video <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6),
+tbl_video <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7),
                             Date = c("2022-02-21",
                                      "2022-02-28",
                                      "2022-03-07",
                                      "2022-03-14",
                                      "2022-03-21",
-                                     "2022-03-28"),
+                                     "2022-03-28",
+                                     "2022-04-04"),
                             Topic = c(
                               "[Introduction](https://youtu.be/9XdsxWiXU90)",
                               "[Linear Regression Analysis](https://youtu.be/RABkYT673HY)",
                               "[Discrete Predictor Variables](https://youtu.be/r8RVceub6Dg)",
                               "[Regression on Dummy Variables](https://youtu.be/ny9cUQAL0wU)",
                               "[Generalized Inverses and Estimable Functions](https://youtu.be/OIrArr82MkA)",
-                              "[Contrasts in R, Plotting and Simulation](https://youtu.be/cKJRerCMVFc)"
+                              "[Contrasts in R, Plotting and Simulation](https://youtu.be/cKJRerCMVFc)",
+                              "[Model Selection](https://youtu.be/Kmu0aUJktkU)"
                             ))
 knitr::kable(tbl_video)
 ```
