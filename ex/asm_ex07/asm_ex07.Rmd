@@ -27,12 +27,45 @@ params:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r ex07-p01-init, echo=FALSE}
+if (params$isonline){
+  s_ex07p01_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mod_sel.csv" 
+} else {
+  s_ex07p01_path <- file.path(here::here(), "docs", "data", "asm_bw_mod_sel.csv")
+}
+```
 
 ## Problem 1: Model Selection
+Given is a dataset with body weight as a response and different other variables and factors. Use model selection to find the relevant predictor variables and factors for the best linear fixed effect model. Use the estimated mean square error $C_p$ as a quality measure for a single linear model. The dataset to be analysed can be obtained from 
 
+```{r, echo=FALSE}
+cat(s_ex07p01_path, "\n")
+```
+
+
+### Your Tasks
+* Run a forward selection for the given dataset to find the best model
+* Do a backward elemination for the given dataset to find the best model
+* Compare the two models whether they are identical with respect to the set of predictor variables and factors that they include.
 
 <!-- your-solution-start
 ### Your Solution
+
+Because, we need the residual standard deviation of the full model and backward elimination starts with the full model, we start with backward elimination
+
+#### Start with Backward Elimination
+
+* Start with the full model considering all variables
+* Eliminate the variable that increases the residual sum of squares the least and compute $C_p$ for resulting model
+* Repeat above step until all variables and factors are elminiated
+* Select the model with the smallest $C_p$ value
+
+#### Forward Selection
+
+* Forward selection starts with a minimal model containing only an intercept
+* Add the variable that reduces the residual sum of squares the most and compute $C_p$ for that model
+* Repeat step above until all variables are added
+* Select from all the models the one with the smallest $C_p$ value
 
 ---  your-solution-end -->
 
@@ -40,11 +73,43 @@ knitr::opts_chunk$set(echo = TRUE)
 <!-- master-solution-start -->
 
 ### Solution
+Because, we need the residual standard deviation of the full model and backward elimination starts with the full model, we start with backward elimination
+
+#### Backward Elimination
+
+* Read the data
+
+```{r}
+s_ex07p01_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mod_sel.csv" 
+tbl_ex07p01 <- readr::read_csv(file = s_ex07p01_path)
+```
+
+* Start with the full model considering all variables
+
+```{r}
+s_resp <- "BW"
+vec_pred_full <- setdiff(colnames(tbl_ex07p01), c(s_resp, "Animal"))
+fmlm_full <- as.formula(paste0(s_resp, " ~ ", 
+                               paste0(vec_pred_full, collapse = " + "), 
+                               collapse = ""))
+lm_ex07p01_full <- lm(formula = fmlm_full, data = tbl_ex07p01)
+smry_ex07p01_full <- summary(lm_ex07p01_full)
+n_sd_full <- smry_ex07p01_full$sigma
+```
+
+* Eliminate the variable that increases the residual sum of squares the least and compute $C_p$ for resulting model
+
+From the full model select one variable at the time, remove that variable, fit a reduced model and compute for that model the residual sum of squares and the $C_p$ value.
+
+* Repeat above step until all variables and factors are elminiated
+* Select the model with the smallest $C_p$ value
+
 
 <!-- master-solution-end -->
 
 
-## Problem 2
+## Problem 2: Verification of Model Selection Results
+Use the R-package `olsrr` to verify the results of Problem 1. Have a look at the documentation of `olsrr` at https://github.com/rsquaredacademy/olsrr. 
 
 <!-- your-solution-start
 ### Your Solution
