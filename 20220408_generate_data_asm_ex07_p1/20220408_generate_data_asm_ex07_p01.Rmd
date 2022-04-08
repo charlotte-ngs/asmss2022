@@ -1,0 +1,108 @@
+---
+title: "Generate Data for Problem 1 of asm_ex07"
+output: html_notebook
+---
+
+The data for Problem 1 of asm_ex07 is a simulated dataset that uses results of the regression of body weight on breast circumference as input. 
+
+
+## Regression Analysis
+Start with a regression analysis on the small dataset.
+
+```{r sim-data-ex07-p01}
+# first do a regression analysis on the small dataset with 10 records
+s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+tbl_bwbc <- readr::read_csv(file = s_ex05p02_data_path)
+# extract input for simulation from results of regression analysis
+lm_bwbc <- lm(`Body Weight` ~ `Breast Circumference`, data = tbl_bwbc)
+```
+
+
+## Input for Simulation
+Extract input for simulation from results of regression analysis
+
+```{r}
+b0 <- coefficients(lm_bwbc)["(Intercept)"]
+b1 <- coefficients(lm_bwbc)["`Breast Circumference`"]
+mean_bc <- mean(tbl_bwbc$`Breast Circumference`)
+sd_bc <- sd(tbl_bwbc$`Breast Circumference`)
+sry_bwbc <- summary(lm_bwbc)
+sd_res <- sry_bwbc$sigma
+```
+
+
+## Simulation Function
+The following function is used for simulating data
+
+```{r}
+simulate_bwbc <- function(pn_nrobs, pn_b0, pn_b1, pn_mean_x, pn_sd_x, pn_sd_res){
+  vec_bc <- rnorm(pn_nrobs, mean = pn_mean_x, sd = pn_sd_x)
+  vec_bw <- pn_b0 + pn_b1 * vec_bc + rnorm(pn_nrobs, mean = 0, sd = pn_sd_res)
+  tbl_result <- tibble::tibble(Animal = c(1:pn_nrobs),
+                               BC = vec_bc,
+                               BW = vec_bw)
+  return(tbl_result)
+}
+```
+
+The following chunk generates the dataset
+
+```{r}
+set.seed(3298)
+n_nr_obs <- 50
+tbl_ex07p01 <- simulate_bwbc(pn_nrobs = n_nr_obs, 
+                     pn_b0 = b0, 
+                     pn_b1 = b1, 
+                     pn_mean_x = mean_bc, 
+                     pn_sd_x = sd_bc, 
+                     pn_sd_res = sd_res)
+tbl_ex07p01
+```
+
+Add random variables
+
+```{r}
+# height
+n_mean_hei <- 130
+n_sd_hei <- 1.7
+tbl_ex07p01$HEI <- rnorm(nrow(tbl_ex07p01), mean = n_mean_hei, sd = n_sd_hei)
+# BCS
+vec_bcs_level <- c(1:5)
+tbl_ex07p01$BCS <- sample(vec_bcs_level, size = n_nr_obs, replace = TRUE)
+```
+
+Add correlated breed
+
+```{r}
+vec_breed <- c("Angus", "Simmental", "Limousin")
+n_nr_ani_per_breed <- floor(n_nr_obs / length(vec_breed))
+tbl_ex07p01 <- tbl_ex07p01[order(tbl_ex07p01$BW),]
+# initialize breed factor
+tbl_ex07p01$Breed <- rep(NA, n_nr_obs)
+# distribute breed levels
+for (i in seq_along(vec_breed)){
+  tbl_ex07p01$Breed[((i-1)*n_nr_ani_per_breed+1):(i*n_nr_ani_per_breed)] <- vec_breed[i]  
+}
+# add latest breed to last records
+if ((n_nr_ani_per_breed * length(vec_breed)) < n_nr_obs){
+  tbl_ex07p01$Breed[(n_nr_ani_per_breed * length(vec_breed) + 1):n_nr_obs] <- vec_breed[length(vec_breed)]
+}
+```
+
+Reorder dataset according to animals
+
+```{r}
+tbl_ex07p01 <- dplyr::arrange(tbl_ex07p01, Animal)
+tbl_ex07p01
+```
+
+
+## Write Data to File
+Write data to file, if file does not exist
+
+```{r}
+s_ex07p01_path <- file.path(here::here(), "docs", "data", "asm_bw_mod_sel.csv")
+if (!file.exists(s_ex07p01_path))
+  readr::write_csv(tbl_ex07p01, file = s_ex07p01_path)
+```
+
