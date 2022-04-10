@@ -36,7 +36,7 @@ if (params$isonline){
 ```
 
 ## Problem 1: Model Selection
-Given is a dataset with body weight as a response and different other variables and factors. Use model selection to find the relevant predictor variables and factors for the best linear fixed effect model. Use the estimated mean square error $C_p$ as a quality measure for a single linear model. The dataset to be analysed can be obtained from 
+Given is a dataset with body weight as a response and different other variables and factors. The columns `Breed` and `BCS` (Body Condition Score) are taken as factors. All other columns are taken as predictor variables. The column `Animal` is not used in any model. Use model selection to find the relevant predictor variables and factors for the best linear fixed effect model. Use the estimated mean square error $C_p$ as a quality measure for a single linear model. The dataset to be analysed can be obtained from 
 
 ```{r, echo=FALSE}
 cat(s_ex07p01_path, "\n")
@@ -55,7 +55,7 @@ Because, we need the residual standard deviation of the full model and backward 
 
 #### Start with Backward Elimination
 
-* Start with the full model considering all variables
+* Start with the full model considering all variables and factors
 * Eliminate the variable that increases the residual sum of squares the least and compute $C_p$ for resulting model
 * Repeat above step until all variables and factors are elminiated
 * Select the model with the smallest $C_p$ value
@@ -77,11 +77,13 @@ Because, we need the residual standard deviation of the full model and backward 
 
 #### Backward Elimination
 
-* Read the data
+* Read the data and convert `Breed` and `BCS` to factors
 
 ```{r}
 s_ex07p01_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mod_sel.csv" 
 tbl_ex07p01 <- readr::read_csv(file = s_ex07p01_path)
+tbl_ex07p01$BCS <- as.factor(tbl_ex07p01$BCS)
+tbl_ex07p01$Breed <- as.factor(tbl_ex07p01$Breed)
 ```
 
 * Start with the full model considering all variables
@@ -95,11 +97,66 @@ fmlm_full <- as.formula(paste0(s_resp, " ~ ",
 lm_ex07p01_full <- lm(formula = fmlm_full, data = tbl_ex07p01)
 smry_ex07p01_full <- summary(lm_ex07p01_full)
 n_sd_full <- smry_ex07p01_full$sigma
+n_ssqr_full <- crossprod(residuals(lm_ex07p01_full))
+n_ssqr_full
 ```
 
 * Eliminate the variable that increases the residual sum of squares the least and compute $C_p$ for resulting model
 
-From the full model select one variable at the time, remove that variable, fit a reduced model and compute for that model the residual sum of squares and the $C_p$ value.
+From the full model select one variable at the time, remove that variable, fit a reduced model and compute for that model the residual sum of squares. The model that increases the residual sum of squares the least, is selected and for that model the $C_p$ value is compute. 
+
+```{r}
+tbl_belim_res <- NULL
+for (p in vec_pred_full){
+  fm_update_cur <- as.formula(paste0(". ~ . - ", p, collapse = ""))
+  lm_cur <- update(lm_ex07p01_full, fm_update_cur)
+  vec_res <- residuals(lm_cur)
+  tbl_cur <- tibble::tibble(Variable = p,
+                            RSSQ = crossprod(vec_res))
+  if (is.null(tbl_belim_res)){
+    tbl_belim_res <- tbl_cur
+  } else {
+    tbl_belim_res <- dplyr::bind_rows(tbl_belim_res, tbl_cur)
+  }
+}
+tbl_belim_res
+```
+
+From `tbl_belim_res`, we determine the variable which is excluded
+
+```{r}
+n_idx_var_exclude <- which(tbl_belim_res$RSSQ == min(tbl_belim_res$RSSQ))
+s_var_exclude <- tbl_belim_res$Variable[n_idx_var_exclude]
+s_var_exclude
+```
+
+The model after this first round of elimination corresponds to the model that results when taking away the variable `r s_var_exclude` from the full model.
+
+```{r}
+vec_pred_cur <- setdiff(vec_pred_full, s_var_exclude)
+fm_cur <- as.formula(paste0(s_resp, " ~ ", 
+                               paste0(vec_pred_cur, collapse = " + "), 
+                               collapse = ""))
+lm_cur <- lm(formula = fm_cur, data = tbl_ex07p01)
+summary(lm_cur)
+```
+
+For the current model, we have to compute the $C_p$ value
+
+```{r}
+n_nr_obs <- nrow(tbl_ex07p01)
+n_rssq <- crossprod(residuals(lm_cur))
+n_model_size <- length(vec_pred_cur)
+n_cp_cur <- n_rssq / (n_sd_full^2) - n_nr_obs + 2 * n_model_size
+n_cp_cur
+```
+
+Verify, according to https://search.r-project.org/CRAN/refmans/olsrr/html/ols_mallows_cp.html
+
+```{r}
+olsrr::ols_mallows_cp(lm_cur, lm_ex07p01_full)
+```
+
 
 * Repeat above step until all variables and factors are elminiated
 * Select the model with the smallest $C_p$ value
