@@ -18,7 +18,7 @@ params:
     choices: ['exercise', 'solution', 'notebook']
   isonline:
     label: 'Online (y/n)'
-    value: FALSE
+    value: TRUE
     choices: [TRUE, FALSE]
 ---
 
