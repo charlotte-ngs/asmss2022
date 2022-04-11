@@ -101,6 +101,6 @@ $$C_p(\mathcal{M}) = \frac{SSE(\mathcal{M})}{\hat{\sigma}^2} - n + 2 |\mathcal{M
 
 ## Example
 
-* In R uxe: 
+* In R use: 
     + package `olsrr` - no spaces in variable names
     + function `MASS::stepAIC()`
