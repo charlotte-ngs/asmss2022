@@ -8,8 +8,8 @@ Sciences](http://www.vorlesungsverzeichnis.ethz.ch/Vorlesungsverzeichnis/lernein
 
 ## Topics for Master Theses
 
-Topics for Master Theses at Qualitas AG together with ETH will be
-available soon.
+Topics for Master Theses at Qualitas AG together with ETH are listed
+[here](https://charlotte-ngs.github.io/asmss2022/misc/MasterThesisTopics_SpringSemester2022.html).
 
 ## Information
 
@@ -89,4 +89,4 @@ Commons Attribution 4.0 International License</a>.
 
 ------------------------------------------------------------------------
 
-*Latest Changes: 2022-02-21 07:45:30 (pvr)*
+*Latest Changes: 2022-04-11 15:41:58 (pvr)*
