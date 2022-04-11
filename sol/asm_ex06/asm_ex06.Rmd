@@ -39,7 +39,7 @@ n_nr_cow_per_group <- 6
 ```
 
 ## Problem 1: Experiment Evaluation
-In the paper by `r met$add("Manzocchi2020")` `r n_nr_feed` different feeding treatments for dairy cows were compared. The different feeding treatments consisted of 
+In the paper by [@Manzocchi2020] `r n_nr_feed` different feeding treatments for dairy cows were compared. The different feeding treatments consisted of 
 
 ```{r, echo=FALSE}
 tbl_feed <- tibble::tibble(Treatment = c(1:n_nr_feed),
