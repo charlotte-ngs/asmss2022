@@ -1,3 +1,7 @@
+# asmss2022 0.8.0
+
+* Solutions for asm_ex06 and problems for asm_ex07
+
 # asmss2022 0.7.1
 
 * Slides l07_model_selection
