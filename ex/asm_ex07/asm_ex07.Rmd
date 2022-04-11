@@ -146,7 +146,8 @@ For the current model, we have to compute the $C_p$ value
 ```{r}
 n_nr_obs <- nrow(tbl_ex07p01)
 n_rssq <- crossprod(residuals(lm_cur))
-n_model_size <- length(vec_pred_cur)
+# model size is the number of predictors plus the intercept
+n_model_size <- length(vec_pred_cur) + 1 
 n_cp_cur <- n_rssq / (n_sd_full^2) - n_nr_obs + 2 * n_model_size
 n_cp_cur
 ```
@@ -158,7 +159,65 @@ olsrr::ols_mallows_cp(lm_cur, lm_ex07p01_full)
 ```
 
 
-* Repeat above step until all variables and factors are elminiated
+* Repeat above step until all variables and factors are elminiated. The repetition could be done sequentially, but it is more efficient to do it in a loop. Inside of this loop, we have to perform several steps. For a better overview, we encapsulate these step in functions. The first function takes a model and returns a submodel with the one predictor variable or factor less such that the residual standard error increases the least. The second function is going to compute the $C_p$ value for a given sub-model and a full model. 
+
+```{r}
+get_subm_elim <- function(plm_cur_model){
+  # minimal value for RSSQ
+  n_rssq_min <- NULL
+  lm_result_sub <- NULL
+  # obtain the vector of predictor variables and factors
+  vec_pred_cur <- attr(terms(plm_cur_model), "term.labels")
+  # loop over vector of predictors and compute RSSQ for each sub-model
+  for (p in vec_pred_cur){
+    # remove p from predictors
+    fm_cur_subm <- as.formula(paste0(". ~ . - ", p, collapse = ""))
+    lm_cur_subm <- update(plm_cur_model, fm_cur_subm)
+    vec_res_subm <- residuals(lm_cur_subm)
+    n_rssq_subm <- crossprod(vec_res_subm)
+    # check whether n_rssq_sub is minimal
+    if (is.null(n_rssq_min)){
+      n_rssq_min <- n_rssq_subm
+      lm_result_sub <- lm_cur_subm
+    } else {
+      if (n_rssq_subm < n_rssq_min){
+        n_rssq_min <- n_rssq_subm
+        lm_result_sub <- lm_cur_subm
+      }
+    }
+  }
+  # return model with minimal rssq
+  return(lm_result_sub)
+}
+```
+
+The function `get_subm_elim()` can be verified by a call with the full model. Then the sub-model with `HEI` eliminated should result. 
+
+```{r}
+lm_ex07p01_first_subm <- get_subm_elim(plm_cur_model = lm_ex07p01_full)
+lm_ex07p01_first_subm
+```
+
+The second function computes the $C_p$ value for the obtained sub-model.
+
+```{r}
+compute_cp_value <- function(n_res_sd_full_model, pn_nr_obs, plm_cur_model){
+  n_rssq <- crossprod(residuals(plm_cur_model))
+  # model size is the number of predictors plus the intercept
+  vec_pred_cur <- attr(terms(plm_cur_model), "term.labels")
+  n_model_size <- length(vec_pred_cur) + 1 
+  n_cp_cur <- n_rssq / (n_res_sd_full_model^2) - pn_nr_obs + 2 * n_model_size
+  return(n_cp_cur)
+}
+```
+
+For the first submodel, we get
+
+```{r}
+compute_cp_value(n_res_sd_full_model = n_sd_full, pn_nr_obs = nrow(tbl_ex07p01), plm_cur_model = lm_ex07p01_first_subm)
+```
+
+
 * Select the model with the smallest $C_p$ value
 
 
