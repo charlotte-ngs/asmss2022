@@ -18,7 +18,7 @@ params:
     choices: ['exercise', 'solution', 'notebook']
   isonline:
     label: 'Online (y/n)'
-    value: TRUE
+    value: FALSE
     choices: [TRUE, FALSE]
 ---
 
@@ -80,7 +80,11 @@ Because, we need the residual standard deviation of the full model and backward 
 * Read the data and convert `Breed` and `BCS` to factors
 
 ```{r}
-s_ex07p01_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mod_sel.csv" 
+if (params$isonline){
+  s_ex07p01_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mod_sel.csv" 
+} else {
+  s_ex07p01_path <- file.path(here::here(), "docs", "data", "asm_bw_mod_sel.csv")
+}
 tbl_ex07p01 <- readr::read_csv(file = s_ex07p01_path)
 tbl_ex07p01$BCS <- as.factor(tbl_ex07p01$BCS)
 tbl_ex07p01$Breed <- as.factor(tbl_ex07p01$Breed)
@@ -90,7 +94,8 @@ tbl_ex07p01$Breed <- as.factor(tbl_ex07p01$Breed)
 
 ```{r}
 s_resp <- "BW"
-vec_pred_full <- setdiff(colnames(tbl_ex07p01), c(s_resp, "Animal"))
+vec_cols_to_ignore <- c("Animal")
+vec_pred_full <- setdiff(colnames(tbl_ex07p01), c(s_resp, vec_cols_to_ignore))
 fmlm_full <- as.formula(paste0(s_resp, " ~ ", 
                                paste0(vec_pred_full, collapse = " + "), 
                                collapse = ""))
@@ -201,12 +206,12 @@ lm_ex07p01_first_subm
 The second function computes the $C_p$ value for the obtained sub-model.
 
 ```{r}
-compute_cp_value <- function(n_res_sd_full_model, pn_nr_obs, plm_cur_model){
+compute_cp_value <- function(pn_res_sd_full_model, pn_nr_obs, plm_cur_model){
   n_rssq <- crossprod(residuals(plm_cur_model))
   # model size is the number of predictors plus the intercept
   vec_pred_cur <- attr(terms(plm_cur_model), "term.labels")
   n_model_size <- length(vec_pred_cur) + 1 
-  n_cp_cur <- n_rssq / (n_res_sd_full_model^2) - pn_nr_obs + 2 * n_model_size
+  n_cp_cur <- n_rssq / (pn_res_sd_full_model^2) - pn_nr_obs + 2 * n_model_size
   return(n_cp_cur)
 }
 ```
@@ -214,11 +219,61 @@ compute_cp_value <- function(n_res_sd_full_model, pn_nr_obs, plm_cur_model){
 For the first submodel, we get
 
 ```{r}
-compute_cp_value(n_res_sd_full_model = n_sd_full, pn_nr_obs = nrow(tbl_ex07p01), plm_cur_model = lm_ex07p01_first_subm)
+compute_cp_value(pn_res_sd_full_model = n_sd_full, 
+                 pn_nr_obs = nrow(tbl_ex07p01), 
+                 plm_cur_model = lm_ex07p01_first_subm)
+```
+
+Now that we have the two functions ready, we can do the repetition of the elimination process of variables from a model. To make it a little bit easier, we start again with the full model.
+
+```{r}
+n_nr_obs <- nrow(tbl_ex07p01)
+lm_current <- lm_ex07p01_full
+n_sd_current <- summary(lm_current)$sigma
+vec_pred_current <- attr(terms(lm_current), "term.labels")
+# initialise a result dataframe
+tbl_elim_result <- NULL
+# loop as long as, there are variables in vec_pred_current
+while (length(vec_pred_current) > 0){
+  # get variables and C_p of current model
+  tbl_elim_current <- tibble::tibble(`Current Model` = as.character(formula(lm_current))[3],
+                                      Cp = compute_cp_value(pn_res_sd_full_model = n_sd_current,
+                                                            pn_nr_obs = n_nr_obs, 
+                                                            plm_cur_model = lm_current))
+  # store variables and C_p value of current model in result
+  if (is.null(tbl_elim_result)) {
+    tbl_elim_result <- tbl_elim_current
+  } else {
+    tbl_elim_result <- dplyr::bind_rows(tbl_elim_result, tbl_elim_current)
+  }
+  # get new submodel
+  lm_current <- get_subm_elim(plm_cur_model = lm_current)
+  vec_pred_current <- attr(terms(lm_current), "term.labels")
+}
+tbl_elim_result
+```
+
+In the above shown result dataframe, the model which only fits an intercept is missing. Hence, we add that model to the results
+
+```{r}
+lm_inter <- lm(BW ~ 1, data = tbl_ex07p01)
+tbl_elim_inter <- tibble::tibble(`Current Model` = as.character(formula(lm_inter))[3],
+                                      Cp = compute_cp_value(pn_res_sd_full_model = n_sd_current,
+                                                            pn_nr_obs = n_nr_obs, 
+                                                            plm_cur_model = lm_inter))
+tbl_elim_result <- dplyr::bind_rows(tbl_elim_result, tbl_elim_inter)
+tbl_elim_result
 ```
 
 
-* Select the model with the smallest $C_p$ value
+
+* Select the model with the smallest $C_p$ value. The model with the smallest $C_p$ value 
+
+```{r}
+n_model_idx <- which(tbl_elim_result$Cp == min(tbl_elim_result$Cp))
+tbl_elim_result[n_model_idx,]
+```
+
 
 
 <!-- master-solution-end -->
@@ -240,17 +295,3 @@ Use the R-package `olsrr` to verify the results of Problem 1. Have a look at the
 <!-- master-solution-end -->
 
 
-## Problem 3
-
-<!-- your-solution-start
-### Your Solution
-
----  your-solution-end -->
-
-
-<!-- master-solution-start -->
-
-### Solution
-
-<!-- master-solution-end -->
- 

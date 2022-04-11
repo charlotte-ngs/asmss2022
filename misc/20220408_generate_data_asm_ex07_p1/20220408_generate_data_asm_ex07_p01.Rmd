@@ -1,6 +1,11 @@
 ---
 title: "Generate Data for Problem 1 of asm_ex07"
 output: html_notebook
+params:
+  isonline:
+    label: 'Online (y/n)'
+    value: FALSE
+    choices: [TRUE, FALSE]
 ---
 
 The data for Problem 1 of asm_ex07 is a simulated dataset that uses results of the regression of body weight on breast circumference as input. 
@@ -11,7 +16,11 @@ Start with a regression analysis on the small dataset.
 
 ```{r sim-data-ex07-p01}
 # first do a regression analysis on the small dataset with 10 records
-s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+if (params$isonline){
+  s_ex05p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+} else {
+  s_ex05p02_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+}
 tbl_bwbc <- readr::read_csv(file = s_ex05p02_data_path)
 # extract input for simulation from results of regression analysis
 lm_bwbc <- lm(`Body Weight` ~ `Breast Circumference`, data = tbl_bwbc)
@@ -48,8 +57,8 @@ simulate_bwbc <- function(pn_nrobs, pn_b0, pn_b1, pn_mean_x, pn_sd_x, pn_sd_res)
 The following chunk generates the dataset
 
 ```{r}
-set.seed(3298)
-n_nr_obs <- 50
+set.seed(1762)
+n_nr_obs <- 30
 tbl_ex07p01 <- simulate_bwbc(pn_nrobs = n_nr_obs, 
                      pn_b0 = b0, 
                      pn_b1 = b1, 
