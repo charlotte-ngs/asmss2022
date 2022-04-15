@@ -1,3 +1,7 @@
+# asmss2022 0.8.1
+
+* Link to video of lecture 8
+
 # asmss2022 0.8.0
 
 * Solutions for asm_ex06 and problems for asm_ex07
