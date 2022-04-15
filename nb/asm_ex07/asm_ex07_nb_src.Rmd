@@ -69,9 +69,20 @@ Because, we need the residual standard deviation of the full model and backward 
 
 
 ## Problem 2: Verification of Model Selection Results
-Use the R-package `olsrr` to verify the results of Problem 1. Have a look at the documentation of `olsrr` at https://github.com/rsquaredacademy/olsrr. 
+Use the R-package `olsrr` to verify the results of Problem 1. Have a look at the documentation of `olsrr` at https://github.com/rsquaredacademy/olsrr. In a first step, we are going to read the data from
+
+```{r ex07-p02-init, echo=FALSE}
+if (params$isonline){
+  s_ex07p02_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_mod_sel.csv" 
+} else {
+  s_ex07p02_path <- file.path(here::here(), "docs", "data", "asm_bw_mod_sel.csv")
+}
+cat(s_ex07p02_path, "\n")
+```
 
 ### Your Solution
+
+* Based on the documentation, we are going to use the function `ols_step_best_subset`
 
 
 
