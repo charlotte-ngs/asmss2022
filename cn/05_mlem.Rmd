@@ -1,0 +1,37 @@
+# Mixed Linear Effects Models  {#asm-mlem}
+```{r met-mlem-reset, include=FALSE}
+met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(), 
+                                                 rstudioapi::getSourceEditorContext()$path, 
+                                                 rprojroot::thisfile()))
+```
+
+Mixed linear effects models are a very useful tool in the analysis of data with some dependencies. In all statistical analyses that we have seen so far the assumption of independence between observations was central. One way of expressing this independence assumption is via the variance-covariance matrix ($var(\mathbf{e})$) of the vector ($\mathbf{e}$) of residuals. In mathematical terms this can be written as 
+
+\begin{equation}
+var(\mathbf{e}) = \mathbf{I} * \sigma_e^2
+(\#eq:varemlem)
+\end{equation}
+
+which means that the variance-covariance matrix ($var(\mathbf{e})$) is proportional to the identity matrix $\mathbf{I}$ with the variance component $\sigma_e^2$ as proportionality factor. 
+
+In what follows, the models that account for different dependency structures are described. 
+
+
+## Repeatability Models
+
+
+## Pedigree BLUP
+
+
+## Genomic BLUP
+
+
+## Other Resources
+The following resources were used for this chapter:
+
+* https://m-clark.github.io/mixed-models-with-R/
+* https://www.r-bloggers.com/2017/12/linear-mixed-effect-models-in-r/
+* https://gkhajduk.github.io/2017-03-09-mixed-models/
+* `r met$add("Brown2021a")`
+* `r met$add("Singmann2019")`
+
