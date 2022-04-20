@@ -1,0 +1,25 @@
+---
+title: "Generate Repeated Measures Data"
+output: html_notebook
+---
+
+# Disclaimer
+Data with repeated measurements are described.
+
+
+# Single Observation Data
+The data with single observations for body weight and breast circumference from chapter 2 of the lecture notes are used as basis
+
+```{r tab-reg-bw-bc, echo=FALSE, results='asis'}
+tbl_reg <- tibble::tibble(Animal = c(1:10),
+                          `Breast Circumference` = c(176, 177, 178, 179, 179, 180, 181, 182,183, 184),
+                          `Body Weight` = c(471, 463, 481, 470, 496, 491, 518, 511, 510, 541))
+n_nr_obs <- nrow(tbl_reg)
+knitr::kable(tbl_reg,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = paste0("Breast Circumference and Body Weight for ", 
+                              nrow(tbl_reg)," Animals", collapse = ""),
+             escape = FALSE)
+```
+
