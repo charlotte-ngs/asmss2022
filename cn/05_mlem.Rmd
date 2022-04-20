@@ -17,7 +17,8 @@ which means that the variance-covariance matrix ($var(\mathbf{e})$) is proportio
 In what follows, the models that account for different dependency structures are described. 
 
 
-## Repeatability Models
+## Repeated Observations
+It is quite common to have repeated observations of the same traits or characteristics from a group of animals. If we apply that line of thought to the example data used in chapter \@ref(asm-regr), we would have repeated measurements of breast circumference and body weight of the same animals. 
 
 
 ## Pedigree BLUP
