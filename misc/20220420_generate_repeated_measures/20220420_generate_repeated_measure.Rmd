@@ -23,3 +23,51 @@ knitr::kable(tbl_reg,
              escape = FALSE)
 ```
 
+
+# Generate Multiple Observations per Animal
+
+```{r, echo=FALSE}
+n_nr_ani <- 4
+n_nr_rep <- 3
+n_sd_ratio <- 0.4
+n_sd_bc <- sd(tbl_reg$`Breast Circumference`)
+n_sd_bw <- sd(tbl_reg$`Body Weight`)
+```
+
+For course notes, we choose `r n_nr_ani` animals and generate `r n_nr_rep` repetitions from each observation. The variation within the observations of one animal is `r 100 * n_sd_ratio^2`% of the total phenotypic variation for body weight and breast circumference.
+
+```{r}
+set.seed(432)
+vec_sel_ani <- sample(tbl_reg$Animal, size = n_nr_ani)
+# loop over selected animals
+tbl_rep_obs <- NULL
+for (aidx in vec_sel_ani){
+  # add observation of currently selected animal aidx
+  if (is.null(tbl_rep_obs)){
+    tbl_rep_obs <- tbl_reg[aidx,]
+  } else {
+    tbl_rep_obs <- dplyr::bind_rows(tbl_rep_obs, tbl_reg[aidx,])
+  }
+  # add repeated observations
+  tbl_rep_cur <- tibble::tibble(Animal = rep(aidx, n_nr_rep-1),
+                                `Breast Circumference` = rnorm((n_nr_rep-1), 
+                                                               mean = tbl_reg$`Breast Circumference`[aidx],
+                                                               sd = n_sd_bc*n_sd_ratio),
+                                `Body Weight` = rnorm((n_nr_rep-1),
+                                                      mean = tbl_reg$`Body Weight`[aidx],
+                                                      sd = n_sd_bw*n_sd_ratio))
+  tbl_rep_obs <- dplyr::bind_rows(tbl_rep_obs, tbl_rep_cur)
+  
+}
+tbl_rep_obs
+```
+
+# Plot
+
+```{r}
+ggplot2::ggplot(data = tbl_rep_obs, mapping = ggplot2::aes(x = `Breast Circumference`, 
+                                                           y = `Body Weight`, 
+                                                           color = as.factor(Animal))) + 
+  ggplot2::geom_point()
+```
+
