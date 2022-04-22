@@ -62,12 +62,46 @@ for (aidx in vec_sel_ani){
 tbl_rep_obs
 ```
 
+# File
+The generated data is written to a file.
+
+```{r}
+s_rep_obs_path <- file.path(here::here(), "docs", "data", "asm_bw_bc_rep_obs.csv")
+if (!file.exists(s_rep_obs_path)) readr::write_csv(tbl_rep_obs, file = s_rep_obs_path)
+```
+
+
+
 # Plot
 
 ```{r}
+tbl_rep_obs$Animal <- as.factor(tbl_rep_obs$Animal)
 ggplot2::ggplot(data = tbl_rep_obs, mapping = ggplot2::aes(x = `Breast Circumference`, 
                                                            y = `Body Weight`, 
-                                                           color = as.factor(Animal))) + 
+                                                           color = Animal)) + 
   ggplot2::geom_point()
+```
+
+# Analysis
+The repeated observation data can still be analysed with a linear regression model
+
+```{r}
+lm_rep_obs <- lm(`Body Weight` ~ `Breast Circumference`, data = tbl_rep_obs)
+summary(lm_rep_obs)
+```
+
+But the assumptions of independent observations is violated. This can be seen in the residuals plot.
+
+```{r}
+tbl_rep_obs$Animal <- as.factor(tbl_rep_obs$Animal)
+ggplot2::ggplot(data = tibble::tibble(Animal = tbl_rep_obs$Animal, 
+                                      Fitted = fitted(lm_rep_obs), 
+                                      Residuals = residuals(lm_rep_obs)),
+                ggplot2::aes(x = Fitted, y = Residuals, color = Animal)) + 
+  ggplot2::geom_point()
+```
+
+```{r}
+plot(lm_rep_obs)
 ```
 
