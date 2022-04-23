@@ -85,6 +85,7 @@ Extending the dataset shown in Table \@ref(tab:bw-breed-tab) to multiple observa
 ```{r bw-breed-rep-obs-tab, echo=FALSE}
 s_bw_breed_rep_obs_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_breed_rep_obs.csv"
 tbl_rep_obs_breed <- readr::read_csv(file = s_bw_breed_rep_obs_path)
+tbl_rep_obs_breed <- dplyr::select(tbl_rep_obs_breed, Animal, `Body Weight`, Breed)
 tbl_rep_obs_breed$Animal <- as.factor(tbl_rep_obs_breed$Animal)
 knitr::kable(tbl_rep_obs_breed,
              booktabs = TRUE,
@@ -95,11 +96,13 @@ knitr::kable(tbl_rep_obs_breed,
 Applying an ANOVA on the dataset given in Table \@ref(tab:bw-breed-rep-obs-tab) allows to check whether there is variation between measurements of the same animal.
 
 ```{r}
-aov_bw_breed_rep <- aov(`Body Weight` ~ Breed + Animal, data = tbl_rep_obs_breed)
+aov_bw_breed_rep <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_breed)
 summary(aov_bw_breed_rep)
 ```
 
-The above ANOVA results indicate that there is variation of the repeated observation of body weight within breed. While ANOVA is a widely used method, it has a major disadvantage. ANOVA cannot handle data with unbalanced class sizes. That means, the ANOVA analysis does not perform very well, if the number of observations for different factor classes are not the same. This is also the case for the used dataset shown in Table \@ref(tab:bw-breed-rep-obs-tab) where the number of animals for the different breeds is not the same. The problems of unequal class sizes are addressed by a different class of models, called the mixed linear effects models.
+The above ANOVA results show that taking into account the repeated measurement structure of the data greatly reduces the mean squared residuals. On the other hand due to the low number of animals in the dataset, the null-hypothesis of the factor `Breed` having no effect on `Body Weight` could not be rejected. 
+
+While ANOVA is a widely used method and the above results show that we were able to correctly separate the variation between breeds and within a series of observation for the same animal, it has a major disadvantage. ANOVA cannot handle so-called **unbalanced** data very well. Unbalanced data means that the number of observations per factor level or per animal is not the same. Because the problem of unbalanced data occurs quite frequently even in planned experiments, ANOVA is not used that often nowadays. The problems of unbalanced data can be addressed by a different class of models, called the mixed linear effects models.
 
 
 ### Mixed Linear Effects Models
@@ -120,4 +123,7 @@ The following resources were used for this chapter:
 * One-factor anova: https://youtu.be/GctGncQrJew
 * `r met$add("Brown2021a")`
 * `r met$add("Singmann2019")`
-
+* Repeated Measures ANOVA: 
+    + https://conjugateprior.org/2013/01/formulae-in-r-anova/
+    + https://s3-eu-west-1.amazonaws.com/s3-euw1-ap-pe-ws4-cws-documents.ri-prod/9781138024571/chapters/ch11/1_Least-Square_RM_ANOVA_in_R_Using_aov().JLH.pdf
+* Data Anaylsis in R: https://bookdown.org/steve_midway/DAR/

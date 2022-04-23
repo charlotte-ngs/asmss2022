@@ -190,6 +190,32 @@ summary(aov_rep_obs)
 From https://youtu.be/eT_SLeXMOYE, we get
 
 ```{r}
+s_bw_breed_rep_obs_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_breed_rep_obs.csv"
+tbl_rep_obs_breed <- readr::read_csv(file = s_bw_breed_rep_obs_path)
+tbl_rep_obs_breed$Animal <- as.factor(tbl_rep_obs_breed$Animal)
+tbl_rep_obs_breed$Breed <- as.factor(tbl_rep_obs_breed$Breed)
+tbl_rep_obs_breed$Time <- as.factor(tbl_rep_obs_breed$Time)
+tbl_rep_obs_breed
+```
+
+Run the repeated measures ANOVA
+
+```{r}
+aov_bw_breed_rep <- aov(`Body Weight` ~ Breed + Time + Error(Animal/Time), data = tbl_rep_obs_breed)
+summary(aov_bw_breed_rep)
+```
+
+Use just the one-way repeated measures ANOVA
+
+```{r}
+aov_bw_rep <- aov(`Body Weight` ~ Time + Error(Animal/Time), data = tbl_rep_obs_breed)
+summary(aov_bw_rep)
+
+```
+
+```{r}
+aov_bw_rep <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_breed)
+summary(aov_bw_rep)
 
 ```
 
