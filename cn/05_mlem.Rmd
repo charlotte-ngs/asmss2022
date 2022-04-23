@@ -92,16 +92,14 @@ knitr::kable(tbl_rep_obs_breed,
              caption = "Repeated Observations of Body Weight and Breed for Beef Animals")
 ```
 
-Applying an ANOVA on the dataset given in Table  \@ref(tab:bw-breed-rep-obs-tab) allows to check whether there is variation between measurements of the same animal.
+Applying an ANOVA on the dataset given in Table \@ref(tab:bw-breed-rep-obs-tab) allows to check whether there is variation between measurements of the same animal.
 
 ```{r}
 aov_bw_breed_rep <- aov(`Body Weight` ~ Breed + Animal, data = tbl_rep_obs_breed)
 summary(aov_bw_breed_rep)
 ```
 
-
-
-### Random Effects Models
+The above ANOVA results indicate that there is variation of the repeated observation of body weight within breed. While ANOVA is a widely used method, it has a major disadvantage. ANOVA cannot handle data with unbalanced class sizes. That means, the ANOVA analysis does not perform very well, if the number of observations for different factor classes are not the same. This is also the case for the used dataset shown in Table \@ref(tab:bw-breed-rep-obs-tab) where the number of animals for the different breeds is not the same. The problems of unequal class sizes are addressed by a different class of models, called the mixed linear effects models.
 
 
 ### Mixed Linear Effects Models
