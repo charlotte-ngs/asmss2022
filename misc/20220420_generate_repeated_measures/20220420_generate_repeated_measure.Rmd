@@ -107,6 +107,7 @@ tbl_bw_bc_breed$Breed[tbl_rep_obs$Animal]
 ```{r}
 tbl_rep_obs_breed <- dplyr::select(tbl_rep_obs, Animal, `Body Weight`)
 tbl_rep_obs_breed$Breed <- tbl_bw_bc_breed$Breed[tbl_rep_obs$Animal]
+tbl_rep_obs_breed$Time <- rep(english::ordinal(c(1:n_nr_rep)), n_nr_ani)
 tbl_rep_obs_breed
 ```
 
@@ -184,4 +185,11 @@ aov_rep_obs <- aov(formula = `Body Weight` ~ `Breast Circumference`, data = tbl_
 summary(aov_rep_obs)
 ```
 
+
+# Two Way Repeated Measures ANOVA
+From https://youtu.be/eT_SLeXMOYE, we get
+
+```{r}
+
+```
 
