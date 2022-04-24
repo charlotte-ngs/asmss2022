@@ -214,8 +214,84 @@ summary(aov_bw_rep)
 ```
 
 ```{r}
-aov_bw_rep <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_breed)
+aov_bw_breed_rep <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_breed)
+summary(aov_bw_breed_rep)
+
+```
+
+Reproduce the computations
+
+
+
+## One way repeated measurements
+
+```{r}
+aov_bw_rep <- aov(`Body Weight` ~ Error(Animal), data = tbl_rep_obs_breed)
 summary(aov_bw_rep)
+
+```
+
+Boxplot
+
+```{r}
+boxplot(tbl_rep_obs_breed$`Body Weight` ~ tbl_rep_obs_breed$Animal)
+```
+
+Reproduce the computations
+
+```{r}
+(n_mean_bw_total <- mean(tbl_rep_obs_breed$`Body Weight`))
+(n_ssq_total <- sum((tbl_rep_obs_breed$`Body Weight`-n_mean_bw_total)^2))
+```
+
+```{r}
+(n_mean_bw_2 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 2]))
+(n_mean_bw_5 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 5]))
+(n_mean_bw_7 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 7]))
+(n_mean_bw_10 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 10]))
+```
+
+```{r}
+(n_ssq_res <- sum((tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 2] - n_mean_bw_2)^2 +
+                      (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 5] - n_mean_bw_5)^2 +
+                      (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 7] - n_mean_bw_7)^2 +
+                      (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 10] - n_mean_bw_10)^2))
+```
+
+```{r}
+(n_ssq_animal <- n_nr_rep * sum((n_mean_bw_2 - n_mean_bw_total)^2 + 
+                      (n_mean_bw_5 - n_mean_bw_total)^2 +
+                      (n_mean_bw_7  - n_mean_bw_total)^2 +
+                      (n_mean_bw_10  - n_mean_bw_total)^2))
+```
+
+
+Going back to two-way and do the computations for the breed
+
+```{r}
+(n_mean_bw_an <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Angus"]))
+(n_mean_bw_si <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Simmental"]))
+(n_mean_bw_li <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Limousin"]))
+```
+
+```{r}
+(n_nr_an <- length(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Angus"]))
+(n_nr_si <- length(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Simmental"]))
+(n_nr_li <- length(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Limousin"]))
+```
+
+
+```{r}
+(n_ssq_breed <- sum(n_nr_an * (n_mean_bw_an - n_mean_bw_total)^2 + 
+                    n_nr_si * (n_mean_bw_si - n_mean_bw_total)^2 + 
+                    n_nr_li * (n_mean_bw_li - n_mean_bw_total)^2 ))
+```
+
+
+```{r}
+(n_ssq_breed_res <- sum((tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Angus"]-n_mean_bw_an)^2 +
+                         (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Simmental"] - n_mean_bw_si)^2 +
+                         (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Limousin"] - n_mean_bw_li)^2))
 
 ```
 

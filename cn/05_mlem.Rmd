@@ -90,7 +90,7 @@ tbl_rep_obs_breed$Animal <- as.factor(tbl_rep_obs_breed$Animal)
 knitr::kable(tbl_rep_obs_breed,
              booktabs = TRUE,
              longtable = TRUE,
-             caption = "Repeated Observations of Body Weight and Breed for Beef Animals")
+             caption = "Repeated Observations of Body Weight and Breed for Beef Cattle Animals")
 ```
 
 Applying an ANOVA on the dataset given in Table \@ref(tab:bw-breed-rep-obs-tab) allows to check whether there is variation between measurements of the same animal.
@@ -103,6 +103,80 @@ summary(aov_bw_breed_rep)
 The above ANOVA results show that taking into account the repeated measurement structure of the data greatly reduces the mean squared residuals. On the other hand due to the low number of animals in the dataset, the null-hypothesis of the factor `Breed` having no effect on `Body Weight` could not be rejected. 
 
 While ANOVA is a widely used method and the above results show that we were able to correctly separate the variation between breeds and within a series of observation for the same animal, it has a major disadvantage. ANOVA cannot handle so-called **unbalanced** data very well. Unbalanced data means that the number of observations per factor level or per animal is not the same. Because the problem of unbalanced data occurs quite frequently even in planned experiments, ANOVA is not used that often nowadays. The problems of unbalanced data can be addressed by a different class of models, called the mixed linear effects models.
+
+
+### Random Effects Models
+Before, we introduce the mixed linear effects model, we first have a look at how the repeated measurements data can be modelled with a random effects model. For the demonstration of the random effects model, we use the dataset in Table \@ref(tab:bw-breed-rep-obs-tab), but we are ignoring the factor `Breed` for a moment. Then this dataset just looks like a repeated measurement of the body weight of some beef cattle animals (see Table \@ref(tab:bw-rep-meas-tab)). 
+
+```{r bw-rep-meas-tab, echo=FALSE}
+tbl_rep_obs_no_breed <- dplyr::select(tbl_rep_obs_breed, Animal, `Body Weight`)
+knitr::kable(tbl_rep_obs_no_breed,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = "Repeated Measurements of Body Weight for Beef Cattle Animals")
+```
+
+In a random effects model with repeated observations, the expected value $E(y_{ij})$ for body weight $y_{ij}$ of animal $i$ with the $j^{th}$ observation can be written as 
+
+\begin{equation}
+E(y_{ij}) = \mu + \alpha_i
+(\#eq:repobsbwremmlem)
+\end{equation}
+
+Algebraically the expression for $E(y_{ij})$ given in \@ref(eq:repobsbwremmlem) is not different from what we have seen for the fixed linear effects model in chapter \@ref(asm-flem). But the assumptions are different. In \@ref(eq:repobsbwremmlem), $\alpha_i$ is the effect of animal $i$ on the observed body weight. Because the animals in the dataset (Table \@ref(tab:bw-rep-meas-tab)) is a random sample of a large population of animals, the effect $\alpha_i$ is a so-called **random effect**. A random effect in a model is to be treated as a random variable for which, we have to specify its distributional properties such as expected value and variance. For our example of the repeated measurements data, we assume the following three properties for the $\alpha_i$ effects
+
+1. they are indepentently and identically distributed (i.i.d.)
+2. they all have expected value of $0$, $E(\alpha_i) = 0 \quad \forall i$
+3. they all have the same variance $\sigma_{\alpha}^2$, $var(\alpha_i) = E\left[\alpha_i - E(\alpha_i)\right]^2 = E(\alpha_i^2) = \sigma_{\alpha}^2$ with $cov(\alpha_i, \alpha_k)=0 \quad \forall i \ne k$
+
+A further consequence of choosing $\alpha_i$ as a random effect is that, the expected value in \@ref(eq:repobsbwremmlem) must be considered a second time and must be specified with more details. Assuming that $\alpha^*$ denotes the general random animal effect on the observed body weight. For a given animal $i$, the effect is then $\alpha_i$ which is a realized but unobservable value of the distribution of the $\alpha^*$ effects. Therefore in \@ref(eq:repobsbwremmlem) the expected value of $y_{ij}$ is conditional on the fact that the random variable $\alpha^*$ takes the value $\alpha_i$. Hence \@ref(eq:repobsbwremmlem) is a conditional mean
+
+\begin{equation}
+E(y_{ij} | \alpha^* = \alpha_i) = \mu + \alpha_i
+(\#eq:repobsbwcondexpmlem)
+\end{equation}
+
+For notational simplicity, the $\alpha^*$ is often ommitted. Taking expectation over $\alpha^*$ leads to 
+
+\begin{equation}
+E_{\alpha^*}\left[E(y_{ij} | \alpha_i) \right] = E(y_{ij}) = \mu
+(\#eq:repobsbwcondexpalphamlem)
+\end{equation}
+
+The residuals are defined as 
+
+\begin{equation}
+e_{ij} = y_{ij} - E(y_{ij} | \alpha_i) = y_{ij} - (\mu + \alpha_i)
+(\#eq:repobsbwresmlem)
+\end{equation}
+
+With that definition, we can establish the model equation for an observation $y_{ij}$ as
+
+\begin{equation}
+y_{ij} = \mu + \alpha_i + e_{ij}
+(\#eq:repobsbwmodeleqmlem)
+\end{equation}
+
+The properties of the residuals are assumed analogously to the fixed effects model. In summary, the properties are listed as 
+
+* the expected value of the residuals are all $0$, $E(e_{ij}) = 0$
+* the variances of the residuals are all equal to $\sigma_e^2$, $var(e_{ij}) = E(e_{ij}^2) = \sigma_e^2$
+* all residuals are independent, $cov(e_{ij}, e_{i'j'}) = 0 \quad \forall i,i' \text{ and } \forall j,j' \text{ except } i=i' \text{ and } j=j'$
+* residuals are independen of $\alpha_i$ effects, $cov(e_{ij}, \alpha_k) = 0 \quad \forall i, j, k$
+
+Together with \@ref(eq:repobsbwmodeleqmlem), we can establish the total variance of all observations $y_{ij}$ as
+
+\begin{equation}
+var(y_{ij}) = var(\mu + \alpha_i + e_{ij}) = \sigma_{\alpha}^2 + \sigma_e^2 = \sigma_y^2
+(\#eq:repobsbwvarymlem)
+\end{equation}
+
+This shows that the variance ($\sigma_y^2$) can be decomposed into the two variance components $\sigma_{\alpha}^2$ and $\sigma_e^2$. It is also noted that the intra-class covariance which corresponds to the covariance between body weights for the same animal can be written as
+
+\begin{equation}
+cov(y_{ij}, y_{ij'}) = cov(\mu + \alpha_i + e_{ij}, \mu + \alpha_i + e_{ij'}) = \sigma_{\alpha}^2 \quad \text{ for } j \ne j'
+(\#eq:repobsbwintraclasscovmlem)
+\end{equation}
 
 
 ### Mixed Linear Effects Models
