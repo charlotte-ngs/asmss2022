@@ -1,3 +1,7 @@
+# asmss2022 0.9.1
+
+* Released asm_ex08
+
 # asmss2022 0.9.0
 
 * First part of chapter 5
