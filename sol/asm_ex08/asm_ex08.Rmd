@@ -1,0 +1,98 @@
+---
+title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 8
+author: Peter von Rohr
+date: 2022-04-25
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+    keep_md: false
+    keep_tex: false
+header-includes:
+ \usepackage{longtable}
+ \usepackage{float}
+params:
+  doctype:
+    label: 'Document Type'
+    value: 'solution'
+    choices: ['exercise', 'solution', 'notebook']
+  isonline:
+    label: 'Online (y/n)'
+    value: TRUE
+    choices: [TRUE, FALSE]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Problem 1: Repeated Measurements Data
+```{r asm-ex08-p01-init, echo=FALSE}
+if (params$isonline){
+  s_asm_ex08_p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+} else {
+  s_asm_ex08_p01_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+}
+n_nr_rep <- 5
+n_sd_prop_bw <- 0.5
+```
+
+Simulate a dataset with repeated measurements of `Body Weight` and `Breed`. The following dataset can be used as a basis: 
+
+```{r asm_ex08-p01-data-path-show, echo=FALSE}
+cat(s_asm_ex08_p01_data_path, "\n")
+```
+
+The generated dataset should have the following properties
+
+* For every observation, the ID of the animal, its `Body Weight` and its `Breed` should be contained in the dataset.
+* Each animal of the given basis dataset should have `r n_nr_rep` repeated observations of `Body Weight` and `Breed`.
+* The phenotypic variance of `Body Weight` within the repeated observations of one animal should be `r 100 * n_sd_prop_bw`% of the total phenotypic variance of `Body Weight` determined from the given basis dataset.
+
+
+### Your Tasks
+
+* Analyse the generated dataset with an ANOVA
+* Try to see whether you can re-cover the used input data in the results of the analysis
+
+
+<!-- your-solution-start
+### Your Solution
+
+* Read the given basis dataset
+* Loop over the records in the basis dataset and add the required number of records
+* Analyse the generated dataset with an ANOVA
+* Assess the results and compare them with the input used in the simulation
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+
+
+## Problem 2: Random Effects Model
+Analyse the dataset generated in Problem 1 with a random effects model using the package `lme4`.
+
+
+<!-- your-solution-start
+### Your Solution
+
+* Read generated dataset from Problem 1
+* Analyse the data using `lme4::lmer()`
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+
+
