@@ -178,6 +178,16 @@ cov(y_{ij}, y_{ij'}) = cov(\mu + \alpha_i + e_{ij}, \mu + \alpha_i + e_{ij'}) = 
 (\#eq:repobsbwintraclasscovmlem)
 \end{equation}
 
+#### Package lme4
+In R, one of the packages that can handle random effects models is the package `lme4`. For the dataset in Table \@ref(tab:bw-rep-meas-tab), this can be done as follows
+
+```{r lme-rep-meas-analysis}
+library(lme4)
+lmer_bw_rep <- lmer(`Body Weight` ~ (1 | Animal), data = tbl_rep_obs_no_breed)
+summary(lmer_bw_rep)
+```
+
+\pagebreak
 
 ### Mixed Linear Effects Models
 
