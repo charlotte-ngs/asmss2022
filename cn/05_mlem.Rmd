@@ -187,7 +187,6 @@ lmer_bw_rep <- lmer(`Body Weight` ~ (1 | Animal), data = tbl_rep_obs_no_breed)
 summary(lmer_bw_rep)
 ```
 
-\pagebreak
 
 ### Mixed Linear Effects Models
 

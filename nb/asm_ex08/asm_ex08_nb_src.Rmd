@@ -1,26 +1,24 @@
 ---
-title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 8
+title: Applied Statistical Methods - Notebook 8
 author: Peter von Rohr
-date: 2022-04-25
-output:
-  bookdown::pdf_document2:
-    toc: false
-    number_sections: false
-    keep_md: false
-    keep_tex: false
-header-includes:
- \usepackage{longtable}
- \usepackage{float}
+date: '2022-04-25'
+output: html_notebook
 params:
   doctype:
-    label: 'Document Type'
-    value: 'solution'
-    choices: ['exercise', 'solution', 'notebook']
+    label: Document Type
+    value: solution
+    choices:
+    - exercise
+    - solution
+    - notebook
   isonline:
-    label: 'Online (y/n)'
-    value: TRUE
-    choices: [TRUE, FALSE]
+    label: Online (y/n)
+    value: true
+    choices:
+    - true
+    - false
 ---
+
 
 
 ```{r setup, include=FALSE}
@@ -58,7 +56,6 @@ The generated dataset should have the following properties
 * Try to see whether you can re-cover the used input data in the results of the analysis
 
 
-<!-- your-solution-start
 ### Your Solution
 
 * Read the given basis dataset
@@ -66,33 +63,26 @@ The generated dataset should have the following properties
 * Analyse the generated dataset with an ANOVA
 * Assess the results and compare them with the input used in the simulation
 
----  your-solution-end -->
 
 
-<!-- master-solution-start -->
-
-### Solution
-
-<!-- master-solution-end -->
 
 
 ## Problem 2: Random Effects Model
 Analyse the dataset generated in Problem 1 with a random effects model using the package `lme4`.
 
 
-<!-- your-solution-start
 ### Your Solution
 
 * Read generated dataset from Problem 1
 * Analyse the data using `lme4::lmer()`
 
----  your-solution-end -->
 
 
-<!-- master-solution-start -->
-
-### Solution
-
-<!-- master-solution-end -->
 
 
+
+
+```{r, echo=FALSE, results='asis'}
+cat('\n---\n\n _Latest Changes: ', format(Sys.time(), '%Y-%m-%d %H:%M:%S'), ' (', Sys.info()['user'], ')_\n', sep = '')
+```
+ 
