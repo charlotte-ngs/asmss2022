@@ -1,3 +1,7 @@
+# asmss2022 0.9.0
+
+* First part of chapter 5
+
 # asmss2022 0.8.1
 
 * Link to video of lecture 8

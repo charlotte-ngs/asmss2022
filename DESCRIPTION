@@ -1,6 +1,6 @@
 Package: asmss2022
 Title: Applied Statistical Methods in Animal Science - Spring Semester 2022
-Version: 0.8.1
+Version: 0.9.0
 Authors@R: 
     person(given = "Peter",
            family = "von Rohr",
