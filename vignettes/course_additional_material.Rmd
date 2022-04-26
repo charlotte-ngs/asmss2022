@@ -44,7 +44,7 @@ knitr::kable(tbl_sl)
 
 ## Videos
 ```{r tbl-video, echo=FALSE, message=FALSE, warning=FALSE}
-tbl_video <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8),
+tbl_video <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
                             Date = c("2022-02-21",
                                      "2022-02-28",
                                      "2022-03-07",
@@ -52,7 +52,8 @@ tbl_video <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8),
                                      "2022-03-21",
                                      "2022-03-28",
                                      "2022-04-04",
-                                     "2022-04-11"),
+                                     "2022-04-11",
+                                     "2022-04-25"),
                             Topic = c(
                               "[Introduction](https://youtu.be/9XdsxWiXU90)",
                               "[Linear Regression Analysis](https://youtu.be/RABkYT673HY)",
@@ -61,7 +62,8 @@ tbl_video <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8),
                               "[Generalized Inverses and Estimable Functions](https://youtu.be/OIrArr82MkA)",
                               "[Contrasts in R, Plotting and Simulation](https://youtu.be/cKJRerCMVFc)",
                               "[Model Selection](https://youtu.be/Kmu0aUJktkU)",
-                              "[Model Selection II](https://youtu.be/o2qWmcHdA3A)"
+                              "[Model Selection II](https://youtu.be/o2qWmcHdA3A)",
+                              "[Repeated Measures ANOVA and Random Effects Models](https://youtu.be/VNnmVci5gRw)"
                             ))
 knitr::kable(tbl_video)
 ```
