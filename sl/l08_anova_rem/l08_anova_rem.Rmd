@@ -1,0 +1,74 @@
+---
+title: ANOVA and Random Effects Models
+author: Peter von Rohr
+date: "2022-04-25"
+output: beamer_presentation
+params:
+  isonline:
+    label: 'Online (y/n)'
+    value: FALSE
+    choices: [TRUE, FALSE]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Repeated Measurements
+
+* Same characteristics (`Body Weight`, `BC`, ...) measured multiple times for the same animal
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+if (params$isonline){
+  s_rep_obs_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_bc_rep_obs.csv"
+} else {
+  s_rep_obs_path <- file.path(here::here(), "docs", "data", "asm_bw_bc_rep_obs.csv")
+}
+tbl_rep_obs <- readr::read_csv(file = s_rep_obs_path)
+knitr::kable(head(tbl_rep_obs, 8),
+             booktabs = TRUE,
+             longtable = TRUE)
+```
+
+* Column `Animal` no longer just a counter, it becomes a model factor
+
+## Properties 
+
+* What is the benefit of repeated measurements?
+* Equivalent to more animals in the dataset?
+* Assumption: repeated observations of the same animal are more "similar"
+* No longer independence of observations
+
+
+## Data Scatterplot
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%"}
+tbl_rep_obs$Animal <- as.factor(tbl_rep_obs$Animal)
+ggplot2::ggplot(data = tbl_rep_obs, 
+                mapping = ggplot2::aes(x = `Breast Circumference`,
+                                       y = `Body Weight`)) + 
+  ggplot2::geom_point(ggplot2::aes(color = Animal, 
+                                   size = 3))
+
+```
+
+
+## Statistical Analysis
+
+* Technically, same regression analysis is possible
+
+```{r}
+lm_rep_obs <- lm(`Body Weight` ~ `Breast Circumference`, data = tbl_rep_obs)
+```
+
+* But assumption of independence is violoted
+* Consequence of independence
+
+$$var(\mathbf{e}) = \mathbf{I} * \sigma_e^2$$
+* Check residuals plot
+
+
+
+## No Repeated Measures
+
+

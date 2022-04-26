@@ -1,0 +1,174 @@
+---
+title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 8
+author: Peter von Rohr
+date: 2022-04-25
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+    keep_md: false
+    keep_tex: false
+header-includes:
+ \usepackage{longtable}
+ \usepackage{float}
+params:
+  doctype:
+    label: 'Document Type'
+    value: 'solution'
+    choices: ['exercise', 'solution', 'notebook']
+  isonline:
+    label: 'Online (y/n)'
+    value: FALSE
+    choices: [TRUE, FALSE]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Problem 1: Repeated Measurements Data
+```{r asm-ex08-p01-init, echo=FALSE}
+if (params$isonline){
+  s_asm_ex08_p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+} else {
+  s_asm_ex08_p01_data_path <- file.path(here::here(), "docs", "data", "asm_bw_flem.csv")
+}
+n_nr_rep <- 5
+n_sd_prop_bw <- 0.5
+```
+
+Simulate a dataset with repeated measurements of `Body Weight` and `Breed`. The following dataset can be used as a basis: 
+
+```{r asm_ex08-p01-data-path-show, echo=FALSE}
+cat(s_asm_ex08_p01_data_path, "\n")
+```
+
+The generated dataset should have the following properties
+
+* For every observation, the ID of the animal, its `Body Weight` and its `Breed` should be contained in the dataset.
+* Each animal of the given basis dataset should have `r n_nr_rep` repeated observations of `Body Weight` and `Breed`.
+* The phenotypic variance of `Body Weight` within the repeated observations of one animal should be `r 100 * n_sd_prop_bw`% of the total phenotypic variance of `Body Weight` determined from the given basis dataset.
+
+
+### Your Tasks
+
+* Analyse the generated dataset with an ANOVA
+* Try to see whether you can re-cover the used input data in the results of the analysis
+
+
+<!-- your-solution-start
+### Your Solution
+
+* Read the given basis dataset
+* Loop over the records in the basis dataset and add the required number of records
+* Analyse the generated dataset with an ANOVA
+* Assess the results and compare them with the input used in the simulation
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+* Read the given basis dataset. First assign the variable with the datafile name
+
+```{r, eval=params$isonline}
+s_asm_ex08_p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+Read the data
+
+```{r}
+tbl_ex08_p01 <- readr::read_csv(file = s_asm_ex08_p01_data_path)
+tbl_ex08_p01 <- dplyr::select(tbl_ex08_p01, Animal, `Body Weight`, Breed)
+head(tbl_ex08_p01)
+```
+
+
+* Loop over the records in the basis dataset and add the required number of records
+
+```{r}
+set.seed(9875)
+sd_bw <- sd(tbl_ex08_p01$`Body Weight`)
+tbl_rep_obs_result <- NULL
+for (idx in 1:nrow(tbl_ex08_p01)){
+  tbl_rep_cur <- dplyr::bind_rows(tbl_ex08_p01[idx,],
+                                  tibble::tibble(Animal = c(rep(tbl_ex08_p01$Animal[idx], n_nr_rep - 1)),
+                                                 `Body Weight` = rnorm((n_nr_rep-1), 
+                                                                       mean = tbl_ex08_p01$`Body Weight`[idx], 
+                                                                       sd = n_sd_prop_bw * sd_bw),
+                                                 Breed = c(rep(tbl_ex08_p01$Breed[idx], n_nr_rep-1))))
+  if (is.null(tbl_rep_obs_result)){
+    tbl_rep_obs_result <- tbl_rep_cur
+  } else {
+    tbl_rep_obs_result <- dplyr::bind_rows(tbl_rep_obs_result, tbl_rep_cur)
+  }
+}
+head(tbl_rep_obs_result)
+```
+
+The generated dataset is written to a file, such that it will be available for Problem 2
+
+```{r}
+s_ex08_p01_rep_obs_data_dir <- file.path(here::here(), "docs", "data")
+if (!dir.exists(s_ex08_p01_rep_obs_data_dir)) 
+  dir.create(path = s_ex08_p01_rep_obs_data_dir, recursive = TRUE)
+s_ex08_p01_rep_obs_data_path <- file.path(s_ex08_p01_rep_obs_data_dir, 
+                                          "asm_ex08_p01_rep_obs.csv")
+if (!file.exists(s_ex08_p01_rep_obs_data_path)) 
+  readr::write_csv(tbl_rep_obs_result, file = s_ex08_p01_rep_obs_data_path)
+```
+
+
+* Analyse the generated dataset with an ANOVA
+
+```{r}
+tbl_rep_obs_result$Animal <- as.factor(tbl_rep_obs_result$Animal)
+aov_ex08_p01 <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_result)
+summary(aov_ex08_p01)
+```
+
+* Assess the results and compare them with the input used in the simulation
+
+The variance of the residuals in the original basis dataset is obtained from 
+
+```{r}
+lm_bw_breed <- lm(`Body Weight` ~ Breed, data = tbl_ex08_p01)
+(smry_bw_breed <- summary(lm_bw_breed))
+```
+
+The estimate of the residual variance is `r smry_bw_breed$sigma` which is comparable to the value found by `aov()`. The used value for the variance within observations is given by 
+
+```{r}
+n_obs_var_bw <- var(tbl_ex08_p01$`Body Weight`)
+n_obs_var_bw * n_sd_prop_bw^2
+```
+
+This variance is used for each of the animals in the base dataset. Hence in total the variance between observations has to be summed over all animal groups.
+
+<!-- master-solution-end -->
+
+
+## Problem 2: Random Effects Model
+Analyse the dataset generated in Problem 1 with a random effects model using the package `lme4`.
+
+
+<!-- your-solution-start
+### Your Solution
+
+* Read generated dataset from Problem 1
+* Analyse the data using `lme4::lmer()`
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+
+

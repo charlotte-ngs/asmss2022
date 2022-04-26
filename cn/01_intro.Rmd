@@ -2,7 +2,7 @@
 ```{r met-intro-reset, include=FALSE}
 met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(), 
                                                  rstudioapi::getSourceEditorContext()$path, 
-                                                 rprojroot::thisfile()))
+                                                 whereami::thisfile()))
 ```
 
 According to Wikipedia `r met$add("Wikipedia2019")`, the term `Big Data` has been used since the 1990s. Some credit was given to John Mashey `r met$add("Mashey1998")` for popularizing the term. Nowadays `Big Data` is used in connection with large companies, social media or governments which collect massive amounts of data. This data is then used to infer certain conclusions about behaviors of customers, or followers or voters. The following subsections show a few examples of `Big Data`-applications. 

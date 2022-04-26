@@ -12,7 +12,7 @@ output: bookdown::gitbook
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 knitr::knit_hooks$set(hook_convert_odg = rmdhelp::hook_convert_odg)
 # number format option
 options(scipen = 999)
@@ -22,7 +22,7 @@ options(scipen = 999)
 met <- rmdhelp::MendeleyExportToolR6$new()
 met$set_this_rmd_file(ps_this_rmd_file = ifelse(rstudioapi::isAvailable(), 
                                                  rstudioapi::getSourceEditorContext()$path, 
-                                                 rprojroot::thisfile()))
+                                                 whereami::thisfile()))
 ```
 
 

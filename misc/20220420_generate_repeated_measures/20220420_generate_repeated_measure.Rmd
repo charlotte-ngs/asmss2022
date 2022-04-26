@@ -1,0 +1,297 @@
+---
+title: "Generate Repeated Measures Data"
+output: html_notebook
+---
+
+# Disclaimer
+Data with repeated measurements are described.
+
+
+# Single Observation Data
+The data with single observations for body weight and breast circumference from chapter 2 of the lecture notes are used as basis
+
+```{r tab-reg-bw-bc, echo=FALSE, results='asis'}
+tbl_reg <- tibble::tibble(Animal = c(1:10),
+                          `Breast Circumference` = c(176, 177, 178, 179, 179, 180, 181, 182,183, 184),
+                          `Body Weight`          = c(471, 463, 481, 470, 496, 491, 518, 511, 510, 541))
+n_nr_obs <- nrow(tbl_reg)
+knitr::kable(tbl_reg,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = paste0("Breast Circumference and Body Weight for ", 
+                              nrow(tbl_reg)," Animals", collapse = ""),
+             escape = FALSE)
+```
+
+
+# Generate Multiple Observations per Animal
+
+```{r, echo=FALSE}
+n_nr_ani <- 4
+n_nr_rep <- 3
+n_sd_ratio_bc <- 0.2
+n_sd_ratio_bw <- 0.5
+n_sd_bc <- sd(tbl_reg$`Breast Circumference`)
+n_sd_bw <- sd(tbl_reg$`Body Weight`)
+```
+
+For course notes, we choose `r n_nr_ani` animals and generate `r n_nr_rep` repetitions from each observation. The variation within the observations for body weight of one animal is `r 100 * n_sd_ratio_bw^2`% of the total phenotypic variation for body weight. For breast circumference the within-animal variation is `r 100 * n_sd_ratio_bc^2`% of the total phenotypic variance of breast circumference.
+
+```{r}
+set.seed(432)
+vec_sel_ani <- sample(tbl_reg$Animal, size = n_nr_ani)
+vec_sel_ani[1] <- 2
+# loop over selected animals
+tbl_rep_obs <- NULL
+for (aidx in vec_sel_ani){
+  # add observation of currently selected animal aidx
+  if (is.null(tbl_rep_obs)){
+    tbl_rep_obs <- tbl_reg[aidx,]
+  } else {
+    tbl_rep_obs <- dplyr::bind_rows(tbl_rep_obs, tbl_reg[aidx,])
+  }
+  # add repeated observations
+  tbl_rep_cur <- tibble::tibble(Animal = rep(aidx, n_nr_rep-1),
+                                `Breast Circumference` = rnorm((n_nr_rep-1), 
+                                                               mean = tbl_reg$`Breast Circumference`[aidx],
+                                                               sd = n_sd_bc*n_sd_ratio_bc),
+                                `Body Weight` = rnorm((n_nr_rep-1),
+                                                      mean = tbl_reg$`Body Weight`[aidx],
+                                                      sd = n_sd_bw*n_sd_ratio_bw))
+  tbl_rep_obs <- dplyr::bind_rows(tbl_rep_obs, tbl_rep_cur)
+  
+}
+tbl_rep_obs
+```
+
+# File
+The generated data is written to a file.
+
+```{r}
+s_rep_obs_path <- file.path(here::here(), "docs", "data", "asm_bw_bc_rep_obs.csv")
+if (!file.exists(s_rep_obs_path)) readr::write_csv(tbl_rep_obs, file = s_rep_obs_path)
+```
+
+
+# Data with Breed
+
+```{r}
+tbl_bw_bc_breed <- tibble::tibble(Animal = c(1:10),
+                          `Breast Circumference` = c(176, 177, 178, 179, 179, 180, 181, 182,183, 184),
+                          `Body Weight`          = c(471, 463, 481, 470, 496, 491, 518, 511, 510, 541),
+                          Breed                  = c("Angus",
+                                                     "Angus",
+                                                     "Simmental",
+                                                     "Angus",
+                                                     "Simmental",
+                                                     "Simmental",
+                                                     "Limousin",
+                                                     "Limousin",
+                                                     "Limousin",
+                                                     "Limousin"))
+
+```
+
+The selected animals are given by
+
+```{r}
+tbl_rep_obs$Animal
+```
+
+The breed for those animals are obtained by
+
+```{r}
+tbl_bw_bc_breed$Breed[tbl_rep_obs$Animal]
+```
+
+```{r}
+tbl_rep_obs_breed <- dplyr::select(tbl_rep_obs, Animal, `Body Weight`)
+tbl_rep_obs_breed$Breed <- tbl_bw_bc_breed$Breed[tbl_rep_obs$Animal]
+tbl_rep_obs_breed$Time <- rep(english::ordinal(c(1:n_nr_rep)), n_nr_ani)
+tbl_rep_obs_breed
+```
+
+```{r}
+s_bw_breed_rep_obs_path <- file.path(here::here(), "docs", "data", "asm_bw_breed_rep_obs.csv")
+if (!file.exists(s_bw_breed_rep_obs_path)) readr::write_csv(tbl_rep_obs_breed, file = s_bw_breed_rep_obs_path)
+```
+
+
+# Plot
+
+```{r}
+tbl_rep_obs$Animal <- as.factor(tbl_rep_obs$Animal)
+ggplot2::ggplot(data = tbl_rep_obs, mapping = ggplot2::aes(x = `Breast Circumference`, 
+                                                           y = `Body Weight`, 
+                                                           color = Animal)) + 
+  ggplot2::geom_point()
+```
+
+# Analysis
+
+## Linear Regression
+The repeated observation data can still be analysed with a linear regression model
+
+```{r}
+lm_rep_obs <- lm(`Body Weight` ~ `Breast Circumference`, data = tbl_rep_obs)
+summary(lm_rep_obs)
+```
+
+But the assumptions of independent observations is violated. This can be seen in the residuals plot.
+
+```{r}
+tbl_rep_obs$Animal <- as.factor(tbl_rep_obs$Animal)
+ggplot2::ggplot(data = tibble::tibble(Animal = tbl_rep_obs$Animal, 
+                                      Fitted = fitted(lm_rep_obs), 
+                                      Residuals = residuals(lm_rep_obs)),
+                ggplot2::aes(x = Fitted, y = Residuals, color = Animal)) + 
+  ggplot2::geom_point()
+```
+
+Residuals vs Fitted Plot
+
+```{r}
+plot(lm_rep_obs, 1)
+```
+
+QQ-Plot
+
+```{r}
+plot(lm_rep_obs, 2)
+```
+
+
+## ANOVA
+What does the ANOVA give us? First, we start with the single observation data
+
+```{r, message=FALSE, warning=FALSE}
+s_bw_bc_reg_path <- file.path(here::here(), "docs", "data", "asm_bw_bc_reg.csv")
+tbl_bw_bc_reg <- readr::read_csv(file = s_bw_bc_reg_path)
+aov_bw_bc_reg <- aov(formula = `Body Weight` ~ `Breast Circumference`, data = tbl_bw_bc_reg)
+summary(aov_bw_bc_reg)
+```
+
+The above information is also included in the summary output of the linear regression model.
+
+```{r}
+lm_bw_bc_reg <- lm(formula = `Body Weight` ~ `Breast Circumference`, data = tbl_bw_bc_reg)
+summary(lm_bw_bc_reg)
+```
+
+
+
+```{r}
+aov_rep_obs <- aov(formula = `Body Weight` ~ `Breast Circumference`, data = tbl_rep_obs)
+summary(aov_rep_obs)
+```
+
+
+# Two Way Repeated Measures ANOVA
+From https://youtu.be/eT_SLeXMOYE, we get
+
+```{r}
+s_bw_breed_rep_obs_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_breed_rep_obs.csv"
+tbl_rep_obs_breed <- readr::read_csv(file = s_bw_breed_rep_obs_path)
+tbl_rep_obs_breed$Animal <- as.factor(tbl_rep_obs_breed$Animal)
+tbl_rep_obs_breed$Breed <- as.factor(tbl_rep_obs_breed$Breed)
+tbl_rep_obs_breed$Time <- as.factor(tbl_rep_obs_breed$Time)
+tbl_rep_obs_breed
+```
+
+Run the repeated measures ANOVA
+
+```{r}
+aov_bw_breed_rep <- aov(`Body Weight` ~ Breed + Time + Error(Animal/Time), data = tbl_rep_obs_breed)
+summary(aov_bw_breed_rep)
+```
+
+Use just the one-way repeated measures ANOVA
+
+```{r}
+aov_bw_rep <- aov(`Body Weight` ~ Time + Error(Animal/Time), data = tbl_rep_obs_breed)
+summary(aov_bw_rep)
+
+```
+
+```{r}
+aov_bw_breed_rep <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_breed)
+summary(aov_bw_breed_rep)
+
+```
+
+Reproduce the computations
+
+
+
+## One way repeated measurements
+
+```{r}
+aov_bw_rep <- aov(`Body Weight` ~ Error(Animal), data = tbl_rep_obs_breed)
+summary(aov_bw_rep)
+
+```
+
+Boxplot
+
+```{r}
+boxplot(tbl_rep_obs_breed$`Body Weight` ~ tbl_rep_obs_breed$Animal)
+```
+
+Reproduce the computations
+
+```{r}
+(n_mean_bw_total <- mean(tbl_rep_obs_breed$`Body Weight`))
+(n_ssq_total <- sum((tbl_rep_obs_breed$`Body Weight`-n_mean_bw_total)^2))
+```
+
+```{r}
+(n_mean_bw_2 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 2]))
+(n_mean_bw_5 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 5]))
+(n_mean_bw_7 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 7]))
+(n_mean_bw_10 <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 10]))
+```
+
+```{r}
+(n_ssq_res <- sum((tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 2] - n_mean_bw_2)^2 +
+                      (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 5] - n_mean_bw_5)^2 +
+                      (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 7] - n_mean_bw_7)^2 +
+                      (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Animal == 10] - n_mean_bw_10)^2))
+```
+
+```{r}
+(n_ssq_animal <- n_nr_rep * sum((n_mean_bw_2 - n_mean_bw_total)^2 + 
+                      (n_mean_bw_5 - n_mean_bw_total)^2 +
+                      (n_mean_bw_7  - n_mean_bw_total)^2 +
+                      (n_mean_bw_10  - n_mean_bw_total)^2))
+```
+
+
+Going back to two-way and do the computations for the breed
+
+```{r}
+(n_mean_bw_an <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Angus"]))
+(n_mean_bw_si <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Simmental"]))
+(n_mean_bw_li <- mean(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Limousin"]))
+```
+
+```{r}
+(n_nr_an <- length(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Angus"]))
+(n_nr_si <- length(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Simmental"]))
+(n_nr_li <- length(tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Limousin"]))
+```
+
+
+```{r}
+(n_ssq_breed <- sum(n_nr_an * (n_mean_bw_an - n_mean_bw_total)^2 + 
+                    n_nr_si * (n_mean_bw_si - n_mean_bw_total)^2 + 
+                    n_nr_li * (n_mean_bw_li - n_mean_bw_total)^2 ))
+```
+
+
+```{r}
+(n_ssq_breed_res <- sum((tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Angus"]-n_mean_bw_an)^2 +
+                         (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Simmental"] - n_mean_bw_si)^2 +
+                         (tbl_rep_obs_breed$`Body Weight`[tbl_rep_obs_breed$Breed == "Limousin"] - n_mean_bw_li)^2))
+
+```
+
