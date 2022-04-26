@@ -1,3 +1,8 @@
+# asmss2022 0.9.2
+
+* Link to video of lecture 9
+* Link to slides of lecture 9
+
 # asmss2022 0.9.1
 
 * Released asm_ex08
