@@ -1,4 +1,4 @@
-pandoc: 2.14.0.3
+pandoc: 2.17.1.1
 pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
@@ -6,7 +6,7 @@ articles:
   course_exercises: course_exercises.html
   course_notes: course_notes.html
   course_solutions: course_solutions.html
-last_built: 2022-04-26T04:19Z
+last_built: 2022-04-26T09:00Z
 urls:
   reference: https://charlotte-ngs.github.io/asmss2022/reference
   article: https://charlotte-ngs.github.io/asmss2022/articles
