@@ -18,7 +18,7 @@ params:
     choices: ['exercise', 'solution', 'notebook']
   isonline:
     label: 'Online (y/n)'
-    value: TRUE
+    value: FALSE
     choices: [TRUE, FALSE]
 ---
 
@@ -72,6 +72,46 @@ The generated dataset should have the following properties
 <!-- master-solution-start -->
 
 ### Solution
+
+* Read the given basis dataset. First assign the variable with the datafile name
+
+```{r, eval=params$isonline}
+s_asm_ex08_p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+Read the data
+
+```{r}
+tbl_ex08_p01 <- readr::read_csv(file = s_asm_ex08_p01_data_path)
+tbl_ex08_p01 <- dplyr::select(tbl_ex08_p01, Animal, `Body Weight`, Breed)
+head(tbl_ex08_p01)
+```
+
+
+* Loop over the records in the basis dataset and add the required number of records
+
+```{r}
+set.seed(9875)
+sd_bw <- sd(tbl_ex08_p01$`Body Weight`)
+tbl_rep_obs_result <- NULL
+for (idx in 1:nrow(tbl_ex08_p01)){
+  tbl_rep_cur <- dplyr::bind_rows(tbl_ex08_p01[idx,],
+                                  tibble::tibble(Animal = c(rep(tbl_ex08_p01$Animal[idx], n_nr_rep - 1)),
+                                                 `Body Weight` = rnorm((n_nr_rep-1), 
+                                                                       mean = tbl_ex08_p01$`Body Weight`[idx], 
+                                                                       sd = n_sd_prop_bw * sd_bw),
+                                                 Breed = c(rep(tbl_ex08_p01$Breed[idx], n_nr_rep-1))))
+  if (is.null(tbl_rep_obs_result)){
+    tbl_rep_obs_result <- tbl_rep_cur
+  } else {
+    tbl_rep_obs_result <- dplyr::bind_rows(tbl_rep_obs_result, tbl_rep_cur)
+  }
+}
+tbl_rep_obs_result
+```
+
+* Analyse the generated dataset with an ANOVA
+* Assess the results and compare them with the input used in the simulation
 
 <!-- master-solution-end -->
 
