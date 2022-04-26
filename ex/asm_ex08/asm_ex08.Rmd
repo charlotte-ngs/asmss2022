@@ -107,11 +107,47 @@ for (idx in 1:nrow(tbl_ex08_p01)){
     tbl_rep_obs_result <- dplyr::bind_rows(tbl_rep_obs_result, tbl_rep_cur)
   }
 }
-tbl_rep_obs_result
+head(tbl_rep_obs_result)
 ```
 
+The generated dataset is written to a file, such that it will be available for Problem 2
+
+```{r}
+s_ex08_p01_rep_obs_data_dir <- file.path(here::here(), "docs", "data")
+if (!dir.exists(s_ex08_p01_rep_obs_data_dir)) 
+  dir.create(path = s_ex08_p01_rep_obs_data_dir, recursive = TRUE)
+s_ex08_p01_rep_obs_data_path <- file.path(s_ex08_p01_rep_obs_data_dir, 
+                                          "asm_ex08_p01_rep_obs.csv")
+if (!file.exists(s_ex08_p01_rep_obs_data_path)) 
+  readr::write_csv(tbl_rep_obs_result, file = s_ex08_p01_rep_obs_data_path)
+```
+
+
 * Analyse the generated dataset with an ANOVA
+
+```{r}
+tbl_rep_obs_result$Animal <- as.factor(tbl_rep_obs_result$Animal)
+aov_ex08_p01 <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_result)
+summary(aov_ex08_p01)
+```
+
 * Assess the results and compare them with the input used in the simulation
+
+The variance of the residuals in the original basis dataset is obtained from 
+
+```{r}
+lm_bw_breed <- lm(`Body Weight` ~ Breed, data = tbl_ex08_p01)
+(smry_bw_breed <- summary(lm_bw_breed))
+```
+
+The estimate of the residual variance is `r smry_bw_breed$sigma` which is comparable to the value found by `aov()`. The used value for the variance within observations is given by 
+
+```{r}
+n_obs_var_bw <- var(tbl_ex08_p01$`Body Weight`)
+n_obs_var_bw * n_sd_prop_bw^2
+```
+
+This variance is used for each of the animals in the base dataset. Hence in total the variance between observations has to be summed over all animal groups.
 
 <!-- master-solution-end -->
 
