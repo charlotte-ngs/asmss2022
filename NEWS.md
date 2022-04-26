@@ -1,3 +1,7 @@
+# asmss2022 0.9.3
+
+* Link to MSc thesis topics
+
 # asmss2022 0.9.2
 
 * Link to video of lecture 9
