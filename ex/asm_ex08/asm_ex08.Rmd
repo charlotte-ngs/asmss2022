@@ -153,7 +153,17 @@ This variance is used for each of the animals in the base dataset. Hence in tota
 
 
 ## Problem 2: Random Effects Model
-Analyse the dataset generated in Problem 1 with a random effects model using the package `lme4`.
+```{r ex08-p02-init, echo=FALSE}
+s_ex08_p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_ex08_p01_rep_obs.csv"
+if (!params$isonline)
+  s_ex08_p02_data_path <- file.path(here::here(), "docs", "data", "asm_ex08_p01_rep_obs.csv")
+```
+
+Analyse the dataset generated in Problem 1 with a random effects model using the package `lme4`. If you had difficulties to solve Problem 1, then you can also use the following dataset.
+
+```{r, echo=FALSE}
+cat(s_ex08_p02_data_path, "\n")
+```
 
 
 <!-- your-solution-start
