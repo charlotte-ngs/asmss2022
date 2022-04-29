@@ -179,6 +179,33 @@ cat(s_ex08_p02_data_path, "\n")
 
 ### Solution
 
+* Read generated dataset from Problem 1
+
+```{r}
+# read the data
+tbl_ex08_p02 <- readr::read_csv(file = s_ex08_p02_data_path)
+# convert animal and breed to factors
+tbl_ex08_p02$Animal <- as.factor(tbl_ex08_p02$Animal)
+tbl_ex08_p02$Breed <- as.factor(tbl_ex08_p02$Breed)
+tbl_ex08_p02
+```
+
+
+* Analyse the data using `lme4::lmer()`
+
+The mixed model analysis is done with 
+
+```{r}
+lmer_ex08_p02 <- lme4::lmer(`Body Weight` ~ Breed + (1|Animal), data = tbl_ex08_p02)
+summary(lmer_ex08_p02)
+```
+
+Plots
+
+```{r}
+plot(lmer_ex08_p02)
+```
+
 <!-- master-solution-end -->
 
 
