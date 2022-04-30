@@ -128,8 +128,31 @@ if (!file.exists(s_ex08_p01_rep_obs_data_path))
 ```{r}
 tbl_rep_obs_result$Animal <- as.factor(tbl_rep_obs_result$Animal)
 aov_ex08_p01 <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_result)
-summary(aov_ex08_p01)
+(smry_aov_ex08_p01 <- summary(aov_ex08_p01))
 ```
+
+The results of the `aov()` analysis gives estimates for the residual error variance $\sigma_e^2$ and for the variance $\sigma_a^2$ within the repeated measurements of one animal. The estimate $\widehat{\sigma_e^2}$ is directly obtained from the section `Error: Within` in the column `Mean Sq`. 
+
+```{r}
+n_hat_sigmae2 <- smry_aov_ex08_p01$`Error: Within`[[1]]["Residuals","Mean Sq"]
+```
+
+The value for this estimate is $\widehat{\sigma_e^2} = `r round(n_hat_sigmae2, digits = 1)`$. The estimate for $\sigma_a^2$ is obtained by the formula 
+
+$$E(MSQ_a) = n_a * \sigma_a^2 + \sigma_e^2$$
+
+For the expected value of the $MSQ_a$, we insert the `Mean Sq`-value of the `Residuals` row in the section `Error: Animal`. This leads to 
+
+$$\widehat{\sigma_a^2} = \frac{\widehat{E(MSQ_a)} - \widehat{\sigma_e^2}}{n_a}$$
+
+The variable $n_a$ is the number of observations for one animal. The numeric value for $\widehat{\sigma_a^2}$ is computed as 
+
+```{r}
+n_est_msqa <- smry_aov_ex08_p01$`Error: Animal`[[1]]["Residuals","Mean Sq"]
+n_est_sigmaa2 <- (n_est_msqa - n_hat_sigmae2) / n_nr_rep
+```
+
+Hence, $\widehat{\sigma_a^2} = `r round(n_est_sigmaa2, digit=1)`$
 
 * Assess the results and compare them with the input used in the simulation
 
@@ -137,17 +160,17 @@ The variance of the residuals in the original basis dataset is obtained from
 
 ```{r}
 lm_bw_breed <- lm(`Body Weight` ~ Breed, data = tbl_ex08_p01)
-(smry_bw_breed <- summary(lm_bw_breed))
+smry_bw_breed <- summary(lm_bw_breed)
 ```
 
-The estimate of the residual variance is `r smry_bw_breed$sigma` which is comparable to the value found by `aov()`. The used value for the variance within observations is given by 
+The estimate of the residual variance is `r round(smry_bw_breed$sigma^2, digits=1)` which is comparable to the value found by `aov()`. The used value for the variance within observations is given by 
 
 ```{r}
 n_obs_var_bw <- var(tbl_ex08_p01$`Body Weight`)
 n_obs_var_bw * n_sd_prop_bw^2
 ```
 
-This variance is used for each of the animals in the base dataset. Hence in total the variance between observations has to be summed over all animal groups.
+This variance is comparable to what was found by `aov()`.
 
 <!-- master-solution-end -->
 
@@ -200,11 +223,8 @@ lmer_ex08_p02 <- lme4::lmer(`Body Weight` ~ Breed + (1|Animal), data = tbl_ex08_
 summary(lmer_ex08_p02)
 ```
 
-Plots
+In the output of the `summary()` function, the formula of the model that produced the above results is shown. The REML criterion tells us that the parameter estimation process has converged to the solutions shown. The statistics on the residuals is comparable to what we have already seen in the output of the summary of the `lm()` function. The variance components were estimated with the REML method and are the same as the estimates found by `aov()`. But this is only the case when the dataset is balanced, i.e., for each animal the same number of observations are contained in the dataset.
 
-```{r}
-plot(lmer_ex08_p02)
-```
 
 <!-- master-solution-end -->
 
