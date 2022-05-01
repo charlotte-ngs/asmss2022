@@ -18,7 +18,7 @@ params:
     choices: ['exercise', 'solution', 'notebook']
   isonline:
     label: 'Online (y/n)'
-    value: TRUE
+    value: FALSE
     choices: [TRUE, FALSE]
 ---
 
@@ -73,11 +73,120 @@ The generated dataset should have the following properties
 
 ### Solution
 
+* Read the given basis dataset. First assign the variable with the datafile name
+
+```{r, eval=params$isonline}
+s_asm_ex08_p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_bw_flem.csv"
+```
+
+Read the data
+
+```{r}
+tbl_ex08_p01 <- readr::read_csv(file = s_asm_ex08_p01_data_path)
+tbl_ex08_p01 <- dplyr::select(tbl_ex08_p01, Animal, `Body Weight`, Breed)
+head(tbl_ex08_p01)
+```
+
+
+* Loop over the records in the basis dataset and add the required number of records
+
+```{r}
+set.seed(9875)
+sd_bw <- sd(tbl_ex08_p01$`Body Weight`)
+tbl_rep_obs_result <- NULL
+for (idx in 1:nrow(tbl_ex08_p01)){
+  tbl_rep_cur <- dplyr::bind_rows(tbl_ex08_p01[idx,],
+                                  tibble::tibble(Animal = c(rep(tbl_ex08_p01$Animal[idx], n_nr_rep - 1)),
+                                                 `Body Weight` = rnorm((n_nr_rep-1), 
+                                                                       mean = tbl_ex08_p01$`Body Weight`[idx], 
+                                                                       sd = n_sd_prop_bw * sd_bw),
+                                                 Breed = c(rep(tbl_ex08_p01$Breed[idx], n_nr_rep-1))))
+  if (is.null(tbl_rep_obs_result)){
+    tbl_rep_obs_result <- tbl_rep_cur
+  } else {
+    tbl_rep_obs_result <- dplyr::bind_rows(tbl_rep_obs_result, tbl_rep_cur)
+  }
+}
+head(tbl_rep_obs_result)
+```
+
+The generated dataset is written to a file, such that it will be available for Problem 2
+
+```{r}
+s_ex08_p01_rep_obs_data_dir <- file.path(here::here(), "docs", "data")
+if (!dir.exists(s_ex08_p01_rep_obs_data_dir)) 
+  dir.create(path = s_ex08_p01_rep_obs_data_dir, recursive = TRUE)
+s_ex08_p01_rep_obs_data_path <- file.path(s_ex08_p01_rep_obs_data_dir, 
+                                          "asm_ex08_p01_rep_obs.csv")
+if (!file.exists(s_ex08_p01_rep_obs_data_path)) 
+  readr::write_csv(tbl_rep_obs_result, file = s_ex08_p01_rep_obs_data_path)
+```
+
+
+* Analyse the generated dataset with an ANOVA
+
+```{r}
+tbl_rep_obs_result$Animal <- as.factor(tbl_rep_obs_result$Animal)
+aov_ex08_p01 <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_result)
+(smry_aov_ex08_p01 <- summary(aov_ex08_p01))
+```
+
+The results of the `aov()` analysis gives estimates for the residual error variance $\sigma_e^2$ and for the variance $\sigma_a^2$ within the repeated measurements of one animal. The estimate $\widehat{\sigma_e^2}$ is directly obtained from the section `Error: Within` in the column `Mean Sq`. 
+
+```{r}
+n_hat_sigmae2 <- smry_aov_ex08_p01$`Error: Within`[[1]]["Residuals","Mean Sq"]
+```
+
+The value for this estimate is $\widehat{\sigma_e^2} = `r round(n_hat_sigmae2, digits = 1)`$. The estimate for $\sigma_a^2$ is obtained by the formula 
+
+$$E(MSQ_a) = n_a * \sigma_a^2 + \sigma_e^2$$
+
+For the expected value of the $MSQ_a$, we insert the `Mean Sq`-value of the `Residuals` row in the section `Error: Animal`. This leads to 
+
+$$\widehat{\sigma_a^2} = \frac{\widehat{E(MSQ_a)} - \widehat{\sigma_e^2}}{n_a}$$
+
+The variable $n_a$ is the number of observations for one animal. The numeric value for $\widehat{\sigma_a^2}$ is computed as 
+
+```{r}
+n_est_msqa <- smry_aov_ex08_p01$`Error: Animal`[[1]]["Residuals","Mean Sq"]
+n_est_sigmaa2 <- (n_est_msqa - n_hat_sigmae2) / n_nr_rep
+```
+
+Hence, $\widehat{\sigma_a^2} = `r round(n_est_sigmaa2, digit=1)`$
+
+* Assess the results and compare them with the input used in the simulation
+
+The variance of the residuals in the original basis dataset is obtained from 
+
+```{r}
+lm_bw_breed <- lm(`Body Weight` ~ Breed, data = tbl_ex08_p01)
+smry_bw_breed <- summary(lm_bw_breed)
+```
+
+The estimate of the residual variance is `r round(smry_bw_breed$sigma^2, digits=1)` which is comparable to the value found by `aov()`. The used value for the variance within observations is given by 
+
+```{r}
+n_obs_var_bw <- var(tbl_ex08_p01$`Body Weight`)
+n_obs_var_bw * n_sd_prop_bw^2
+```
+
+This variance is comparable to what was found by `aov()`.
+
 <!-- master-solution-end -->
 
 
 ## Problem 2: Random Effects Model
-Analyse the dataset generated in Problem 1 with a random effects model using the package `lme4`.
+```{r ex08-p02-init, echo=FALSE}
+s_ex08_p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_ex08_p01_rep_obs.csv"
+if (!params$isonline)
+  s_ex08_p02_data_path <- file.path(here::here(), "docs", "data", "asm_ex08_p01_rep_obs.csv")
+```
+
+Analyse the dataset generated in Problem 1 with a random effects model using the package `lme4`. If you had difficulties to solve Problem 1, then you can also use the following dataset.
+
+```{r, echo=FALSE}
+cat(s_ex08_p02_data_path, "\n")
+```
 
 
 <!-- your-solution-start
@@ -92,6 +201,30 @@ Analyse the dataset generated in Problem 1 with a random effects model using the
 <!-- master-solution-start -->
 
 ### Solution
+
+* Read generated dataset from Problem 1
+
+```{r}
+# read the data
+tbl_ex08_p02 <- readr::read_csv(file = s_ex08_p02_data_path)
+# convert animal and breed to factors
+tbl_ex08_p02$Animal <- as.factor(tbl_ex08_p02$Animal)
+tbl_ex08_p02$Breed <- as.factor(tbl_ex08_p02$Breed)
+tbl_ex08_p02
+```
+
+
+* Analyse the data using `lme4::lmer()`
+
+The mixed model analysis is done with 
+
+```{r}
+lmer_ex08_p02 <- lme4::lmer(`Body Weight` ~ Breed + (1|Animal), data = tbl_ex08_p02)
+summary(lmer_ex08_p02)
+```
+
+In the output of the `summary()` function, the formula of the model that produced the above results is shown. The REML criterion tells us that the parameter estimation process has converged to the solutions shown. The statistics on the residuals is comparable to what we have already seen in the output of the summary of the `lm()` function. The variance components were estimated with the REML method and are the same as the estimates found by `aov()`. But this is only the case when the dataset is balanced, i.e., for each animal the same number of observations are contained in the dataset.
+
 
 <!-- master-solution-end -->
 
