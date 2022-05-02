@@ -1,3 +1,7 @@
+# asmss2022 0.10.1
+
+* Exercise asm_ex09
+
 # asmss2022 0.10.0
 
 * Course notes part 1 of Mixed Models
