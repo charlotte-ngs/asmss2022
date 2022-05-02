@@ -54,6 +54,31 @@ $$h^2 = \frac{4* \sigma_s^2}{\sigma_p^2} $$
 
 ### Solution
 
+* Assign milk dataset to a tibble
+
+```{r}
+tbl_milk <- tibble::as.tibble(pedigreemm::milk)
+```
+
+* Analyse the data for each of the responses. The responses are pre-defined and must appear as column names
+
+```{r}
+vec_resp_milk <- c("milk", "fat", "prot", "scs")
+# check
+if (!all(is.element(vec_resp_milk, colnames(tbl_milk)))){
+  stop(" *** ERROR: Response not in dataset: ", vec_resp_milk[!is.element(vec_resp_milk, colnames(tbl_milk))])
+}
+```
+
+For each of the responses run an analysis
+
+
+
+
+* Compute estimated heritability
+* Obtain summary statistics for predicted sire breeding values
+
+
 <!-- master-solution-end -->
 
 
