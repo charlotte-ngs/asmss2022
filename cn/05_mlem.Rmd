@@ -228,6 +228,34 @@ summary(mlem__rep_obs_breed)
 
 The variance components obtained by `lme4::lmer()` are the same as what we have seen before as results of ANOVA. This is because, we are looking at balanced data. 
 
+In livestock breeding, linear mixed effects models are of interest when it comes to the evaluation of the genetic potential of selection candidates. From quantitative genetics, we know that parents with a superior genetic potential produce offspring which are better on average compared to the mean performance of animals from the same generation. The genetic potential of an animal is quantified by a concept which is referred to as _breeding value_. In what follows, we describe how breeding values for animals can be predicted using mixed models. 
+
+
+## Sire Model
+In a first application of mixed models for predicting breeding values, observation of daughter performance records were used to predict breeding values for sires. Assuming that sires are unrelated, i.e. they do not share any common ancestors, sire breeding values can be predicted similarly to the analysis of the repeated observations dataset. A possible mixed model for such an analysis might look as follows
+
+\begin{equation}
+\mathbf{y} = \mathbf{Xb} + \mathbf{Zs} + \mathbf{e}
+(\#eq:sireunrelatedmlem)
+\end{equation}
+
+where $\mathbf{y}$ is the vector of length $n$ with responses, $\mathbf{b}$ is the vector of length $p$ with fixed effects, $\mathbf{s}$ is the vector of length $q$ with sire breeding values and $\mathbf{e}$ is the vector of length $n$ with random residuals. Matrices $\mathbf{X}$ and $\mathbf{Z}$ are design matrices which relate the observations to the respective effects.
+
+A dataset that can be used to be analysed with a model such as shown in equation \@ref(eq:sireunrelatedmlem) is given in by the `milk` dataset of the package `pedigreemm`. The first six lines of this dataset are shown in Table \@ref(tab:milkdatapedigreemmtabmlem). 
+
+```{r milkdatapedigreemmtabmlem, echo=FALSE}
+tbl_milk_pedigreemm_head <- tibble::as.tibble(head(pedigreemm::milk))
+knitr::kable(tbl_milk_pedigreemm_head,
+             booktabs = TRUE,
+             longtable = TRUE,
+             caption = "First six lines of milk dataset from package pedigreemm")
+```
+
+In Table \@ref(tab:milkdatapedigreemmtabmlem) the columns `milk`, `fat`, `prot` and `scs` stand for milk yield, fat yield, protein yield and somatic cell score for a given lactiation of a cow, respectively and can be selected as response variables. The columns `lact`, `herd` and `dim` are lactation, herd number and days in milk, respectively and these columns can be used as fixed effects or covariates. The sire column is used for the random sire breeding value effect in the model. 
+
+As already stated, if we assume that these sires are unrelated, the dataset can be analysed as shown above using the function `lme4::lmer`. 
+
+
 ## Pedigree BLUP
 
 
