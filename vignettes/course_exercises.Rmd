@@ -19,7 +19,7 @@ This page contains a list of exercises.
 ```{r, echo=FALSE, results='asis'}
 s_url_ex <- "https://charlotte-ngs.github.io/asmss2022/ex/"
 s_url_nb <- "https://charlotte-ngs.github.io/asmss2022/nb/"
-tbl_ex <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8),
+tbl_ex <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
                          Date = c("2022-02-28",
                                   "2022-03-07",
                                   "2022-03-14",
@@ -36,7 +36,8 @@ tbl_ex <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8),
                            paste0("Contrasts and Simulation [pdf](", s_url_ex, "asm_ex05.pdf) | [nb](", s_url_nb, "asm_ex05_nb_src.nb.html)", collapse = ""),
                            paste0("Experimental Verification [pdf](", s_url_ex, "asm_ex06.pdf) | [nb](", s_url_nb, "asm_ex06_nb_src.nb.html)", collapse = ""),
                            paste0("Model Selection [pdf](", s_url_ex, "asm_ex07.pdf) | [nb](", s_url_nb, "asm_ex07_nb_src.nb.html)", collapse = ""),
-                           paste0("ANOVA and Random Effects Models [pdf](", s_url_ex, "asm_ex08.pdf) | [nb](", s_url_nb, "asm_ex08_nb_src.nb.html)", collapse = "")
+                           paste0("ANOVA and Random Effects Models [pdf](", s_url_ex, "asm_ex08.pdf) | [nb](", s_url_nb, "asm_ex08_nb_src.nb.html)", collapse = ""),
+                           paste0("Sire Model [pdf](", s_url_ex, "asm_ex09.pdf) | [nb](", s_url_nb, "asm_ex09_nb_src.nb.html)", collapse = "")
                          ))
 knitr::kable(tbl_ex)
 ```
