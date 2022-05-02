@@ -1,0 +1,59 @@
+---
+title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 9
+author: Peter von Rohr
+date: 2022-05-02
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+    keep_md: false
+    keep_tex: false
+header-includes:
+ \usepackage{longtable}
+ \usepackage{float}
+params:
+  doctype:
+    label: 'Document Type'
+    value: 'solution'
+    choices: ['exercise', 'solution', 'notebook']
+  isonline:
+    label: 'Online (y/n)'
+    value: TRUE
+    choices: [TRUE, FALSE]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Problem 1: Milk Dataset
+Use the dataset `milk` from package `pedigreemm` and fit a sire model to each of the response variables (`milk`, `fat`, `prot` and `scs`) in the data. The dataset can be loaded using the command `pedigreemm::milk`. The other variables like `lact` and `herd` can be used as fixed effects. The `sire` column is used as a random effect. For this analysis, we assume that sires are unrelated. 
+
+### Your Tasks
+* Analyse the `milk` dataset from package `pedigreemm` using the function `lme4::lmer()` for all given response variables. You can use the same model for each of the responses.
+* Compute the estimated heritability for each response variable, using the fact that the heritability $h^2$ can be computed from the variance $\sigma_s^2$ of the sire effects and the phenotypic variance $\sigma_p^2$ with the formula 
+
+$$h^2 = \frac{4* \sigma_s^2}{\sigma_p^2} $$
+
+* Compute the summary statistic using the function `summary()` of all the predicted sire breeding values. Solutions for the sire breeding values are obtained using the function `ranef()`
+
+<!-- your-solution-start
+### Your Solution
+
+* Assign milk dataset to a tibble
+* Analyse the data for each of the responses
+* Compute estimated heritability
+* Obtain summary statistics for predicted sire breeding values
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+
+
