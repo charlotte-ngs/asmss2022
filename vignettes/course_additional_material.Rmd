@@ -20,7 +20,7 @@ This page contains additional material like links to slides, video recordings, o
 ## Slides
 ```{r tbl-sl, echo=FALSE, message=FALSE, warning=FALSE}
 s_sl_url <- "https://charlotte-ngs.github.io/asmss2022/sl/"
-tbl_sl <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8,9),
+tbl_sl <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
                          Date = c("2022-02-21",
                                   "2022-02-28",
                                   "2022-02-28",
@@ -29,7 +29,8 @@ tbl_sl <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8,9),
                                   "2022-03-21",
                                   "2022-03-28",
                                   "2022-04-04",
-                                  "2022-04-25"),
+                                  "2022-04-25",
+                                  "2022-05-02"),
                          Topic = c(
                            paste0("[Introduction](", s_sl_url, "asm-w01-v01-intro.pdf)", collapse = ""),
                            paste0("[Linear Regression](", s_sl_url, "l02_regr.pdf)", collapse = ""),
@@ -39,7 +40,8 @@ tbl_sl <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8,9),
                            paste0("[Contrasts](", s_sl_url, "l05_contrasts.pdf)", collapse = ""),
                            paste0("[Contrasts, Plots and Simulation](", s_sl_url, "l06_con_plot_sim.pdf)", collapse = ""),
                            paste0("[Model Selection](", s_sl_url, "l07_model_selection.pdf)", collapse = ""),
-                           paste0("[Repeated Measures ANOVA and Random Effects Models](", s_sl_url, "l08_anova_rem.pdf)", collapse = "")
+                           paste0("[Repeated Measures ANOVA and Random Effects Models](", s_sl_url, "l08_anova_rem.pdf)", collapse = ""),
+                           paste0("[Linear Mixed Effects Models](", s_sl_url, "l09_mlem.pdf)", collapse = "")
                          ))
 knitr::kable(tbl_sl)
 ```
