@@ -188,8 +188,45 @@ summary(lmer_bw_rep)
 ```
 
 
-### Mixed Linear Effects Models
+###  Linear Mixed Effects Models
+Linear mixed effects models or just _mixed models_ are a combination or a merger of fixed linear effects models and random models. That means mixed models contain both fixed effects and random effects. A first example of a dataset which can be modelled with a mixed model is shown in Table \@ref(tab:bw-breed-rep-obs-tab). In this dataset, the factor `Breed` is regarded as a fixed effect whereas the influence of the animal on a single measurement is considered as a random effect. Hence, body weight $y_{ijk}$ which corresponds to repeated observation $k$ of animal $j$ from breed $i$ can be written as
 
+\begin{equation}
+y_{ijk} = b_0 + b_i + \alpha_j + e_{ijk}
+(\#eq:singleobsmlem)
+\end{equation}
+
+where $b_0$ is the intercept, $b_i$ is the fixed effect of breed $i$, $\alpha_j$ is the random effect of animal $j$ and $e_{ijk}$ is the random residual. In matrix-vector notation equation \@ref(eq:singleobsmlem) takes the form 
+
+\begin{equation}
+\mathbf{y} = \mathbf{Xb} + \mathbf{Z}\alpha + \mathbf{e}
+(\#eq:matvecnotmlem)
+\end{equation}
+
+where $\mathbf{y}$ is the vector of length $n$ containing responses, $\mathbf{b}$ the vector of length $p$ with covariates, $\alpha$ the vector of length $q$ with random effects related to the repeated observations for an animal and $\mathbf{e}$ is the vector of length $n$ with random residuals. The matrices $\mathbf{X}$ and $\mathbf{Z}$ relate the different effects to the observations. 
+
+From equation \@ref(eq:singleobsmlem), we cannot really tell any difference to a fixed linear effects model. Only with the specification of the distributional properties of all the model components, it becomes clear that equation  \@ref(eq:singleobsmlem) specifies a mixed model. The mixed model is characterized by two random variables
+
+1. a $q$-dimensional vector of random effects represented by the random variable $\alpha^*$
+2. a $n$-dimensional vector of responses represented by the random variable $\mathbf{\mathcal{Y}}^*$
+
+The datasets to be analysed with mixed models contain observations, denoted by the vector $\mathbf{y}$. Values $\alpha$ of $\alpha^*$ are not observed and hence are unknown. When specifying the distributional properties of a mixed model, the unconditional distribution of $\alpha^*$ and the conditional distribution of $(\mathbf{\mathcal{Y}}^*|\alpha^*)$ are given. The description of these distributions involve the form of the distribution and the values of the distributional parameters. The observations of the responses and of the covariates are used to estimate these parameters. The unconditional distribution of $\alpha^*$ and the conditional distribution of $(\mathbf{\mathcal{Y}}^*|\alpha^*)$ are both assumed to be multivariate normal distributions. 
+
+\begin{align}
+(\mathbf{\mathcal{Y}}^*|\alpha^*) & \sim \mathcal{N}(\mathbf{Xb} + \mathbf{Z}\alpha, \sigma^2 * I) \notag \\
+\alpha^* & \sim  \mathcal{N}(\mathbf{0},\Sigma)
+(\#eq:distalphaygivenalphamlem)
+\end{align}
+
+The analysis of the dataset shown in Table \@ref(tab:bw-breed-rep-obs-tab) can be analysed using the function `lmer()` of package `lme4`. 
+
+```{r}
+mlem__rep_obs_breed <- lme4::lmer(`Body Weight` ~ Breed + (1|Animal), 
+                                  data = tbl_rep_obs_breed)
+summary(mlem__rep_obs_breed)
+```
+
+The variance components obtained by `lme4::lmer()` are the same as what we have seen before as results of ANOVA. This is because, we are looking at balanced data. 
 
 ## Pedigree BLUP
 
