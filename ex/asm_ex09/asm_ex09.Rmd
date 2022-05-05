@@ -57,7 +57,7 @@ $$h^2 = \frac{4* \sigma_s^2}{\sigma_p^2} $$
 * Assign milk dataset to a tibble
 
 ```{r}
-tbl_milk <- tibble::as.tibble(pedigreemm::milk)
+tbl_milk <- tibble::as_tibble(pedigreemm::milk)
 ```
 
 * Analyse the data for each of the responses. The responses are pre-defined and must appear as column names
@@ -66,16 +66,75 @@ tbl_milk <- tibble::as.tibble(pedigreemm::milk)
 vec_resp_milk <- c("milk", "fat", "prot", "scs")
 # check
 if (!all(is.element(vec_resp_milk, colnames(tbl_milk)))){
-  stop(" *** ERROR: Response not in dataset: ", vec_resp_milk[!is.element(vec_resp_milk, colnames(tbl_milk))])
+  stop(" *** ERROR: Response not in dataset: ", 
+       vec_resp_milk[!is.element(vec_resp_milk, colnames(tbl_milk))])
 }
 ```
 
 For each of the responses run an analysis
 
+```{r}
+vec_fix_fact_milk <- c("lact", "herd")
+vec_fix_cov_milk <- c("dim")
+s_rand_eff_milk <- "sire"
+s_rhs <- paste0(c(paste0(vec_fix_fact_milk, collapse = " + "),
+              paste0(vec_fix_cov_milk, collapse = " + "),
+              paste0("(1|", s_rand_eff_milk, ")", collapse = "")),
+              collapse = " + ")
 
+```
+
+Convert fixed effects to factors
+
+```{r}
+# convert fixed effects to factors
+for (f in vec_fix_fact_milk){
+  tbl_milk[[f]] <- as.factor(tbl_milk[[f]])
+}
+```
+
+Construct a function that runs an analysis for a given response
+
+```{r}
+run_lmer_single_response <- function(ps_resp, ps_rhs, ptbl_data){
+  # check
+  # formula
+  s_formula <- paste(ps_resp, ps_rhs, sep = " ~ ")
+  frma_lmem <- as.formula(s_formula)
+  return(lme4::lmer(frma_lmem, data = ptbl_data))
+}
+```
+
+Let the analysis be done for all responses
+
+```{r}
+l_lmer_results <- lapply(vec_resp_milk, 
+                         run_lmer_single_response, 
+                         ps_rhs = s_rhs, 
+                         ptbl_data = tbl_milk)
+```
+
+Print all the summaries as results
+
+```{r}
+for (l in l_lmer_results){
+  print(summary(l))
+}
+```
 
 
 * Compute estimated heritability
+
+```{r}
+for (l in l_lmer_results){
+  smry_l <- summary(l)
+  # getting sire std. dev
+  attr(smry_l$varcor[[1]], "stddev")[[1]]
+  
+}
+```
+
+
 * Obtain summary statistics for predicted sire breeding values
 
 
