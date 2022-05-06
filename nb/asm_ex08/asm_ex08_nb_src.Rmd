@@ -13,7 +13,7 @@ params:
     - notebook
   isonline:
     label: Online (y/n)
-    value: false
+    value: true
     choices:
     - true
     - false
