@@ -123,19 +123,35 @@ for (l in l_lmer_results){
 ```
 
 
-* Compute estimated heritability
+* Compute estimated heritability. For the sire model, the heritability $h^2$ is defined as 
+
+$$h^2 = \frac{4*\sigma_s^2}{\sigma_s^2 + \sigma_e^2}$$
+The estimates for the sire variance $\sigma_s^2$ and $\sigma_e^2$ can be extracted from the summary of the `lmer` result.
 
 ```{r}
 for (l in l_lmer_results){
   smry_l <- summary(l)
   # getting sire std. dev
-  attr(smry_l$varcor[[1]], "stddev")[[1]]
-  
+  n_sire_var <- attr(smry_l$varcor[[1]], "stddev")[[1]]
+  n_res_var <- smry_l$sigma
+  n_h2 <- 4*n_sire_var / (n_sire_var+n_res_var)
+  s_trait <- unlist(strsplit(as.character(smry_l$call)[2], split = " ~ ", fixed = TRUE))[1]
+  cat("Heritability for trait: ", s_trait, ": ", n_h2, "\n")
 }
 ```
 
 
-* Obtain summary statistics for predicted sire breeding values
+* Obtain summary statistics for predicted sire breeding values. The breeding values can be obtained by the function `raneff()`
+
+```{r}
+for (l in l_lmer_results){
+  smry_l <- summary(l)
+  s_trait <- unlist(strsplit(as.character(smry_l$call)[2], split = " ~ ", fixed = TRUE))[1]
+  cat("Summary statistics of breeding values for trait: ", s_trait, "\n")
+  print(summary(lme4::ranef(l)$sire[[1]]))
+}
+```
+
 
 
 <!-- master-solution-end -->
