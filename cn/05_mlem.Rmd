@@ -251,12 +251,16 @@ knitr::kable(tbl_milk_pedigreemm_head,
              caption = "First six lines of milk dataset from package pedigreemm")
 ```
 
-In Table \@ref(tab:milkdatapedigreemmtabmlem) the columns `milk`, `fat`, `prot` and `scs` stand for milk yield, fat yield, protein yield and somatic cell score for a given lactiation of a cow, respectively and can be selected as response variables. The columns `lact`, `herd` and `dim` are lactation, herd number and days in milk, respectively and these columns can be used as fixed effects or covariates. The sire column is used for the random sire breeding value effect in the model. 
+In Table \@ref(tab:milkdatapedigreemmtabmlem) the columns `milk`, `fat`, `prot` and `scs` stand for milk yield, fat yield, protein yield and somatic cell score for a given lactation of a cow, respectively and can be selected as response variables. The columns `lact`, `herd` and `dim` are lactation, herd number and days in milk, respectively and these columns can be used as fixed effects or covariates. The sire column is used for the random sire breeding value effect in the model. 
 
 As already stated, if we assume that these sires are unrelated, the dataset can be analysed as shown above using the function `lme4::lmer`. 
 
+\pagebreak
+
 
 ## Pedigree BLUP
+In real datasets, the assumption of unrelated sires is unrealistic, because the selection process favors that male offspring of a given sire will be selected as sires again. As a consequence of this the random sire effects are not independent. The dependence structure between the sire effects must be considered in the analysis. 
+
 
 
 ## Genomic BLUP
