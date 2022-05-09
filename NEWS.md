@@ -1,3 +1,7 @@
+# asmss2022 0.11.1
+
+* Slides l10
+
 # asmss2022 0.11.0
 
 * Pedigree BLUP sire model
