@@ -19,14 +19,15 @@ This page contains the list of links pointing to the different chapters in the c
 
 ```{r chapter-table, echo=FALSE, message=FALSE, warning=FALSE}
 s_cn_url <- "https://charlotte-ngs.github.io/asmss2022/cn/"
-tbl_chpt <- tibble::tibble(Nr      = c(1, 2, 3, 4, 5, 6, 7),
+tbl_chpt <- tibble::tibble(Nr      = c(1, 2, 3, 4, 5, 6, 7, 8),
                            Date    = c("2022-02-21",
                                        "2022-02-28",
                                        "2022-03-07",
                                        "2022-03-14",
                                        "2022-03-21",
                                        "2022-04-28",
-                                       "2022-05-02"),
+                                       "2022-05-02",
+                                       "2022-05-09"),
                            Topics  = c(
                              paste0("[Introduction](", s_cn_url, "01_intro.pdf)", collapse = ""),
                              paste0("[Linear Regression](", s_cn_url, "02_regr.pdf)", collapse = ""),
@@ -34,7 +35,8 @@ tbl_chpt <- tibble::tibble(Nr      = c(1, 2, 3, 4, 5, 6, 7),
                              paste0("[Regression on Dummy Variables](", s_cn_url, "03_regdvar.pdf)", collapse = ""),
                              paste0("[Model Selection](", s_cn_url, "04_msel.pdf)", collapse = ""),
                              paste0("[ANOVA and Random Effects Models](", s_cn_url, "05_mlem.pdf)", collapse = ""),
-                             paste0("[Linear Mixed Effects Models](", s_cn_url, "05_mlem_part2.pdf)", collapse = "")
+                             paste0("[Linear Mixed Effects Models](", s_cn_url, "05_mlem_part2.pdf)", collapse = ""),
+                             paste0("[Pedigree BLup - Sire Model](", s_cn_url, "05_mlem_pblup_sire.pdf)", collapse = "")
                            ))
 knitr::kable(tbl_chpt)
 ```
