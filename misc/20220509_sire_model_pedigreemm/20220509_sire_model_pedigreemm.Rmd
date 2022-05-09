@@ -1,0 +1,66 @@
+---
+title: "Sire Model - pedigreemm"
+output: html_notebook
+---
+
+# Disclaimer
+Fit a sire model with `pedigreemm`
+
+
+# Data
+
+```{r}
+tbl_sire_model <- tibble::tibble(Animal = c(4:8),
+                                 Sire   = c(1,3,1,4,3),
+                                 Sex    = c("M","F","F","M","M"),
+                                 WWG    = c(4.5, 2.9, 3.9, 3.5, 5.0))
+tbl_sire_model
+```
+
+Write the data to a file
+
+```{r}
+s_sire_data_path <- file.path(here::here(), "docs", "data", "wwg_sire_data.csv")
+if (!file.exists(s_sire_data_path))
+  readr::write_csv(tbl_sire_model, file = s_sire_data_path)
+```
+
+
+# Model
+According to Vazquez2010, a sire model can be fit by first getting the pedigree
+
+```{r}
+ped_sire <- pedigreemm::pedigree(sire = c(rep(NA,2), 1), dam = rep(NA,3), label = as.character(c(1,3,4)))
+pedigreemm::getA(ped = ped_sire)
+```
+
+The inverse of $A$ is 
+
+```{r}
+pedigreemm::getAInv(ped = ped_sire)
+```
+
+
+The mixed model fit is done via
+
+```{r}
+library(pedigreemm)
+lmem_sire <- pedigreemm(
+  formula = WWG ~ Sex + (1 | Sire), 
+  data = tbl_sire_model,
+  pedigree = list(Sire = ped_sire)
+)
+```
+
+The results 
+
+```{r}
+summary(lmem_sire)
+```
+
+The breeding values
+
+```{r}
+ranef(lmem_sire)
+```
+
