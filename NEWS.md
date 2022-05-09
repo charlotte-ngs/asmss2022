@@ -1,3 +1,7 @@
+# asmss2022 0.11.0
+
+* Pedigree BLUP sire model
+
 # asmss2022 0.10.1
 
 * Exercise asm_ex09
