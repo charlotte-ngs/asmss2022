@@ -1,3 +1,7 @@
+# asmss2022 0.11.2
+
+* Link to videos of lecture 11
+
 # asmss2022 0.11.1
 
 * Slides l10
