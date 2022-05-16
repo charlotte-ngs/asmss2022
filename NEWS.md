@@ -1,3 +1,7 @@
+# asmss2022 0.12.0
+
+* Course notes on Genomic BLUP
+
 # asmss2022 0.11.2
 
 * Link to videos of lecture 11
