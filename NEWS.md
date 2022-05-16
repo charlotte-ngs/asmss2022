@@ -1,6 +1,10 @@
+# asmss2022 0.12.2
+
+* Video of lecture 12
+
 # asmss2022 0.12.1
 
-* Slides l12
+* Slides for lecture 12
 
 # asmss2022 0.12.0
 
