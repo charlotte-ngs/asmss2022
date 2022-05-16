@@ -675,7 +675,7 @@ Z^TX  &  Z^TZ + \lambda_g * G^{-1}
 \left[ 
 \begin{array}{c}
 \hat{b} \\
-\hat{u}
+\hat{g}
 \end{array}
 \right]
 = 
