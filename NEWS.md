@@ -1,3 +1,7 @@
+# asmss2022 0.12.1
+
+* Slides l12
+
 # asmss2022 0.12.0
 
 * Course notes on Genomic BLUP
