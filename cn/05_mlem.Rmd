@@ -616,7 +616,7 @@ W^T1_n  &  W^TW + \lambda_q * I
 \right]
 \left[ 
 \begin{array}{c}
-\hat{\nu} \\
+\hat{\mu} \\
 \hat{q}
 \end{array}
 \right]
@@ -844,3 +844,49 @@ Equation \@ref(eq:GenomicBvAnimalNoPhen) is referred to as genomic regression of
 
 ## Single Step Genomic BLUP
 In real-world livestock breeding datasets not all animals are genotyped. But we want to have predicted breeding values for all animals in a population. Futhermore, the genomic information of the genotyped animals should also give more accurate predicted breeding values for related animals without genomic information.
+
+The single step genomic BLUP model can be specified as 
+
+\begin{equation}
+y = Xb + Zg + e
+(\#eq:singlestepgblupbvm)
+\end{equation}
+
+with $var(g) = H * \sigma_g^2$ and $var(e) = I * \sigma_e^2$. At this point it is important to note that the vector $g$ of genomic breeding values can be split into two parts
+
+$$g = \left[\begin{array}{c} g_1 \\ g_2 \end{array} \right]$$
+
+where $g_1$ is the vector of breeding values for non-genotyped animals and $g_2$ is the vector of genotyped animals.
+
+\begin{equation}
+\left[ 
+\begin{array}{cc}
+X^TX  &  X^TZ \\
+Z^TX  &  Z^TZ + \lambda * H^{-1}
+\end{array}
+\right]
+\left[ 
+\begin{array}{c}
+\hat{b} \\
+\hat{g}
+\end{array}
+\right]
+= 
+\left[ 
+\begin{array}{c}
+X^Ty \\
+Z^Ty
+\end{array}
+\right]
+(\#eq:singlestepmmemlem)
+\end{equation}
+
+where here $\lambda = \sigma_e^2 / \sigma_g^2$. 
+
+The above required inverse matrix $H^{-1}$ can be shown (e.g. in `r met$add("Legarra2014")`) to correspond to 
+
+$$H^{-1} = A^{-1} + \left(\begin{array}{cc} 0  &  0  \\  0  &  G^{-1} - A_{22}^{-1} \end{array} \right) $$
+
+where $A^{-1}$ is the inverse numerator relationship matrix and $A_22$ corresponds to the part of the numerator relationship matrix containing all genotyped animals.
+
+
