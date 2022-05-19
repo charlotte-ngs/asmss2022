@@ -1,0 +1,11 @@
+Lieber Pascal Urscheler,
+vielen Dank für ihre Fragen. Ich versuche es einmal mit ein paar Antworten.
+
+
+
+- Dummy Variable: Eine Dummy Variable ist eine Variable in einem linearen Modell, welche nicht kontinuierlich gemessen wurde, wie der Brustumfang. Ein Beispiel für eine Dummy Variable in einem linearen Modell ist die "Rasse" eines Tieres. Als Beispiel würde ich mir die Lösung zu Problem 2 in der Übung 3 (https://charlotte-ngs.github.io/asmss2022/sol/asm_ex03_sol.pdf) anschauen. Dort wird die Rasse als Dummy Variable in einem linearen Modell angepasst. Die Rasse ist eine Dummy Variable, weil sie nicht kontinuierlich messbar ist, wie der Brustumfang, sondern es gibt einfach eine diskrete Auswahl an Rassen. Diese Auswahl entsprechen dann den Effektstufen. Im Modell gibt es dann für jede Rasse einen separaten Effekt oder eine separate Dummy Variable. In der X-Matrix gibt es für die Dummy Variablen nur 0 oder 1 als Eintrag. Dies im Gegensatz zu einer Regressionsvariablen wie dem Brustumfang, wo der gemessene Wert des Brustumfangs in der X-Matrix eingetragen ist.
+
+- Estimable Functions (schätzbare Funktionen): Eine schätzbare Funktion ist eine Linearkombination aus einer Lösung der Least-Squares Normalgleichungen (Seite 35 von https://charlotte-ngs.github.io/asmss2022/cn/03_regdvar.pdf). Ein Beispiel dazu gibt es in der Lösung von Problem 3 der Übung 3 (https://charlotte-ngs.github.io/asmss2022/sol/asm_ex03_sol.pdf). Dort werden die Rassen als Einflussfaktor für das Körpergewicht modelliert. Da es sich bei der Rasse um eine Dummy Variable handelt, gibt es für die Normalgleichung nicht nur eine sondern unendlich viele Lösungen. Aus diesen Lösungen können aber gewisse Funktionen gebildet werden, welche unabhängig von der gewählten Lösung der Normalgleichung, immer gleich sind. Eine solche Funktion wird dann eine schätzbare Funktion genannt. Beispiele für schätzbare Funktionen gibt es in der Läsung von Problem 3 der Übung 3 (https://charlotte-ngs.github.io/asmss2022/sol/asm_ex03_sol.pdf). In diesem Beispiel wird das Körpergewicht als fixes lineares Modell der Rasse angepasst.
+
+- Contrasts
+
