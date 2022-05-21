@@ -1,0 +1,168 @@
+---
+title: "Pedigree Simulation Packages"
+output: html_notebook
+---
+
+## Disclaimer
+When teaching topics in livestock breeding and genomics, very often it is required to be able to generate a pedigree. Hence a good pedigree simulation tool would be required. In what follows, a short overview is provided.
+
+
+## Search
+The search is done by the term "pedigree simulation package in R" and the results are given under `https://www.google.com/search?q=pedigree+simulation+package+in+R&spell=1&sa=X&ved=2ahUKEwix59Oqle73AhUBPewKHU8TBSMQkeECKAB6BAgBEDg`. The following packages were selected for a short review.
+
+
+## pedsuite
+The package pedsuite (https://magnusdv.github.io/pedsuite/) seams a very up-to-date and modern-looking package with a website built with `pkgdown`. This suite consists of several tools of which `pedtools` seams to play a central role. From a first glance this suite seams to be targetted towards Human pedigrees. 
+
+We try an example with the following chunk
+
+```{r}
+s_ped_pkg <- "pedsuite"
+if (!is.element(s_ped_pkg, installed.packages())) 
+    install.packages(s_ped_pkg)
+```
+
+Create first pedigree
+
+```{r}
+library(pedsuite)
+p_cousin <- cousinPed(1, child = TRUE)
+plot(p_cousin)
+```
+
+The structure of the generated pedigree can be inspected by
+
+```{r}
+str(p_cousin)
+```
+
+As shown above, the pedigree object has the structure of a list. The individual fields are obtained via the standard list selection syntax. As an example, the following statement
+
+```{r}
+p_cousin$ID
+```
+
+returns the vector of IDs of all animals in the pedigree. The `pedsuite` does in principle not provide the functionality of simulating a pedigree. But it gives the possibility of constructing pedigrees of a specific structure. 
+
+
+## pedSimulate
+More information on the package `pedSimulate` can be obtained at `https://github.com/nilforooshan/pedSimulate`. The package `pedSimulate` provides the possibility of simulating a pedigree from scratch.
+
+```{r}
+s_ped_pkg <- "pedSimulate"
+if (!is.element(s_ped_pkg, installed.packages())) 
+    install.packages(s_ped_pkg)
+```
+
+According to the manual, a pedigree can be siumated with
+
+```{r}
+library(pedSimulate)
+ped <- simulatePed(
+  F0size = 4,
+  Va0 = 9,
+  Ve = 36,
+  littersize = 2,
+  ngen = 2,
+  overlap.s = 1,
+  m.rate = 0.5,
+  seed = 7391
+)
+```
+
+The structure of the generated pedigree is 
+
+```{r}
+str(ped)
+```
+
+Does plotting also work
+
+```{r}
+plot(ped)
+```
+
+Alternative using `pedsuite`
+
+```{r}
+vec_sex <- ped$SEX
+vec_sex[vec_sex == "m"] <- 1
+vec_sex[vec_sex == "f"] <- 2
+p_ped <- pedtools::ped(id = ped$ID, fid = ped$SIRE, mid = ped$DAM, sex = vec_sex)
+plot(p_ped)
+```
+
+As a tabular object
+
+```{r}
+ped
+```
+
+When looking at the values generated in columns `PA`, `MS`, `E` and `P` which are all related to the performance of an animal, it is not clear how these values are generated. Furthermore from what is seen from the documentation it is difficult to reproduce these numbers. 
+
+It could be possible that there is a general mean or the sex as fixed effect. Hence
+
+```{r}
+vec_males <- ped$ID[ped$SEX == "m"]
+vec_males
+```
+
+```{r}
+ped$P[vec_males] - ped$PA[vec_males] - ped$MS[vec_males] - ped$E[vec_males]
+```
+
+Same for females
+
+```{r}
+vec_females <- ped$ID[ped$SEX == "f"]
+vec_females
+
+```
+
+```{r}
+ped$P[vec_females] - ped$PA[vec_females] - ped$MS[vec_females] - ped$E[vec_females]
+```
+
+Since these constants are the same, there is no sex-effect but just a general mean.
+
+
+### Adding a fixed sex effect
+We want to add a fixed effect for sex
+
+```{r}
+vec_sex_eff <- c(3.1, -1.8)
+mat_X_sex <- model.matrix(lm(ped$P ~ 0 + ped$SEX))
+attr(mat_X_sex, "assign") <- NULL
+attr(mat_X_sex, "contrasts") <- NULL
+mat_X_sex
+```
+
+The sex effect to be added is computed as
+
+```{r}
+mat_sex_eff <- mat_X_sex %*% vec_sex_eff
+mat_sex_eff
+```
+
+Adding the sex effect to the pedigree data
+
+```{r}
+ped$P <- as.vector(ped$P + mat_sex_eff[,1])
+ped
+```
+
+
+## Write Data to File
+
+```{r}
+library(dplyr)
+tbl_ped <- tibble::as_tibble(ped)
+tbl_ped
+tbl_ped_data_out <- ped %>%
+  select(ID, SIRE, DAM, SEX, P)
+tbl_ped_data_out
+s_data_out_path <- file.path(here::here(), "docs", "data", "asm_ped_sim_data.csv")
+if (!file.exists(s_data_out_path))
+  readr::write_csv(tbl_ped_data_out, s_data_out_path)
+```
+
