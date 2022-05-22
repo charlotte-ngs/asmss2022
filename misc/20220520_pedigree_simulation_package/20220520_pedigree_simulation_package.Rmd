@@ -148,19 +148,31 @@ Adding the sex effect to the pedigree data
 
 ```{r}
 ped$P <- as.vector(ped$P + mat_sex_eff[,1])
+ped$P <- round(ped$P, digits = 1)
 ped
 ```
 
 
 ## Write Data to File
 
+Prepare output
+
 ```{r}
 library(dplyr)
 tbl_ped <- tibble::as_tibble(ped)
-tbl_ped
+# select relevant columns
 tbl_ped_data_out <- ped %>%
   select(ID, SIRE, DAM, SEX, P)
+# set unknown paretns to NA
+tbl_ped_data_out$SIRE[tbl_ped_data_out$SIRE == 0] <- NA
+tbl_ped_data_out$DAM[tbl_ped_data_out$DAM == 0] <- NA
+tbl_ped_data_out <- tbl_ped_data_out[(!is.na(tbl_ped_data_out$SIRE) & !is.na(tbl_ped_data_out$DAM)), ]
 tbl_ped_data_out
+```
+
+
+Write data to file
+```{r}
 s_data_out_path <- file.path(here::here(), "docs", "data", "asm_ped_sim_data.csv")
 if (!file.exists(s_data_out_path))
   readr::write_csv(tbl_ped_data_out, s_data_out_path)
