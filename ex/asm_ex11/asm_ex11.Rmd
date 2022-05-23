@@ -44,6 +44,11 @@ Predict genomic breeding values using a marker effects model. The dataset is ava
 cat(s_ex11_p01_data_path, "\n")
 ```
 
+### Hints
+
+* The variance $\sigma_q^2$ of the marker effect is $`r sigma_q2`$.
+* The residual variance $\sigma_e^2$ is $`r sigma_e2`$
+* The sex of each animal can be modelled as a fixed effect
 
 <!-- your-solution-start
 ### Your Solution
@@ -65,6 +70,7 @@ if (!params$isonline)
   s_ex11_p02_data_path <- file.path(here::here(), "docs", "data", "asm_geno_sim_data.csv")
 
 sigma_q2 <- 3
+sigma_g2 <- 3*sigma_q2
 sigma_e2 <- 36
 ```
 
@@ -72,6 +78,32 @@ Use the same dataset as in Problem 1 to predict genomic breeding values based on
 
 ```{r, echo=FALSE}
 cat(s_ex11_p02_data_path, "\n")
+```
+
+### Hints
+
+* The genomic variance $\sigma_g^2$ of the marker effect is $`r sigma_g2`$.
+* The residual variance $\sigma_e^2$ is $`r sigma_e2`$
+* The sex of each animal can be modelled as a fixed effect
+
+Use the following function to compute the genomic relationship matrix $G$ based on the matrix of genotypes
+
+```{r}
+computeMatGrm <- function(pmatData) {
+  matData <- pmatData
+  # check the coding, if matData is -1, 0, 1 coded, then add 1 to get to 0, 1, 2 coding
+  if (min(matData) < 0) matData <- matData + 1
+  # Allele frequencies, column vector of P and sum of frequency products
+  freq <- apply(matData, 2, mean) / 2
+  P <- 2 * (freq - 0.5)
+  sumpq <- sum(freq*(1-freq))
+  # Changing the coding from (0,1,2) to (-1,0,1) and subtract matrix P
+  Z <- matData - 1 - matrix(P, nrow = nrow(matData), 
+                             ncol = ncol(matData), 
+                             byrow = TRUE)
+  # Z%*%Zt is replaced by tcrossprod(Z)
+  return(tcrossprod(Z)/(2*sumpq))
+}
 ```
 
 <!-- your-solution-start

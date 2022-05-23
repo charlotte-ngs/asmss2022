@@ -398,5 +398,7 @@ order(mat_sol_sire[3:nrow(mat_sol_sire)], decreasing = TRUE)
 order(mat_sol[3:nrow(mat_sol)], decreasing = TRUE)
 ```
 
+The order of the sires is the same under both models
+
 <!-- master-solution-end -->
  

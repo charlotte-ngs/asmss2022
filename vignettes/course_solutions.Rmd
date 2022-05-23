@@ -18,7 +18,7 @@ This page contains solutions to exercises.
 
 ```{r, echo=FALSE, results='asis'}
 s_url_sol <- "https://charlotte-ngs.github.io/asmss2022/sol/"
-tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
+tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
                          Date = c("2022-02-28",
                                   "2022-03-07",
                                   "2022-03-14",
@@ -27,7 +27,8 @@ tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
                                   "2022-04-04",
                                   "2022-04-11",
                                   "2022-04-25",
-                                  "2022-05-02"),
+                                  "2022-05-02",
+                                  "2022-05-23"),
                          Topic = c(
                            paste0("[Linear Regression](", s_url_sol, "asm_ex01_sol.pdf)",  collapse = ""),
                            paste0("[Linear Regression (Part 2)](", s_url_sol, "asm_ex02_sol.pdf)",  collapse = ""),
@@ -37,7 +38,8 @@ tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
                            paste0("[Experimental Verification](", s_url_sol, "asm_ex06_sol.pdf)", collapse = "") ,
                            paste0("[Model Selection](", s_url_sol, "asm_ex07_sol.pdf)", collapse = ""),
                            paste0("[ANOVA and Random Effects Models](", s_url_sol, "asm_ex08_sol.pdf)", collapse = ""),
-                           paste0("[Sire Model](", s_url_sol, "asm_ex09_sol.pdf)", collapse = "")
+                           paste0("[Sire Model](", s_url_sol, "asm_ex09_sol.pdf)", collapse = ""),
+                           paste0("[Comparison of Sire Model and Animal Model](", s_url_sol, "asm_ex10_sol.pdf)", collapse = "")
                          ))
 knitr::kable(tbl_sol)
 ```
