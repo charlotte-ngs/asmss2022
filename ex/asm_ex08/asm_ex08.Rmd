@@ -131,7 +131,7 @@ aov_ex08_p01 <- aov(`Body Weight` ~ Breed + Error(Animal), data = tbl_rep_obs_re
 (smry_aov_ex08_p01 <- summary(aov_ex08_p01))
 ```
 
-The results of the `aov()` analysis gives estimates for the residual error variance $\sigma_e^2$ and for the variance $\sigma_a^2$ within the repeated measurements of one animal. The estimate $\widehat{\sigma_e^2}$ is directly obtained from the section `Error: Within` in the column `Mean Sq`. 
+The results of the `aov()` analysis gives estimates for the residual error variance $\sigma_e^2$ and for the variance $\sigma_a^2$ between animals. The estimate $\widehat{\sigma_e^2}$ is directly obtained from the section `Error: Within` in the column `Mean Sq`. 
 
 ```{r}
 n_hat_sigmae2 <- smry_aov_ex08_p01$`Error: Within`[[1]]["Residuals","Mean Sq"]
