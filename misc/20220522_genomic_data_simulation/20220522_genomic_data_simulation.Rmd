@@ -1,0 +1,142 @@
+---
+title: "Genomic Simulation"
+output: html_notebook
+---
+
+## Disclaimer
+Use pedigree simulation as the basis to simulate genomic data.
+
+
+## Simulaiton
+Based on the pedigree simulation, we start with
+
+```{r}
+library(pedSimulate)
+ped <- simulatePed(
+  F0size = 4,
+  Va0 = 3,
+  Ve = 36,
+  littersize = 2,
+  ngen = 2,
+  overlap.s = 1,
+  m.rate = 0.5,
+  seed = 2980
+)
+```
+
+As a check, the pedigree as a tabular object is obtained by 
+
+```{r}
+ped
+```
+
+
+## Genotypes
+Adding genotypes can be done by
+
+```{r}
+set.seed(1579)
+n_nr_SNP <- 100
+AF <- runif(n_nr_SNP, 0.1, 0.9)
+gen <- simulateGen(ped  = ped,
+                   AF   = AF,
+                   seed = 6984)
+```
+
+The structure of the simulated data is given by
+
+```{r}
+str(gen)
+```
+
+As tabular object
+
+```{r}
+gen[,1:10]
+```
+
+What are the frequencies
+
+```{r}
+table(gen[,1])
+```
+
+
+## Marker Effects
+Select a number of markers which have a non-zero effect
+
+```{r}
+vec_non_zero_mrk <- c(3, 31, 73)
+vec_mrk_eff <- vector("numeric", length = n_nr_SNP)
+vec_mrk_eff[vec_non_zero_mrk] <- c(1.7, 3.1, 7.7)
+```
+
+The effect to be added to the phenotype is computed as the matrix dot product of the genotype matrix times the vector of marker effects.
+
+```{r}
+vec_p_to_add <- gen %*% vec_mrk_eff
+vec_p_to_add[1:10]
+```
+
+Adding the genomic contributions
+
+```{r}
+ped$P <- as.vector(ped$P + vec_p_to_add)
+ped
+```
+
+
+## Preparing data for Output
+
+```{r}
+tbl_gen <- tibble::as_tibble(gen)
+tbl_gen
+```
+
+A vector ov column names
+
+```{r}
+vec_col_names <- sapply(1:n_nr_SNP, function(x) paste0("SNP", x, collapse = ""), USE.NAMES = FALSE)
+vec_col_names
+```
+
+```{r}
+colnames(tbl_gen) <- vec_col_names
+tbl_gen
+```
+
+Append genotypes to ped
+
+```{r}
+library(dplyr)
+tbl_ped <- tibble::as_tibble(ped)
+# select relevant columns
+tbl_ped_data_out <- ped %>%
+  select(ID, SIRE, DAM, SEX, P)
+# set unknown paretns to NA
+tbl_ped_data_out$SIRE[tbl_ped_data_out$SIRE == 0] <- NA
+tbl_ped_data_out$DAM[tbl_ped_data_out$DAM == 0] <- NA
+tbl_gen_data_out <- tbl_gen[(!is.na(tbl_ped_data_out$SIRE) & !is.na(tbl_ped_data_out$DAM)), ]
+
+tbl_ped_data_out <- tbl_ped_data_out[(!is.na(tbl_ped_data_out$SIRE) & !is.na(tbl_ped_data_out$DAM)), ]
+
+# remove founder genotypes
+tbl_gen_data_out <- dplyr::bind_cols(tbl_ped_data_out, tbl_gen_data_out)
+tbl_gen_data_out
+```
+
+Further preparation
+
+```{r}
+# rouding
+tbl_gen_data_out$P <- round(tbl_gen_data_out$P, digits = 1)
+tbl_gen_data_out
+```
+
+Write data to a file
+
+```{r}
+s_data_out_path <- file.path(here::here(), "docs", "data", "asm_geno_sim_data.csv")
+if (!file.exists(s_data_out_path))
+  readr::write_csv(tbl_gen_data_out, s_data_out_path)
+```

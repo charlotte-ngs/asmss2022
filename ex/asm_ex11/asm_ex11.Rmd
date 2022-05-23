@@ -1,0 +1,103 @@
+---
+title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 11
+author: Peter von Rohr
+date: 2022-05-22
+output:
+  bookdown::pdf_document2:
+    toc: false
+    number_sections: false
+    keep_md: false
+    keep_tex: false
+header-includes:
+ \usepackage{longtable}
+ \usepackage{float}
+params:
+  doctype:
+    label: 'Document Type'
+    value: 'solution'
+    choices: ['exercise', 'solution', 'notebook']
+  isonline:
+    label: 'Online (y/n)'
+    value: TRUE
+    choices: [TRUE, FALSE]
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Problem 1: Marker Effects Model
+```{r ex11p01-setup, echo=FALSE}
+s_ex11_p01_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_geno_sim_data.csv"
+if (!params$isonline)
+  s_ex11_p01_data_path <- file.path(here::here(), "docs", "data", "asm_geno_sim_data.csv")
+
+sigma_q2 <- 3
+sigma_e2 <- 36
+```
+
+Predict genomic breeding values using a marker effects model. The dataset is available from
+
+```{r, echo=FALSE}
+cat(s_ex11_p01_data_path, "\n")
+```
+
+
+<!-- your-solution-start
+### Your Solution
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+
+
+## Problem 2: Breeding Value Based Model
+```{r ex11p02-setup, echo=FALSE}
+s_ex11_p02_data_path <- "https://charlotte-ngs.github.io/asmss2022/data/asm_geno_sim_data.csv"
+if (!params$isonline)
+  s_ex11_p02_data_path <- file.path(here::here(), "docs", "data", "asm_geno_sim_data.csv")
+
+sigma_q2 <- 3
+sigma_e2 <- 36
+```
+
+Use the same dataset as in Problem 1 to predict genomic breeding values based on a breeding-value model. The dataset is available from
+
+```{r, echo=FALSE}
+cat(s_ex11_p02_data_path, "\n")
+```
+
+<!-- your-solution-start
+### Your Solution
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+
+
+## Problem 3
+
+<!-- your-solution-start
+### Your Solution
+
+---  your-solution-end -->
+
+
+<!-- master-solution-start -->
+
+### Solution
+
+<!-- master-solution-end -->
+ 
