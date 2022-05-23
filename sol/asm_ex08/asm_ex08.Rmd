@@ -18,7 +18,7 @@ params:
     choices: ['exercise', 'solution', 'notebook']
   isonline:
     label: 'Online (y/n)'
-    value: FALSE
+    value: TRUE
     choices: [TRUE, FALSE]
 ---
 
@@ -96,11 +96,11 @@ sd_bw <- sd(tbl_ex08_p01$`Body Weight`)
 tbl_rep_obs_result <- NULL
 for (idx in 1:nrow(tbl_ex08_p01)){
   tbl_rep_cur <- dplyr::bind_rows(tbl_ex08_p01[idx,],
-                                  tibble::tibble(Animal = c(rep(tbl_ex08_p01$Animal[idx], n_nr_rep - 1)),
-                                                 `Body Weight` = rnorm((n_nr_rep-1), 
-                                                                       mean = tbl_ex08_p01$`Body Weight`[idx], 
-                                                                       sd = n_sd_prop_bw * sd_bw),
-                                                 Breed = c(rep(tbl_ex08_p01$Breed[idx], n_nr_rep-1))))
+                   tibble::tibble(Animal = c(rep(tbl_ex08_p01$Animal[idx], n_nr_rep - 1)),
+                                 `Body Weight` = rnorm((n_nr_rep-1), 
+                                  mean = tbl_ex08_p01$`Body Weight`[idx], 
+                                  sd = n_sd_prop_bw * sd_bw),
+                                  Breed = c(rep(tbl_ex08_p01$Breed[idx], n_nr_rep-1))))
   if (is.null(tbl_rep_obs_result)){
     tbl_rep_obs_result <- tbl_rep_cur
   } else {
