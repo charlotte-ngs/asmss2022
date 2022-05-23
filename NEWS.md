@@ -1,3 +1,7 @@
+# asmss2022 0.13.0
+
+* Exercises asm_ex10 and asm_ex11 and Test Exam
+
 # asmss2022 0.12.2
 
 * Video of lecture 12
