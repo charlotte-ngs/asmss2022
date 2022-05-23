@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPTDIR=/home/quagadmin/courses/asmss2022/bash
-DIRTOFETCH=ex/asm_ex09
+DIRTOFETCH=ex/asm_ex11
 # DIRTOFETCH=sol/asm_ex06
 TESTSTUDENT=/home/quagadmin/courses/asmss2022/students/test_student_usernames_asmss2022.txt
 STUDENTUSER=/home/quagadmin/courses/asmss2022/students/student_usernames_asmss2022.txt

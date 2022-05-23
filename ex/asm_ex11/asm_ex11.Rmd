@@ -144,10 +144,31 @@ mat_wty <- crossprod(mat_W, vec_y)
 mat_rhs <- rbind(mat_xty, mat_wty)
 # solution
 mat_sol <- solve(mat_coef, mat_rhs)
-mat_sol[1:10,]
+# partition solutions
+vec_sol_fix <- mat_sol[1:2,]
+vec_sol_marker <- mat_sol[3:nrow(mat_sol),]
 ```
 
-* Compute predicted genomic breeding values based on the estimated marker effects
+The solution for the estimates of the fixed effects are: 
+
+```{r}
+vec_sol_fix
+```
+
+The solutions for the first few marker effects are
+
+```{r}
+vec_sol_marker[1:10]
+```
+
+
+* Compute predicted genomic breeding values based on the estimated marker effects. The predicted genomic breeding values are obtained by the matrix-multiplication of matrix $W$ times the vector of the estimated marker effects.
+
+```{r}
+mat_mem_gbv <- crossprod(t(mat_W), vec_sol_marker)
+mat_mem_gbv
+```
+
 
 <!-- master-solution-end -->
 
@@ -210,6 +231,154 @@ computeMatGrm <- function(pmatData) {
 <!-- master-solution-start -->
 
 ### Solution
+
+* Read the data
+
+```{r}
+tbl_ex11_p02 <- readr::read_csv(s_ex11_p02_data_path)
+tbl_ex11_p02
+```
+
+* Compute the inverse genomic relationship matrix using the given function for the genomic relationship matrix. The genomic relationship matrix $G$ is computed using the above given function with the matrix $W$ from the marker effect model as an argument.
+
+The matrix $W$
+
+```{r}
+library(dplyr)
+tbl_geno_ex11_p02 <- tbl_ex11_p02 %>%
+  select(SNP1:SNP100)
+mat_W <- as.matrix(tbl_geno_ex11_p01)
+```
+
+The genomic relationship matrix $G$
+
+```{r}
+mat_G <- computeMatGrm(pmatData = mat_W)
+mat_G
+```
+
+We have to check whether $G$ can be inverted. This is done by computing the rank of the matrix
+
+```{r}
+Matrix::rankMatrix(mat_G)
+```
+
+This shows that matrix $G$ does not have full column rank. Hence we add $0.05 * I$ to get to matrix $G^*$. 
+
+```{r}
+mat_G_star <- mat_G + 0.05 * diag(1, nrow = nrow(mat_G))
+Matrix::rankMatrix(mat_G_star)
+```
+
+Matrix $G^*$ can be used as genomic relationship matrix.
+
+* Setup mixed model equations to predict genomic breeding values. The breeding value based model is given by 
+
+$$ y = Xb + Zg + e$$
+where $y$ is the vector of observations, $b$ is the vector of fixed effects and $g$ is the vector of random genomic breeding values. The matrices $X$ and $Z$ are design matrices. 
+
+The mixed model equations are
+
+$$
+\left[ 
+\begin{array}{cc}
+X^TX  &  X^TZ \\
+Z^TX  &  Z^TZ + \lambda_g * (G^*)^{-1}
+\end{array}
+\right]
+\left[ 
+\begin{array}{c}
+\hat{b} \\
+\hat{g}
+\end{array}
+\right]
+= 
+\left[ 
+\begin{array}{c}
+X^Ty \\
+Z^Ty
+\end{array}
+\right]
+$$
+
+with $\lambda_g = \sigma_e^2 / \sigma_g^2$. 
+
+The matrix $X$
+
+```{r}
+mat_X <- model.matrix(lm(P ~ 0 + SEX, data = tbl_ex11_p02))
+attr(mat_X, "assign") <- NULL
+attr(mat_X, "contrasts") <- NULL
+colnames(mat_X) <- NULL
+mat_X
+```
+
+The matrix $Z$
+
+```{r}
+# model matrix from data
+mat_Z <- model.matrix(lm(P ~ 0 + as.factor(ID), data = tbl_ex11_p02))
+attr(mat_Z, "assign") <- NULL
+attr(mat_Z, "contrasts") <- NULL
+colnames(mat_Z) <- NULL
+mat_Z
+```
+
+The vector $y$
+
+```{r}
+vec_y <- tbl_ex11_p02$P
+vec_y
+```
+
+The mixed model equations are
+
+```{r}
+# coefficient matrix
+mat_xtx <- crossprod(mat_X)
+mat_xtz <- crossprod(mat_X, mat_Z)
+mat_ztx <- t(mat_xtz)
+lambda_g <- sigma_e2 / sigma_g2
+mat_ztz_g_inv_lambda <- crossprod(mat_Z) + lambda_g * mat_G_star
+mat_coef <- rbind(cbind(mat_xtx, mat_xtz), cbind(mat_ztx, mat_ztz_g_inv_lambda))
+# right hand side
+mat_xty <- crossprod(mat_X, vec_y)
+mat_zty <- crossprod(mat_Z, vec_y)
+mat_rhs <- rbind(mat_xty, mat_zty)
+# solution
+mat_sol <- solve(mat_coef, mat_rhs)
+# partition the solution
+vec_sol_fix <- mat_sol[1:2,]
+vec_sol_gbv <- mat_sol[3:nrow(mat_sol),]
+```
+
+The solution for the estimated fixed effects are 
+
+```{r}
+vec_sol_fix
+```
+
+The predicted genomic breeding values are
+
+```{r}
+vec_sol_gbv
+```
+
+Comparing order of animals according to predicted genomic breeding values from Problem 1 and Problem 2:
+
+* marker effect model
+
+```{r}
+order(mat_mem_gbv[,1], decreasing = TRUE)
+```
+
+* breeding value based model
+
+```{r}
+order(vec_sol_gbv, decreasing = TRUE)
+```
+
+
 
 <!-- master-solution-end -->
 
