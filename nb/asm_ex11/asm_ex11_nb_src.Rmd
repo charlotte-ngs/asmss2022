@@ -1,26 +1,24 @@
 ---
-title: Applied Statistical Methods - `r tools::toTitleCase(params$doctype)` 11
+title: Applied Statistical Methods - Notebook 11
 author: Peter von Rohr
-date: 2022-05-22
-output:
-  bookdown::pdf_document2:
-    toc: false
-    number_sections: false
-    keep_md: false
-    keep_tex: false
-header-includes:
- \usepackage{longtable}
- \usepackage{float}
+date: '2022-05-22'
+output: html_notebook
 params:
   doctype:
-    label: 'Document Type'
-    value: 'solution'
-    choices: ['exercise', 'solution', 'notebook']
+    label: Document Type
+    value: solution
+    choices:
+    - exercise
+    - solution
+    - notebook
   isonline:
-    label: 'Online (y/n)'
-    value: TRUE
-    choices: [TRUE, FALSE]
+    label: Online (y/n)
+    value: true
+    choices:
+    - true
+    - false
 ---
+
 
 
 ```{r setup, include=FALSE}
@@ -50,106 +48,14 @@ cat(s_ex11_p01_data_path, "\n")
 * The residual variance $\sigma_e^2$ is $`r sigma_e2`$
 * The sex of each animal can be modelled as a fixed effect
 
-<!-- your-solution-start
 ### Your Solution
 
 * Read the data
 * Setup mixed model equations to predict marker effects for all the SNP-loci
 * Compute predicted genomic breeding values based on the estimated marker effects
 
----  your-solution-end -->
 
 
-<!-- master-solution-start -->
-
-### Solution
-
-* Read the data
-
-```{r}
-tbl_ex11_p01 <- readr::read_csv(s_ex11_p01_data_path)
-tbl_ex11_p01
-```
-
-* Setup mixed model equations to predict marker effects for all the SNP-loci. The model is given as 
-
-$$y = Xb + Wq + e$$
-where $y$ is the vector of observations, $b$ is the vector of fixed effects and $q$ is the vector of random marker effects for each SNP. The matrices $X$ and $W$ are design matrices. The matrix $W$ is special because it contains the genotype encodings. 
-
-From that model the mixed model equations can be specified as
-
-$$ 
-\left[ 
-\begin{array}{cc}
-X^TX  &  X^TW \\
-W^TX  &  W^TW + \lambda_q * I
-\end{array}
-\right]
-\left[ 
-\begin{array}{c}
-\hat{b} \\
-\hat{q}
-\end{array}
-\right]
-= 
-\left[ 
-\begin{array}{c}
-X^Ty \\
-W^Ty
-\end{array}
-\right]
-$$
-with $\lambda_q = \sigma_e^2 / \sigma_q^2$. 
-
-The matrix $X$
-
-```{r}
-mat_X <- model.matrix(lm(P ~ 0 + SEX, data = tbl_ex11_p01))
-attr(mat_X, "assign") <- NULL
-attr(mat_X, "contrasts") <- NULL
-mat_X
-```
-
-The matrix $W$
-
-```{r}
-library(dplyr)
-tbl_geno_ex11_p01 <- tbl_ex11_p01 %>%
-  select(SNP1:SNP100)
-mat_W <- as.matrix(tbl_geno_ex11_p01)
-mat_W[,1:10]
-```
-
-The vector $y$
-
-```{r}
-vec_y <- tbl_ex11_p01$P
-vec_y
-```
-
-The mixed model equations
-
-```{r}
-# coefficient matrix
-mat_xtx <- crossprod(mat_X)
-mat_xtw <- crossprod(mat_X, mat_W)
-mat_wtx <- t(mat_xtw)
-lambda_q <- sigma_e2 / sigma_q2
-mat_ztz_lambda_I <- crossprod(mat_W) + lambda_q * diag(1, nrow = ncol(mat_W))
-mat_coef <- rbind(cbind(mat_xtx, mat_xtw), 
-                  cbind(mat_wtx, mat_ztz_lambda_I))
-# right hand side
-mat_xty <- crossprod(mat_X, vec_y)
-mat_wty <- crossprod(mat_W, vec_y)
-mat_rhs <- rbind(mat_xty, mat_wty)
-# solution
-mat_sol <- solve(mat_coef, mat_rhs)
-mat_sol[1:10,]
-```
-
-* Compute predicted genomic breeding values based on the estimated marker effects
-
-<!-- master-solution-end -->
 
 
 ## Problem 2: Breeding Value Based Model
@@ -197,19 +103,18 @@ computeMatGrm <- function(pmatData) {
 * If the genomic relationship matrix $G$ which is computed by the function above cannot be inverted, add $0.05 * I$ to $G$ which results in $G^*$ and use $G^*$ as genomic relationship matrix.
 
 
-<!-- your-solution-start
 ### Your Solution
 
 * Read the data
 * Compute the inverse genomic relationship matrix using the given function for the genomic relationship matrix
 * Setup mixed model equations to predict genomic breeding values
 
----  your-solution-end -->
 
 
-<!-- master-solution-start -->
 
-### Solution
 
-<!-- master-solution-end -->
 
+```{r, echo=FALSE, results='asis'}
+cat('\n---\n\n _Latest Changes: ', format(Sys.time(), '%Y-%m-%d %H:%M:%S'), ' (', Sys.info()['user'], ')_\n', sep = '')
+```
+ 
