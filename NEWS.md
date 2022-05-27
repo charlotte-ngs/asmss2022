@@ -1,3 +1,7 @@
+# asmss2022 0.13.2
+
+* Solution for test exam
+
 # asmss2022 0.13.1
 
 * Deployed solution to asm_ex11
