@@ -18,7 +18,7 @@ This page contains solutions to exercises.
 
 ```{r, echo=FALSE, results='asis'}
 s_url_sol <- "https://charlotte-ngs.github.io/asmss2022/sol/"
-tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
                          Date = c("2022-02-28",
                                   "2022-03-07",
                                   "2022-03-14",
@@ -28,6 +28,7 @@ tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
                                   "2022-04-11",
                                   "2022-04-25",
                                   "2022-05-02",
+                                  "2022-05-23",
                                   "2022-05-23",
                                   "2022-05-23"),
                          Topic = c(
@@ -41,7 +42,8 @@ tbl_sol <- tibble::tibble(Nr = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
                            paste0("[ANOVA and Random Effects Models](", s_url_sol, "asm_ex08_sol.pdf)", collapse = ""),
                            paste0("[Sire Model](", s_url_sol, "asm_ex09_sol.pdf)", collapse = ""),
                            paste0("[Comparison of Sire Model and Animal Model](", s_url_sol, "asm_ex10_sol.pdf)", collapse = ""),
-                           paste0("[Genomic Prediction](", s_url_sol, "asm_ex11_sol.pdf)", collapse = "")
+                           paste0("[Genomic Prediction](", s_url_sol, "asm_ex11_sol.pdf)", collapse = ""),
+                           paste0("[Test Exam](", s_url_sol, "asmss2021_exam_sol_test.pdf)", collapse = "")
                          ))
 knitr::kable(tbl_sol)
 ```
