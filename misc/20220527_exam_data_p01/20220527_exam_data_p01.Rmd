@@ -1,0 +1,69 @@
+---
+title: "Exam ASM 2022 Problem 1"
+output: html_notebook
+---
+
+# Disclaimer
+Data on slaughter weight and sex used in Problem 1 are generated.
+
+
+# Assumptions
+Constants and effects are specified
+
+```{r}
+n_mean_sw <- 287.3
+n_sd_sw <- 9.5
+n_eff_castrate <- 7.1
+n_eff_female <- -13.8
+n_eff_male <- 5.9
+# true vector of effects
+vec_eff_sex <- c(n_mean_sw, n_eff_castrate, n_eff_female, n_eff_male)
+# tibble without data, but with assignment of sex to animals
+n_nr_rec <- 12
+tbl_sw <- tibble::tibble(Animal = c(1:n_nr_rec),
+                         Sex    = c(rep("female", 4),
+                                    rep("castrate", 4),
+                                    rep("male", 4)),
+                         `Slaughter Weight` = rep(0, n_nr_rec))
+# model matrix
+mat_X <- model.matrix(lm(`Slaughter Weight` ~ 0 + Sex, data = tbl_sw))
+attr(mat_X, "assign") <- NULL
+attr(mat_X, "contrasts") <- NULL
+colnames(mat_X) <- NULL
+mat_X <- cbind(matrix(1, nrow = n_nr_rec, ncol = 1), mat_X)
+mat_X
+```
+
+Use the design matrix, the effects and the resiudals to produce the data vector.
+
+```{r}
+set.seed(6723)
+mat_sw <- mat_X %*% vec_eff_sex + rnorm(n_nr_rec, mean = 0, sd = n_sd_sw)
+mat_sw
+```
+
+Add observations to tibble
+
+```{r}
+tbl_sw$`Slaughter Weight` <- round(mat_sw[,1], digits = 1)
+tbl_sw
+```
+
+Write the data to a csv-file
+
+```{r}
+s_exam_data_p01 <- file.path(here::here(), "docs", "data", "asm_exam_p01.csv")
+if (!file.exists(s_exam_data_p01))
+  readr::write_csv(tbl_sw, s_exam_data_p01)
+```
+
+
+## Fitting the Linear Model
+
+```{r}
+lm_sw <- lm(`Slaughter Weight` ~ Sex, data = tbl_sw)
+summary(lm_sw)
+```
+
+
+

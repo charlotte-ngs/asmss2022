@@ -1,0 +1,90 @@
+---
+title: "ASM Exam Data Problem 2"
+output: html_notebook
+---
+
+# Background
+According to https://www.sciencedirect.com/science/article/pii/S1751731121001683#t0005 methane emission per cow and year ($E$) can be computed as 
+
+$$E = F * \alpha$$
+
+where $F$ is the total dry matter intake per cow and year. Because this is a multiplicative model, we take logarithms to get a linear regression where 
+
+$$log(E) = log(F * \alpha) = log(\alpha) + log(F)$$
+
+Hence using logarithms, we can use it as data for a linear regression
+
+```{r}
+# methane in kgg per kg DM
+alpha <- 20.72/1000
+log(alpha)
+
+# mean CH4 emmission in kg per year
+n_mean_ch4 <- 120
+n_sd_shrink_ch4 <- 10
+n_sd_ch4 <- 31/n_sd_shrink_ch4
+
+# DMI
+n_mean_dmi <- n_mean_ch4 / alpha
+n_mean_dmi
+```
+
+```{r}
+n_sd_dmi <- n_sd_ch4 / alpha
+nd_sd_shrink_dmi <- 4
+n_sd_dmi <- n_sd_dmi / nd_sd_shrink_dmi
+n_sd_dmi
+```
+
+
+# Data
+
+```{r}
+set.seed(1532)
+n_nr_rec_p2 <- 15
+vec_log_ch4 <- rnorm(n_nr_rec_p2, mean = log(n_mean_ch4), sd = log(n_sd_ch4))
+summary(vec_log_ch4)
+```
+
+
+```{r}
+vec_log_dmi <- rnorm(n_nr_rec_p2, mean = log(n_mean_dmi), sd = log(n_sd_dmi))
+summary(vec_log_dmi)
+```
+
+
+Use a model for `lCH4``
+
+```{r}
+n_ch4_dmi_beta <- 1.531
+vec_log_ch4_fit <- n_ch4_dmi_beta * vec_log_dmi + log(alpha)/n_sd_shrink_ch4 + rnorm(n_nr_rec_p2, sd = n_sd_ch4)
+mean(vec_log_ch4_fit)
+```
+
+
+```{r}
+tbl_ch4_dmi <- tibble::tibble(Animal = c(1:n_nr_rec_p2),
+                              lDMI = round(vec_log_dmi, digits = 2), 
+                              lCH4 = round(vec_log_ch4_fit, digits = 2))
+tbl_ch4_dmi
+
+```
+
+
+Show a plot
+
+```{r}
+library(ggplot2)
+ggplot(data = tbl_ch4_dmi, aes(x = lDMI, y = lCH4)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, aes(color = "red"), show.legend = FALSE) 
+
+```
+
+# Save Data to File
+
+```{r}
+s_exam_data_p02 <- file.path(here::here(), "docs", "data", "asm_exam_p02.csv")
+if (!file.exists(s_exam_data_p02))
+  readr::write_csv(tbl_ch4_dmi, s_exam_data_p02)
+```

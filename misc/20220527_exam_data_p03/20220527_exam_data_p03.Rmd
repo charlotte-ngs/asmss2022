@@ -1,0 +1,67 @@
+---
+title: "ASM Exam Data Problem 3"
+output: html_notebook
+---
+
+Use a sample of the dataset `pedigreemm::milk` to do model selection
+
+```{r}
+n_nr_rec_p3 <- 20
+set.seed(7212)
+vec_sample_idx <- sample(nrow(pedigreemm::milk), n_nr_rec_p3)
+vec_sample_idx
+```
+
+Get the records
+
+```{r}
+tbl_milk_p03 <- tibble::as_tibble(pedigreemm::milk[vec_sample_idx,])
+tbl_milk_p03
+```
+
+Select only the columns `lact` and `dim` and the response `fat`. 
+
+```{r}
+library(dplyr)
+tbl_milk_p03 <- tbl_milk_p03 %>% select(id, lact, dim, fat)
+tbl_milk_p03
+```
+
+Add a random column and call it hei
+
+```{r}
+n_mean_hei <- 149
+n_sd_hei <- 2.12
+vec_hei <- rnorm(n_nr_rec_p3, mean = n_mean_hei, sd = n_sd_hei)
+tbl_milk_p03$hei <- as.integer(vec_hei)
+tbl_milk_p03
+```
+
+
+
+
+
+Model selection
+
+```{r}
+lm_milk_full <- lm(fat ~ lact + dim + hei, data = tbl_milk_p03)
+summary(lm_milk_full)
+```
+
+
+```{r}
+olsrr::ols_step_best_subset(lm_milk_full)
+```
+
+```{r}
+summary(aov(fat ~ lact + dim + hei, data = tbl_milk_p03))
+```
+
+
+# Save Data to File
+
+```{r}
+s_exam_data_p03 <- file.path(here::here(), "docs", "data", "asm_exam_p03.csv")
+if (!file.exists(s_exam_data_p03))
+  readr::write_csv(tbl_milk_p03, s_exam_data_p03)
+```

@@ -1,0 +1,10 @@
+Dear Students,
+Please find below the links to the datasets that will be used in the exam of Applied Statistical Methods.
+Good luck and best regards, 
+Peter von Rohr
+
+https://charlotte-ngs.github.io/asmss2022/data/asm_exam_p01.csv
+https://charlotte-ngs.github.io/asmss2022/data/asm_exam_p02.csv
+https://charlotte-ngs.github.io/asmss2022/data/asm_exam_p03.csv
+https://charlotte-ngs.github.io/asmss2022/data/asm_exam_p04.csv
+https://charlotte-ngs.github.io/asmss2022/data/asm_exam_p05.csv 

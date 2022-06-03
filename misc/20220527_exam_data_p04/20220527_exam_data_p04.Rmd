@@ -1,0 +1,92 @@
+---
+title: "ASM Exam Data Problem 4"
+output: html_notebook
+---
+
+Use the package `pedSimulate` to generate a pedigree with data
+
+```{r}
+library(pedSimulate)
+ped <- simulatePed(
+  F0size = 4,
+  Va0 = 16,
+  Ve = 64,
+  littersize = 2,
+  ngen = 2,
+  overlap.s = 1,
+  m.rate = 0.5,
+  seed = 1973
+)
+```
+
+Show the data
+
+```{r}
+ped
+```
+
+Replace dam 4 with NA and remove the record of that animal
+
+```{r}
+ped$DAM[ped$DAM == 4] <- NA
+ped <- ped[-4,]
+ped
+```
+
+Adapt IDs
+
+```{r}
+ped$ID <- 1:nrow(ped)
+ped$SIRE[which(ped$SIRE > 4)] <- ped$SIRE[which(ped$SIRE > 4)] - 1
+ped$DAM[which(ped$DAM > 4)] <- ped$DAM[which(ped$DAM > 4)] - 1
+ped
+```
+
+
+
+### Adding a fixed sex effect
+We want to add a fixed effect for sex
+
+```{r}
+vec_sex_eff <- c(-5.1, 3.7)
+mat_X_sex <- model.matrix(lm(ped$P ~ 0 + ped$SEX))
+attr(mat_X_sex, "assign") <- NULL
+attr(mat_X_sex, "contrasts") <- NULL
+mat_X_sex
+```
+
+```{r}
+mat_sex_eff <- mat_X_sex %*% vec_sex_eff
+mat_sex_eff
+```
+
+```{r}
+ped$P <- as.vector(ped$P + mat_sex_eff[,1])
+ped$P <- round(ped$P, digits = 1)
+ped
+```
+
+## Write Data to File
+
+Prepare output
+
+```{r}
+library(dplyr)
+tbl_ped <- tibble::as_tibble(ped)
+# select relevant columns
+tbl_ped_data_out <- ped %>%
+  select(ID, SIRE, DAM, SEX, P)
+# set unknown paretns to NA
+tbl_ped_data_out$SIRE[tbl_ped_data_out$SIRE == 0] <- NA
+tbl_ped_data_out$DAM[tbl_ped_data_out$DAM == 0] <- NA
+tbl_ped_data_out <- tbl_ped_data_out %>% filter(ID > 3)
+tbl_ped_data_out
+```
+
+Write data to file
+```{r}
+s_data_out_path <- file.path(here::here(), "docs", "data", "asm_exam_p04.csv")
+if (!file.exists(s_data_out_path))
+  readr::write_csv(tbl_ped_data_out, s_data_out_path)
+```
+
